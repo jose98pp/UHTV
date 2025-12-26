@@ -1,0 +1,219 @@
+<?php
+
+namespace App\Services;
+
+use App\Repositories\NoticiaRepository;
+use App\Services\ImageValidationService;
+use App\Services\ContentSanitizationService;
+use App\Models\Category;
+use App\Models\Noticia;
+use Illuminate\Support\Facades\Cache;
+
+class NewsService
+{
+    public function __construct(
+        private NoticiaRepository $noticiaRepository,
+        private ImageValidationService $imageValidationService,
+        private ContentSanitizationService $contentSanitizationService
+    ) {}
+
+    /**
+     * Obtener datos para la página principal
+     */
+    public function getHomePageData()
+    {
+        return Cache::remember('homepage_data', 300, function () {
+            // Obtener noticias principales para el carrusel
+            $noticias = $this->noticiaRepository->getPublishedNews(10);
+            
+            // Obtener categorías con múltiples noticias (como Brújula Digital)
+            $categorias = $this->noticiaRepository->getCategoriesWithNews(4);
+            
+            // Obtener últimas noticias
+            $ultimasNoticias = $this->noticiaRepository->getPublishedNews(12);
+            
+            // Procesar noticias con contenido sanitizado e imágenes seguras
+            $noticias = $noticias->map(function ($noticia) {
+                return $this->processNewsItem($noticia);
+            });
+            
+            $ultimasNoticias = $ultimasNoticias->map(function ($noticia) {
+                return $this->processNewsItem($noticia);
+            });
+            
+            // Procesar noticias de categorías con contenido sanitizado e imágenes seguras
+            foreach ($categorias as $categoria) {
+                if ($categoria->noticias) {
+                    $categoria->noticias = $categoria->noticias->map(function ($noticia) {
+                        return $this->processNewsItem($noticia);
+                    });
+                }
+            }
+
+            // Obtener noticias por cada categoría individual para secciones específicas
+            $noticiasPorCategoria = [];
+            foreach ($categorias as $categoria) {
+                $noticiasCategoria = $this->noticiaRepository->getNewsByCategory($categoria->id, 6);
+                $noticiasPorCategoria[$categoria->id] = $noticiasCategoria->map(function ($noticia) {
+                    return $this->processNewsItem($noticia);
+                });
+            }
+
+            // Obtener "más leídas" (placeholder)
+            $masLeidas = $this->noticiaRepository->getPublishedNews(4);
+            $masLeidas = $masLeidas->map(function ($noticia) {
+                return $this->processNewsItem($noticia);
+            });
+            
+            return [
+                'noticias' => $noticias,
+                'categorias' => $categorias,
+                'ultimasNoticias' => $ultimasNoticias,
+                'noticiasPorCategoria' => $noticiasPorCategoria,
+                'masLeidas' => $masLeidas,
+            ];
+        });
+    }
+
+    /**
+     * Obtener datos para página de categoría con paginación
+     */
+    public function getCategoryPageData($categoryId, $perPage = 10)
+    {
+        // Obtener la categoría
+        $categoria = Category::findOrFail($categoryId);
+        
+        // Obtener noticias de la categoría con paginación
+        $noticiasCategoria = Noticia::where('category_id', $categoryId)
+            ->where('publicada', true)
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
+        
+        // Procesar noticias de la categoría con contenido sanitizado e imágenes seguras
+        $noticiasCategoria->getCollection()->transform(function ($noticia) {
+            return $this->processNewsItem($noticia);
+        });
+        
+        // Obtener noticias relacionadas (otras categorías)
+        $noticias = $this->noticiaRepository->getNewsExcludingCategory($categoryId, 6);
+        
+        // Procesar noticias relacionadas con contenido sanitizado e imágenes seguras
+        $noticias = $noticias->map(function ($noticia) {
+            return $this->processNewsItem($noticia);
+        });
+        
+        // Obtener todas las categorías para navegación
+        $categorias = Cache::remember('all_categories', 600, function () {
+            return Category::all();
+        });
+
+        return compact('categoria', 'noticiasCategoria', 'noticias', 'categorias');
+    }
+
+    /**
+     * Obtener datos para página de detalle de noticia
+     */
+    public function getNewsDetailData($newsId)
+    {
+        $noticia = $this->noticiaRepository->getPublishedNewsById($newsId);
+        
+        // Procesar noticia principal con contenido sanitizado e imagen segura
+        $noticia = $this->processNewsItem($noticia);
+        $imagenUrl = $noticia->imagenUrl;
+        
+        // Obtener y procesar noticias relacionadas
+        $noticias = $this->noticiaRepository->getRelatedNews($newsId, 5);
+        $noticias = $noticias->map(function ($noticia) {
+            return $this->processNewsItem($noticia);
+        });
+        
+        $categorias = Cache::remember('all_categories', 600, function () {
+            return Category::all();
+        });
+
+        return compact('noticia', 'noticias', 'categorias', 'imagenUrl');
+    }
+
+    /**
+     * Obtener URL segura de imagen (método legacy - usa ImageValidationService internamente)
+     * 
+     * @deprecated Usar ImageValidationService::getImageUrlOrDefault() directamente
+     */
+    public function getSecureImageUrl($imagePath)
+    {
+        return $this->imageValidationService->getImageUrlOrDefault($imagePath);
+    }
+
+    /**
+     * Buscar noticias
+     */
+    public function searchNews($term, $limit = 10)
+    {
+        if (empty(trim($term))) {
+            return collect();
+        }
+
+        return $this->noticiaRepository->searchNews($term, $limit);
+    }
+
+    /**
+     * Obtener estadísticas del dashboard
+     */
+    public function getDashboardStats()
+    {
+        return Cache::remember('dashboard_stats', 300, function () {
+            return $this->noticiaRepository->getNewsStats();
+        });
+    }
+
+    /**
+     * Get sanitized content for display
+     */
+    public function getSanitizedContent(?string $content): string
+    {
+        if (empty($content)) {
+            return '';
+        }
+        
+        return $this->contentSanitizationService->processRichTextContent($content);
+    }
+    
+    /**
+     * Get clean excerpt for previews
+     */
+    public function getCleanExcerpt(?string $content, int $length = 200): string
+    {
+        if (empty($content)) {
+            return '';
+        }
+        
+        return $this->contentSanitizationService->getCleanExcerpt($content, $length);
+    }
+    
+    /**
+     * Process news item with sanitized content and secure image URL
+     */
+    public function processNewsItem($noticia): object
+    {
+        $noticia->imagenUrl = $this->imageValidationService->getImageUrlOrDefault($noticia->imagen);
+        $noticia->contenidoSanitizado = $this->getSanitizedContent($noticia->contenido ?? '');
+        $noticia->excerptLimpio = $this->getCleanExcerpt($noticia->contenido ?? '', 120);
+        return $noticia;
+    }
+    
+    /**
+     * Limpiar caché relacionado con noticias
+     */
+    public function clearNewsCache()
+    {
+        Cache::forget('homepage_data');
+        Cache::forget('all_categories');
+        Cache::forget('dashboard_stats');
+        
+        // Limpiar caché de categorías específicas si es necesario
+        $categories = Category::all();
+        foreach ($categories as $category) {
+            Cache::forget("category_{$category->id}_data");
+        }
+    }
+}
