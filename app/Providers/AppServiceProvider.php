@@ -29,20 +29,22 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Compartir banners con todas las vistas
-        try {
-            if (\Illuminate\Support\Facades\Schema::hasTable('banners')) {
-                $banners = \App\Models\Banner::active()
-                    ->orderBy('position')
-                    ->get()
-                    ->groupBy('location');
-                
-                \Illuminate\Support\Facades\View::share('banners', $banners);
+        // Compartir banners con todas las vistas (solo en peticiones web, no en consola/tests)
+        if (!$this->app->runningInConsole()) {
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('banners')) {
+                    $banners = \App\Models\Banner::active()
+                        ->orderBy('position')
+                        ->get()
+                        ->groupBy('location');
+                    
+                    \Illuminate\Support\Facades\View::share('banners', $banners);
+                }
+            } catch (\Exception $e) {
+                // Si falla (ej. durante migración), no detener la app
+                \Illuminate\Support\Facades\Log::error('Error loading banners: ' . $e->getMessage());
+                \Illuminate\Support\Facades\View::share('banners', collect());
             }
-        } catch (\Exception $e) {
-            // Si falla (ej. durante migración), no detener la app
-            \Illuminate\Support\Facades\Log::error('Error loading banners: ' . $e->getMessage());
-            \Illuminate\Support\Facades\View::share('banners', collect());
         }
     }
 }

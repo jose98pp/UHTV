@@ -21,18 +21,64 @@ class ImageUrlHelper
             return self::getDefaultImageUrl();
         }
 
-        // Verificar si la imagen existe
-        if (!Storage::disk('public')->exists($imagePath)) {
+        $resolvedPath = self::resolveImagePath($imagePath);
+
+        // Si no se pudo resolver la imagen, devolver imagen por defecto
+        if (!$resolvedPath) {
             return self::getDefaultImageUrl();
         }
 
         // Si hay CDN configurado, usarlo
         if (Config::get('images.cdn.enabled')) {
-            return self::getCdnUrl($imagePath, $size);
+            return self::getCdnUrl($resolvedPath, $size);
         }
 
         // URL local estándar
-        return asset('storage/' . $imagePath);
+        return asset('storage/' . $resolvedPath);
+    }
+
+    /**
+     * Resolver la ruta real de una imagen aunque haya sido movida a una subcarpeta por categoría.
+     *
+     * @param string|null $imagePath
+     * @return string|null
+     */
+    public static function resolveImagePath(?string $imagePath): ?string
+    {
+        if (empty($imagePath)) {
+            return null;
+        }
+
+        $normalizedPath = trim(str_replace('\\', '/', $imagePath), '/');
+        $normalizedPath = preg_replace('#^(storage|public)/#', '', $normalizedPath) ?? $normalizedPath;
+        $normalizedPath = ltrim($normalizedPath, '/');
+
+        if (empty($normalizedPath)) {
+            return null;
+        }
+
+        if (Storage::disk('public')->exists($normalizedPath)) {
+            return $normalizedPath;
+        }
+
+        $basename = basename($normalizedPath);
+        $candidates = [$normalizedPath];
+
+        if ($normalizedPath !== $basename) {
+            $candidates[] = $basename;
+            $candidates[] = 'noticias/' . $basename;
+        }
+
+        foreach ($candidates as $candidate) {
+            if (Storage::disk('public')->exists($candidate)) {
+                return $candidate;
+            }
+        }
+
+        // Evitar escanear todo el disco (puede consumir mucha memoria en discos grandes).
+        // En su lugar solo intentamos rutas deterministas construidas arriba.
+        // Si no se encuentra, devolvemos null para que el caller pueda decidir (migrator, logs, etc.).
+        return null;
     }
 
     /**
@@ -190,15 +236,17 @@ class ImageUrlHelper
             ];
         }
 
-        $exists = Storage::disk('public')->exists($imagePath);
+        $resolvedPath = self::resolveImagePath($imagePath);
+        $exists = !empty($resolvedPath);
         
         return [
             'path' => $imagePath,
+            'resolved_path' => $resolvedPath,
             'exists' => $exists,
             'using_default' => !$exists,
             'url' => self::getImageUrl($imagePath),
-            'size' => $exists ? Storage::disk('public')->size($imagePath) : null,
-            'last_modified' => $exists ? Storage::disk('public')->lastModified($imagePath) : null,
+            'size' => $exists ? Storage::disk('public')->size($resolvedPath) : null,
+            'last_modified' => $exists ? Storage::disk('public')->lastModified($resolvedPath) : null,
             'responsive_urls' => self::getResponsiveImageUrls($imagePath),
         ];
     }

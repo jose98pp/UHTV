@@ -82,7 +82,8 @@ class RichTextEditorTest extends TestCase
                 'titulo' => 'Test News with Rich Content',
                 'contenido' => $richContent,
                 'category_id' => $this->category->id,
-                'publicada' => true
+                'publicada' => true,
+                'imagen' => new UploadedFile(public_path('images/Logo.jpg'), 'Logo.jpg', 'image/jpeg', null, true)
             ]);
 
         $response->assertRedirect(route('admin.noticias.index'));
@@ -186,7 +187,8 @@ class RichTextEditorTest extends TestCase
                 'titulo' => 'Test XSS Protection',
                 'contenido' => $dangerousContent,
                 'category_id' => $this->category->id,
-                'publicada' => false
+                'publicada' => false,
+                'imagen' => new UploadedFile(public_path('images/Logo.jpg'), 'Logo.jpg', 'image/jpeg', null, true)
             ]);
 
         $response->assertRedirect(route('admin.noticias.index'));
@@ -336,7 +338,7 @@ class RichTextEditorTest extends TestCase
         $this->assertNull($error);
 
         $longContent = str_repeat('Very long content. ', 3000);
-        $error = $this->sanitizationService->validateContentLength($longContent);
+        $error = $this->sanitizationService->validateContentLength($longContent, 50000);
         $this->assertStringContainsString('excede el límite máximo', $error);
     }
 
@@ -491,7 +493,8 @@ class RichTextEditorTest extends TestCase
                 'titulo' => 'Complex HTML Test',
                 'contenido' => $complexContent,
                 'category_id' => $this->category->id,
-                'publicada' => false
+                'publicada' => false,
+                'imagen' => new UploadedFile(public_path('images/Logo.jpg'), 'Logo.jpg', 'image/jpeg', null, true)
             ]);
 
         $response->assertRedirect(route('admin.noticias.index'));
@@ -533,7 +536,8 @@ class RichTextEditorTest extends TestCase
                 'titulo' => 'News with Image',
                 'contenido' => $contentWithImage,
                 'category_id' => $this->category->id,
-                'publicada' => false
+                'publicada' => false,
+                'imagen' => new UploadedFile(public_path('images/Logo.jpg'), 'Logo.jpg', 'image/jpeg', null, true)
             ]);
 
         $response->assertRedirect(route('admin.noticias.index'));
@@ -554,7 +558,8 @@ class RichTextEditorTest extends TestCase
                 'titulo' => 'Special Characters Test',
                 'contenido' => $specialContent,
                 'category_id' => $this->category->id,
-                'publicada' => false
+                'publicada' => false,
+                'imagen' => new UploadedFile(public_path('images/Logo.jpg'), 'Logo.jpg', 'image/jpeg', null, true)
             ]);
 
         $response->assertRedirect(route('admin.noticias.index'));
@@ -607,7 +612,8 @@ class RichTextEditorTest extends TestCase
                 'titulo' => 'Normal Size Content',
                 'contenido' => $normalContent,
                 'category_id' => $this->category->id,
-                'publicada' => false
+                'publicada' => false,
+                'imagen' => new UploadedFile(public_path('images/Logo.jpg'), 'Logo.jpg', 'image/jpeg', null, true)
             ]);
 
         $response->assertRedirect(route('admin.noticias.index'));
@@ -706,7 +712,8 @@ class RichTextEditorTest extends TestCase
                 'titulo' => 'Comprehensive XSS Test',
                 'contenido' => $maliciousContent,
                 'category_id' => $this->category->id,
-                'publicada' => false
+                'publicada' => false,
+                'imagen' => new UploadedFile(public_path('images/Logo.jpg'), 'Logo.jpg', 'image/jpeg', null, true)
             ]);
 
         $response->assertRedirect(route('admin.noticias.index'));

@@ -24,6 +24,12 @@ class PortadaController extends Controller
 
    public function show($id)
     {
+        // Incrementar contador de vistas
+        $noticia = Noticia::where('id', $id)->where('publicada', true)->first();
+        if ($noticia) {
+            $noticia->increment('views');
+        }
+        
         $data = $this->newsService->getNewsDetailData($id);
         
         return view('show', $data);

@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Schema;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -84,7 +85,13 @@ class User extends Authenticatable
      */
     public function updateLastLogin()
     {
-        $this->update(['last_login_at' => now()]);
+        try {
+            if (Schema::hasColumn('users', 'last_login_at')) {
+                $this->update(['last_login_at' => now()]);
+            }
+        } catch (\Exception $e) {
+            // Do nothing if column doesn't exist
+        }
     }
 
     /**

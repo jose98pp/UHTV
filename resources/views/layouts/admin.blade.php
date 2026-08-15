@@ -18,6 +18,41 @@
     
     @vite(['resources/css/app.css', 'resources/js/app.jsx'])
     
+    <!-- Script de inicialización inmediata para modo oscuro -->
+    <script>
+        (function() {
+            try {
+                const DARK_MODE_KEY = 'uhtv-dark-mode';
+                const savedTheme = localStorage.getItem(DARK_MODE_KEY);
+                const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                
+                const shouldBeDark = savedTheme === 'dark' || (!savedTheme && systemPrefersDark);
+                
+                if (shouldBeDark) {
+                    document.documentElement.classList.add('dark');
+                    if (document.body) {
+                        document.body.classList.add('dark');
+                    }
+                    document.documentElement.style.colorScheme = 'dark';
+                    document.documentElement.setAttribute('data-bs-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    if (document.body) {
+                        document.body.classList.remove('dark');
+                    }
+                    document.documentElement.style.colorScheme = 'light';
+                    document.documentElement.setAttribute('data-bs-theme', 'light');
+                }
+                
+                window.darkModeImmediateInit = true;
+                window.darkModeInitialState = shouldBeDark;
+                
+            } catch (e) {
+                console.warn('Error in immediate dark mode initialization:', e);
+            }
+        })();
+    </script>
+    
     <style>
         .sidebar-transition {
             transition: transform 0.3s ease-in-out;
@@ -80,10 +115,10 @@
     
     @stack('styles')
 </head>
-<body class="bg-gray-100 font-sans">
-    <div class="flex h-screen">
+<body class="bg-light">
+    <div class="d-flex" style="min-height: 100vh;">
         <!-- Sidebar -->
-        <div id="sidebar" class="admin-sidebar text-white w-64 min-h-screen flex flex-col sidebar-transition position-relative">
+        <div id="sidebar" class="admin-sidebar text-white sidebar-transition position-relative" style="min-width: 256px; min-height: 100vh; display: flex; flex-direction: column;">
             <!-- Logo -->
             <div class="p-4 border-bottom border-light border-opacity-25">
                 <div class="d-flex align-items-center">
@@ -112,8 +147,15 @@
                            class="nav-link-admin d-flex align-items-center text-white text-decoration-none p-3 {{ request()->routeIs('admin.noticias.*') ? 'active' : '' }}">
                             <i class="fas fa-newspaper me-3"></i>
                             <span>Noticias</span>
-                            @if(auth()->user()->noticias()->count() > 0)
-                                <span class="badge bg-light text-dark ms-auto">{{ auth()->user()->noticias()->count() }}</span>
+                            @php
+                                try {
+                                    $noticiasCount = auth()->user()->noticias()->count();
+                                } catch (\Exception $e) {
+                                    $noticiasCount = 0;
+                                }
+                            @endphp
+                            @if($noticiasCount > 0)
+                                <span class="badge bg-light text-dark ms-auto">{{ $noticiasCount }}</span>
                             @endif
                         </a>
                     </li>
@@ -214,14 +256,36 @@
                         <div class="d-none d-md-flex gap-3">
                             <div class="stat-card-mini p-2 text-center" style="min-width: 80px;">
                                 <div class="small text-muted">Noticias</div>
-                                <div class="fw-bold text-primary">{{ auth()->user()->noticias()->count() }}</div>
+                                <div class="fw-bold text-primary">
+                                    @php
+                                        try {
+                                            echo auth()->user()->noticias()->count();
+                                        } catch (\Exception $e) {
+                                            echo 0;
+                                        }
+                                    @endphp
+                                </div>
                             </div>
                             <div class="stat-card-mini p-2 text-center" style="min-width: 80px;">
                                 <div class="small text-muted">Publicadas</div>
-                                <div class="fw-bold text-success">{{ auth()->user()->noticias()->where('publicada', true)->count() }}</div>
+                                <div class="fw-bold text-success">
+                                    @php
+                                        try {
+                                            echo auth()->user()->noticias()->where('publicada', true)->count();
+                                        } catch (\Exception $e) {
+                                            echo 0;
+                                        }
+                                    @endphp
+                                </div>
                             </div>
                         </div>
                         
+                        <!-- Toggle de modo oscuro -->
+                        <button data-dark-mode-toggle class="btn btn-link text-muted p-2 me-2" type="button" aria-label="Cambiar modo oscuro">
+                            <i class="fas fa-sun sun-icon fa-lg hidden"></i>
+                            <i class="fas fa-moon moon-icon fa-lg"></i>
+                        </button>
+
                         <!-- Notifications -->
                         <div class="dropdown">
                             <button class="btn btn-link text-muted position-relative p-2" type="button" data-bs-toggle="dropdown">
@@ -373,6 +437,9 @@
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
     </script>
+    
+    <!-- Dark Mode Script -->
+    <script src="{{ asset('js/dark-mode.js') }}"></script>
     
     @stack('scripts')
 </body>

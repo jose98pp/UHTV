@@ -176,11 +176,13 @@ class MigrateImagesToCategories extends Command
         try {
             $backupPath = 'backups/full_migration_' . now()->format('Y_m_d_H_i_s');
             
-            // Copiar todo el directorio de noticias
-            $files = Storage::disk('public')->allFiles('noticias');
-            
+            $files = [];
+            $this->imageStorageService->streamNewsFiles(function (string $relativePath) use (&$files): void {
+                $files[] = $relativePath;
+            });
+
             $this->output->progressStart(count($files));
-            
+
             foreach ($files as $file) {
                 $backupFilePath = $backupPath . '/' . $file;
                 Storage::disk('public')->copy($file, $backupFilePath);

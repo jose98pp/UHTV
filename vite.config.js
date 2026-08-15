@@ -61,11 +61,11 @@ export default defineConfig({
                         if (assetInfo.name.includes('app')) {
                             return `css/core/app-[hash:8][extname]`;
                         }
-                        if (assetInfo.name.includes('dark-mode')) {
-                            return `css/themes/dark-mode-[hash:8][extname]`;
-                        }
                         if (assetInfo.name.includes('show-dark-mode')) {
                             return `css/pages/show-dark-mode-[hash:8][extname]`;
+                        }
+                        if (assetInfo.name.includes('dark-mode')) {
+                            return `css/themes/dark-mode-[hash:8][extname]`;
                         }
                         if (assetInfo.name.includes('browser-compatibility')) {
                             return `css/compatibility/browser-compat-[hash:8][extname]`;

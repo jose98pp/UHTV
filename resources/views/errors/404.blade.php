@@ -35,11 +35,6 @@
                    class="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200 font-medium">
                     <i class="fas fa-home mr-2"></i>Ir a la Portada
                 </a>
-                
-                <a href="{{ route('admin.login') }}" 
-                   class="block w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition duration-200 font-medium">
-                    <i class="fas fa-user-shield mr-2"></i>Panel de Administración
-                </a>
             </div>
         </div>
 

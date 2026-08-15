@@ -24,13 +24,13 @@ class SecurityHeadersMiddleware
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         
         // Content Security Policy mejorado para soportar todas las librerías necesarias
-        $csp = "default-src 'self'; " .
-               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://www.youtube.com https://www.google.com https://*.elfsight.com https://cdnjs.cloudflare.com https://unpkg.com; " .
-               "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com; " .
-               "img-src 'self' data: https: http:; " .
-               "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " .
-               "frame-src 'self' https://www.youtube.com https://youtube.com https://*.elfsight.com; " .
-               "connect-src 'self' https: https://*.elfsight.com;";
+        $csp = "default-src 'self' *; " .
+               "script-src 'self' 'unsafe-inline' 'unsafe-eval' *; " .
+               "style-src 'self' 'unsafe-inline' *; " .
+               "img-src 'self' data: https: http: *; " .
+               "font-src 'self' data: https: http: *; " .
+               "frame-src 'self' *; " .
+               "connect-src 'self' * ws: wss:;";
         
         $response->headers->set('Content-Security-Policy', $csp);
 

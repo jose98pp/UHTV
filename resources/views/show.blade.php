@@ -100,7 +100,7 @@
             </header>
 
             <!-- Imagen Principal -->
-            @if($noticia->imagen)
+            @if($noticia->has_valid_image)
                 <figure class="mb-12">
                     <div class="relative overflow-hidden rounded-2xl shadow-2xl">
                         <img src="{{ $imagenUrl }}" 

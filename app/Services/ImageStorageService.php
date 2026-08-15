@@ -3,11 +3,14 @@
 namespace App\Services;
 
 use App\Models\Category;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Carbon\Carbon;
+use FilesystemIterator;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 class ImageStorageService
 {
@@ -35,39 +38,26 @@ class ImageStorageService
 
     /**
      * Almacenar imagen organizándola por categoría
-     *
-     * @param UploadedFile $file
-     * @param int $categoryId
-     * @return string|null Ruta de la imagen almacenada
-     * @throws \Exception
      */
     public function storeImageByCategory(UploadedFile $file, int $categoryId): ?string
     {
         try {
-            // Validar el archivo
             $this->validateImageFile($file);
 
-            // Obtener información de la categoría
             $category = Category::find($categoryId);
             if (!$category) {
                 throw new \Exception('Categoría no encontrada');
             }
 
-            // Crear estructura de directorios (solo por categoría, sin fecha)
             $categorySlug = Str::slug($category->name);
             $directory = self::BASE_DIRECTORY . '/' . $categorySlug;
-
-            // Generar nombre único para el archivo
             $fileName = $this->generateUniqueFileName($file, $categoryId);
-
-            // Almacenar el archivo
             $storedPath = $file->storeAs($directory, $fileName, 'public');
 
             if (!$storedPath) {
                 throw new \Exception('Error al almacenar el archivo');
             }
 
-            // Verificar que el archivo se almacenó correctamente
             if (!$this->imageValidationService->validateImagePath($storedPath)) {
                 Storage::disk('public')->delete($storedPath);
                 throw new \Exception('Error en la validación post-almacenamiento');
@@ -77,16 +67,15 @@ class ImageStorageService
                 'path' => $storedPath,
                 'category' => $category->name,
                 'original_name' => $file->getClientOriginalName(),
-                'size' => $file->getSize()
+                'size' => $file->getSize(),
             ]);
 
             return $storedPath;
-
         } catch (\Exception $e) {
             Log::error('Error al almacenar imagen por categoría', [
                 'error' => $e->getMessage(),
                 'category_id' => $categoryId,
-                'file_name' => $file->getClientOriginalName() ?? 'unknown'
+                'file_name' => $file->getClientOriginalName() ?? 'unknown',
             ]);
             throw $e;
         }
@@ -94,59 +83,57 @@ class ImageStorageService
 
     /**
      * Mover imagen existente a nueva estructura de categorías
-     *
-     * @param string $currentPath
-     * @param int $categoryId
-     * @return string|null Nueva ruta de la imagen
      */
     public function moveImageToCategory(string $currentPath, int $categoryId): ?string
     {
         try {
-            // Validar que la imagen actual existe
+            $resolvedPath = \App\Helpers\ImageUrlHelper::resolveImagePath($currentPath);
+
+            if ($resolvedPath && $resolvedPath !== $currentPath) {
+                Log::info('Imagen ya resolvible en la nueva estructura, se reutiliza la ruta encontrada', [
+                    'original' => $currentPath,
+                    'resolved' => $resolvedPath,
+                    'category_id' => $categoryId,
+                ]);
+                return $resolvedPath;
+            }
+
             if (!$this->imageValidationService->validateImagePath($currentPath)) {
                 Log::warning('Imagen no encontrada para mover', ['path' => $currentPath]);
                 return null;
             }
 
-            // Obtener información de la categoría
             $category = Category::find($categoryId);
             if (!$category) {
                 throw new \Exception('Categoría no encontrada');
             }
 
-            // Crear nueva estructura de directorios (solo por categoría, sin fecha)
             $categorySlug = Str::slug($category->name);
             $directory = self::BASE_DIRECTORY . '/' . $categorySlug;
-
-            // Obtener información del archivo actual
             $fileName = basename($currentPath);
             $newPath = $directory . '/' . $fileName;
 
-            // Verificar si ya existe un archivo con el mismo nombre
             if (Storage::disk('public')->exists($newPath)) {
-                // Generar nuevo nombre único
                 $pathInfo = pathinfo($fileName);
                 $fileName = $pathInfo['filename'] . '_' . time() . '.' . $pathInfo['extension'];
                 $newPath = $directory . '/' . $fileName;
             }
 
-            // Mover el archivo
             if (Storage::disk('public')->move($currentPath, $newPath)) {
                 Log::info('Imagen movida exitosamente', [
                     'from' => $currentPath,
                     'to' => $newPath,
-                    'category' => $category->name
+                    'category' => $category->name,
                 ]);
                 return $newPath;
-            } else {
-                throw new \Exception('Error al mover el archivo');
             }
 
+            throw new \Exception('Error al mover el archivo');
         } catch (\Exception $e) {
             Log::error('Error al mover imagen a categoría', [
                 'error' => $e->getMessage(),
                 'current_path' => $currentPath,
-                'category_id' => $categoryId
+                'category_id' => $categoryId,
             ]);
             return null;
         }
@@ -154,32 +141,28 @@ class ImageStorageService
 
     /**
      * Eliminar imagen de forma segura
-     *
-     * @param string $imagePath
-     * @return bool
      */
     public function deleteImage(string $imagePath): bool
     {
         try {
             if ($this->imageValidationService->validateImagePath($imagePath)) {
                 $deleted = Storage::disk('public')->delete($imagePath);
-                
+
                 if ($deleted) {
                     Log::info('Imagen eliminada exitosamente', ['path' => $imagePath]);
                 } else {
                     Log::warning('No se pudo eliminar la imagen', ['path' => $imagePath]);
                 }
-                
+
                 return $deleted;
             }
-            
+
             Log::warning('Intento de eliminar imagen inexistente', ['path' => $imagePath]);
             return false;
-            
         } catch (\Exception $e) {
             Log::error('Error al eliminar imagen', [
                 'error' => $e->getMessage(),
-                'path' => $imagePath
+                'path' => $imagePath,
             ]);
             return false;
         }
@@ -187,9 +170,6 @@ class ImageStorageService
 
     /**
      * Obtener todas las imágenes de una categoría
-     *
-     * @param int $categoryId
-     * @return array
      */
     public function getImagesByCategory(int $categoryId): array
     {
@@ -201,28 +181,59 @@ class ImageStorageService
 
             $categorySlug = Str::slug($category->name);
             $categoryDirectory = self::BASE_DIRECTORY . '/' . $categorySlug;
+            $files = [];
 
-            $files = Storage::disk('public')->allFiles($categoryDirectory);
-            
-            return array_filter($files, function ($file) {
-                $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-                return in_array($extension, self::ALLOWED_EXTENSIONS);
+            $this->streamNewsFiles(function (string $relativePath) use (&$files, $categoryDirectory): void {
+                if (strpos($relativePath, $categoryDirectory) !== 0) {
+                    return;
+                }
+
+                $extension = strtolower(pathinfo($relativePath, PATHINFO_EXTENSION));
+                if (in_array($extension, self::ALLOWED_EXTENSIONS, true)) {
+                    $files[] = $relativePath;
+                }
             });
 
+            return $files;
         } catch (\Exception $e) {
             Log::error('Error al obtener imágenes por categoría', [
                 'error' => $e->getMessage(),
-                'category_id' => $categoryId
+                'category_id' => $categoryId,
             ]);
             return [];
         }
     }
 
     /**
+     * Iterar los archivos de noticias sin cargar todo el árbol en memoria.
+     */
+    public function streamNewsFiles(callable $callback): void
+    {
+        $basePath = storage_path('app/public/' . self::BASE_DIRECTORY);
+        if (!is_dir($basePath)) {
+            return;
+        }
+
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($basePath, FilesystemIterator::SKIP_DOTS)
+        );
+
+        $prefixLength = strlen(storage_path('app/public/'));
+
+        foreach ($iterator as $fileInfo) {
+            if (!$fileInfo->isFile()) {
+                continue;
+            }
+
+            $fullPath = $fileInfo->getPathname();
+            $relativePath = str_replace('\\', '/', substr($fullPath, $prefixLength));
+            $relativePath = ltrim($relativePath, '/');
+            $callback($relativePath);
+        }
+    }
+
+    /**
      * Crear backup de imagen antes de operaciones críticas
-     *
-     * @param string $imagePath
-     * @return string|null Ruta del backup
      */
     public function createImageBackup(string $imagePath): ?string
     {
@@ -238,17 +249,16 @@ class ImageStorageService
             if (Storage::disk('public')->copy($imagePath, $backupPath)) {
                 Log::info('Backup de imagen creado', [
                     'original' => $imagePath,
-                    'backup' => $backupPath
+                    'backup' => $backupPath,
                 ]);
                 return $backupPath;
             }
 
             return null;
-
         } catch (\Exception $e) {
             Log::error('Error al crear backup de imagen', [
                 'error' => $e->getMessage(),
-                'path' => $imagePath
+                'path' => $imagePath,
             ]);
             return null;
         }
@@ -256,62 +266,87 @@ class ImageStorageService
 
     /**
      * Migrar todas las imágenes existentes a la nueva estructura
-     *
-     * @return array Resultado de la migración
      */
-    public function migrateExistingImages(): array
+    public function migrateExistingImages(bool $dryRun = false): array
     {
         $results = [
             'migrated' => 0,
             'failed' => 0,
             'skipped' => 0,
-            'errors' => []
+            'errors' => [],
         ];
 
         try {
-            // Obtener todas las noticias con imágenes
-            $noticias = \App\Models\Noticia::whereNotNull('imagen')
+            $categorySlugs = Category::all()->mapWithKeys(function ($category) {
+                return [$category->id => Str::slug($category->name)];
+            })->toArray();
+
+            \App\Models\Noticia::whereNotNull('imagen')
                 ->where('imagen', '!=', '')
                 ->with('category')
-                ->get();
+                ->chunk(200, function ($noticias) use (&$results, $categorySlugs, $dryRun): void {
+                    foreach ($noticias as $noticia) {
+                        try {
+                            if (!$noticia->category) {
+                                $results['skipped']++;
+                                continue;
+                            }
 
-            foreach ($noticias as $noticia) {
-                try {
-                    if (!$noticia->category) {
-                        $results['skipped']++;
-                        continue;
+                            $categorySlug = $categorySlugs[$noticia->category_id] ?? Str::slug($noticia->category->name);
+                            if (Str::contains($noticia->imagen, $categorySlug)) {
+                                $results['skipped']++;
+                                continue;
+                            }
+
+                            $basename = basename($noticia->imagen);
+                            $candidates = [
+                                $noticia->imagen,
+                                self::BASE_DIRECTORY . '/' . $basename,
+                                self::BASE_DIRECTORY . '/' . $categorySlug . '/' . $basename,
+                            ];
+
+                            $found = null;
+                            foreach ($candidates as $candidate) {
+                                if (Storage::disk('public')->exists($candidate)) {
+                                    $found = $candidate;
+                                    break;
+                                }
+                            }
+
+                            if ($found) {
+                                if ($dryRun) {
+                                    $results['migrated']++;
+                                } else {
+                                    $noticia->update(['imagen' => $found]);
+                                    $results['migrated']++;
+                                }
+                                continue;
+                            }
+
+                            if ($dryRun) {
+                                $results['failed']++;
+                                $results['errors'][] = "Imagen no encontrada (dry-run) para noticia ID: {$noticia->id} - {$noticia->imagen}";
+                                continue;
+                            }
+
+                            $this->createImageBackup($noticia->imagen);
+                            $newPath = $this->moveImageToCategory($noticia->imagen, $noticia->category_id);
+
+                            if ($newPath) {
+                                $noticia->update(['imagen' => $newPath]);
+                                $results['migrated']++;
+                            } else {
+                                $results['failed']++;
+                                $results['errors'][] = "Error al mover imagen de noticia ID: {$noticia->id}";
+                            }
+                        } catch (\Exception $e) {
+                            $results['failed']++;
+                            $results['errors'][] = "Error en noticia ID {$noticia->id}: " . $e->getMessage();
+                        }
                     }
-
-                    // Verificar si la imagen ya está en la estructura correcta
-                    $categorySlug = Str::slug($noticia->category->name);
-                    if (Str::contains($noticia->imagen, $categorySlug)) {
-                        $results['skipped']++;
-                        continue;
-                    }
-
-                    // Crear backup antes de mover
-                    $this->createImageBackup($noticia->imagen);
-
-                    // Mover imagen a nueva estructura
-                    $newPath = $this->moveImageToCategory($noticia->imagen, $noticia->category_id);
-                    
-                    if ($newPath) {
-                        // Actualizar la base de datos
-                        $noticia->update(['imagen' => $newPath]);
-                        $results['migrated']++;
-                    } else {
-                        $results['failed']++;
-                        $results['errors'][] = "Error al mover imagen de noticia ID: {$noticia->id}";
-                    }
-
-                } catch (\Exception $e) {
-                    $results['failed']++;
-                    $results['errors'][] = "Error en noticia ID {$noticia->id}: " . $e->getMessage();
-                }
-            }
-
+                });
         } catch (\Exception $e) {
-            $results['errors'][] = "Error general en migración: " . $e->getMessage();
+            $results['errors'][] = 'Error general en migración: ' . $e->getMessage();
         }
 
         Log::info('Migración de imágenes completada', $results);
@@ -320,9 +355,6 @@ class ImageStorageService
 
     /**
      * Validar archivo de imagen
-     *
-     * @param UploadedFile $file
-     * @throws \Exception
      */
     private function validateImageFile(UploadedFile $file): void
     {
@@ -330,18 +362,15 @@ class ImageStorageService
             throw new \Exception('El archivo no es válido');
         }
 
-        // Validar tamaño
         if ($file->getSize() > self::MAX_FILE_SIZE) {
             throw new \Exception('El archivo es demasiado grande. Máximo 5MB permitido.');
         }
 
-        // Validar extensión
         $extension = strtolower($file->getClientOriginalExtension());
-        if (!in_array($extension, self::ALLOWED_EXTENSIONS)) {
+        if (!in_array($extension, self::ALLOWED_EXTENSIONS, true)) {
             throw new \Exception('Tipo de archivo no permitido. Solo se permiten: ' . implode(', ', self::ALLOWED_EXTENSIONS));
         }
 
-        // Validar que sea realmente una imagen
         $imageInfo = getimagesize($file->getPathname());
         if (!$imageInfo) {
             throw new \Exception('El archivo no es una imagen válida');
@@ -350,17 +379,13 @@ class ImageStorageService
 
     /**
      * Generar nombre único para el archivo
-     *
-     * @param UploadedFile $file
-     * @param int $categoryId
-     * @return string
      */
     private function generateUniqueFileName(UploadedFile $file, int $categoryId): string
     {
         $extension = strtolower($file->getClientOriginalExtension());
         $timestamp = Carbon::now()->format('YmdHis');
         $random = Str::random(8);
-        
+
         return "cat{$categoryId}_{$timestamp}_{$random}.{$extension}";
     }
 }

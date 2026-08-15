@@ -317,3 +317,45 @@
         margin-bottom: 20px;
     }
 }
+
+/* Dark Mode support for news-views */
+.dark .view-toggle {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+}
+
+.dark .view-toggle-btn {
+    color: #9ca3af !important;
+}
+
+.dark .view-toggle-btn:hover:not(.active) {
+    background: #374151 !important;
+    color: #f9fafb !important;
+}
+
+.dark .view-toggle-btn.active {
+    background: #4f46e5 !important;
+    color: white !important;
+}
+
+/* Also support media query dark mode */
+@media (prefers-color-scheme: dark) {
+    .view-toggle {
+        background: #1f2937 !important;
+        border-color: #374151 !important;
+    }
+
+    .view-toggle-btn {
+        color: #9ca3af !important;
+    }
+
+    .view-toggle-btn:hover:not(.active) {
+        background: #374151 !important;
+        color: #f9fafb !important;
+    }
+
+    .view-toggle-btn.active {
+        background: #4f46e5 !important;
+        color: white !important;
+    }
+}

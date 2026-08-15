@@ -126,11 +126,31 @@ class NoticiaRepository
      */
     public function getNewsStats()
     {
-        return [
-            'total_published' => Noticia::where('publicada', true)->count(),
-            'total_draft' => Noticia::where('publicada', false)->count(),
-            'total_categories' => Category::count(),
-            'recent_news' => Noticia::where('created_at', '>=', now()->subDays(7))->count(),
-        ];
+        try {
+            return [
+                'total_published' => Noticia::where('publicada', true)->count(),
+                'total_draft' => Noticia::where('publicada', false)->count(),
+                'total_categories' => Category::count(),
+                'recent_news' => Noticia::where('created_at', '>=', now()->subDays(7))->count(),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'total_published' => 0,
+                'total_draft' => 0,
+                'total_categories' => 0,
+                'recent_news' => 0
+            ];
+        }
+    }
+
+    /**
+     * Obtener noticias más vistas
+     */
+    public function getMostViewedNews($limit = 5)
+    {
+        return Noticia::where('publicada', true)
+            ->orderBy('views', 'desc')
+            ->take($limit)
+            ->get();
     }
 }

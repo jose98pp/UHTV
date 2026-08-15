@@ -59,8 +59,8 @@ class NewsService
                 });
             }
 
-            // Obtener "más leídas" (placeholder)
-            $masLeidas = $this->noticiaRepository->getPublishedNews(4);
+            // Obtener "más leídas" (noticias más vistas)
+            $masLeidas = $this->noticiaRepository->getMostViewedNews(4);
             $masLeidas = $masLeidas->map(function ($noticia) {
                 return $this->processNewsItem($noticia);
             });
@@ -161,9 +161,18 @@ class NewsService
      */
     public function getDashboardStats()
     {
-        return Cache::remember('dashboard_stats', 300, function () {
-            return $this->noticiaRepository->getNewsStats();
-        });
+        try {
+            return Cache::remember('dashboard_stats', 300, function () {
+                return $this->noticiaRepository->getNewsStats();
+            });
+        } catch (\Exception $e) {
+            return [
+                'total_published' => 0,
+                'total_draft' => 0,
+                'total_categories' => 0,
+                'recent_news' => 0
+            ];
+        }
     }
 
     /**

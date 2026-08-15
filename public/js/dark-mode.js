@@ -16,6 +16,7 @@ function applyDarkMode(isDark) {
         html.classList.add('dark');
         body.classList.add('dark');
         html.style.colorScheme = 'dark';
+        html.setAttribute('data-bs-theme', 'dark');
         darkModeEnabled = true;
         
         // Forzar actualización de meta theme-color
@@ -24,6 +25,7 @@ function applyDarkMode(isDark) {
         html.classList.remove('dark');
         body.classList.remove('dark');
         html.style.colorScheme = 'light';
+        html.setAttribute('data-bs-theme', 'light');
         darkModeEnabled = false;
         
         // Forzar actualización de meta theme-color
@@ -153,6 +155,7 @@ window.darkModeEnabled = () => darkModeEnabled;
             document.documentElement.classList.add('dark');
             document.body.classList.add('dark');
             document.documentElement.style.colorScheme = 'dark';
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
         }
     } catch (e) {
         console.warn('Error in immediate dark mode application:', e);

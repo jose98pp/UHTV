@@ -15,14 +15,32 @@ class DashboardController extends Controller
 
     public function index()
     {
-        // Obtener estadísticas
-        $stats = $this->newsService->getDashboardStats();
+        try {
+            // Obtener estadísticas
+            $stats = $this->newsService->getDashboardStats();
+        } catch (\Exception $e) {
+            $stats = [
+                'total_published' => 0,
+                'total_draft' => 0,
+                'total_categories' => 0,
+                'recent_news' => 0
+            ];
+        }
         
-        // Obtener noticias recientes
-        $recentNews = Noticia::with('category')
-            ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get();
+        try {
+            // Obtener noticias recientes
+            $recentNews = Noticia::with('category')
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get();
+            
+            // Procesar cada noticia para obtener imagenUrl
+            $recentNews = $recentNews->map(function ($noticia) {
+                return $this->newsService->processNewsItem($noticia);
+            });
+        } catch (\Exception $e) {
+            $recentNews = collect();
+        }
         
         return view('admin.dashboard', compact('stats', 'recentNews'));
     }

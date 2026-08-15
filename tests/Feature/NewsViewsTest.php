@@ -232,6 +232,9 @@ class NewsViewsTest extends TestCase
     /** @test */
     public function it_includes_lazy_loading_attributes_for_images()
     {
+        \Illuminate\Support\Facades\Storage::fake('public');
+        \Illuminate\Support\Facades\Storage::disk('public')->put('test-image.jpg', 'fake content');
+
         $category = Category::factory()->create();
         $noticia = Noticia::factory()->create([
             'category_id' => $category->id,
@@ -244,7 +247,7 @@ class NewsViewsTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('lazy-image');
         $response->assertSee('data-src');
-        $response->assertSee('loading="lazy"');
+        $response->assertSee('loading="lazy"', false);
     }
 
     /** @test */

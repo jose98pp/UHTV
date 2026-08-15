@@ -12,6 +12,91 @@
         </a>
     </div>
 
+    <!-- Banner Location Guide -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-gradient-primary text-white py-3">
+            <h6 class="m-0 font-weight-bold">
+                <i class="fas fa-map-marked-alt me-2"></i>Guía de Ubicaciones de Banners
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="card border-primary">
+                        <div class="card-body p-2 text-center">
+                            <div class="mb-2" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 60px; border-radius: 4px;"></div>
+                            <small class="fw-bold">Header Principal</small>
+                            <br><small class="text-muted"><code>portada_top</code></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-warning">
+                        <div class="card-body p-2 text-center">
+                            <div class="mb-2" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); height: 60px; border-radius: 4px;"></div>
+                            <small class="fw-bold">Portada Medio</small>
+                            <br><small class="text-muted"><code>portada_middle</code></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-info">
+                        <div class="card-body p-2 text-center">
+                            <div class="mb-2" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); height: 60px; border-radius: 4px;"></div>
+                            <small class="fw-bold">Sidebar Derecho</small>
+                            <br><small class="text-muted"><code>sidebar</code></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-success">
+                        <div class="card-body p-2 text-center">
+                            <div class="mb-2" style="background: linear-gradient(135deg, #28a745 0%, #218838 100%); height: 60px; border-radius: 4px;"></div>
+                            <small class="fw-bold">Footer Horizontal</small>
+                            <br><small class="text-muted"><code>footer</code></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-danger">
+                        <div class="card-body p-2 text-center">
+                            <div class="mb-2" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); height: 60px; border-radius: 4px;"></div>
+                            <small class="fw-bold">Categoría Arriba</small>
+                            <br><small class="text-muted"><code>category_top</code></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-secondary">
+                        <div class="card-body p-2 text-center">
+                            <div class="mb-2" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); height: 60px; border-radius: 4px;"></div>
+                            <small class="fw-bold">Categoría Abajo</small>
+                            <br><small class="text-muted"><code>category_bottom</code></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-dark">
+                        <div class="card-body p-2 text-center">
+                            <div class="mb-2" style="background: linear-gradient(135deg, #343a40 0%, #23272b 100%); height: 60px; border-radius: 4px;"></div>
+                            <small class="fw-bold">Noticia Arriba</small>
+                            <br><small class="text-muted"><code>show_top</code></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-light">
+                        <div class="card-body p-2 text-center">
+                            <div class="mb-2" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); height: 60px; border-radius: 4px;"></div>
+                            <small class="fw-bold">Noticia Abajo</small>
+                            <br><small class="text-muted"><code>show_bottom</code></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Content Row -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
@@ -45,10 +130,10 @@
                                 <label for="location" class="form-label">Ubicación</label>
                                 <select class="form-select @error('location') is-invalid @enderror" id="location" name="location" required>
                                     <option value="">Seleccionar ubicación...</option>
-                                    <option value="portada_top" {{ old('location', $banner->location) == 'portada_top' ? 'selected' : '' }}>Portada - Arriba</option>
+                                    <option value="portada_top" {{ old('location', $banner->location) == 'portada_top' ? 'selected' : '' }}>Portada - Arriba (Header Principal)</option>
                                     <option value="portada_middle" {{ old('location', $banner->location) == 'portada_middle' ? 'selected' : '' }}>Portada - Medio</option>
-                                    <option value="sidebar" {{ old('location', $banner->location) == 'sidebar' ? 'selected' : '' }}>Barra Lateral</option>
-                                    <option value="footer" {{ old('location', $banner->location) == 'footer' ? 'selected' : '' }}>Pie de Página</option>
+                                    <option value="sidebar" {{ old('location', $banner->location) == 'sidebar' ? 'selected' : '' }}>Barra Lateral (Sidebar)</option>
+                                    <option value="footer" {{ old('location', $banner->location) == 'footer' ? 'selected' : '' }}>Pie de Página (Footer)</option>
                                     <option value="category_top" {{ old('location', $banner->location) == 'category_top' ? 'selected' : '' }}>Categoría - Arriba</option>
                                     <option value="category_bottom" {{ old('location', $banner->location) == 'category_bottom' ? 'selected' : '' }}>Categoría - Abajo</option>
                                     <option value="show_top" {{ old('location', $banner->location) == 'show_top' ? 'selected' : '' }}>Noticia - Arriba</option>

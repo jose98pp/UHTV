@@ -11,6 +11,9 @@
 |
 */
 
+// Aumentar límite de memoria para evitar errores de memoria agotada
+ini_set('memory_limit', '512M');
+
 $app = new Illuminate\Foundation\Application(
     $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
 );

@@ -284,3 +284,175 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 }
+
+/* Dark Mode support for news-cards */
+.dark .news-card {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
+    border-color: #374151 !important;
+}
+
+.dark .news-card:hover {
+    border-color: #4b5563 !important;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dark .news-card-content {
+    background: #1f2937 !important;
+}
+
+.dark .news-card:hover .news-card-content {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
+}
+
+.dark .news-card-title {
+    color: #f9fafb !important;
+}
+
+.dark .news-card:hover .news-card-title {
+    color: #818cf8 !important;
+}
+
+.dark .news-card-description {
+    color: #9ca3af !important;
+}
+
+.dark .news-card:hover .news-card-description {
+    color: #d1d5db !important;
+}
+
+.dark .actions-trigger {
+    color: #9ca3af !important;
+}
+
+.dark .actions-trigger:hover {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%) !important;
+    color: #f9fafb !important;
+}
+
+.dark .actions-menu {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+}
+
+.dark .actions-menu a,
+.dark .actions-menu button {
+    color: #d1d5db !important;
+}
+
+.dark .actions-menu a:hover,
+.dark .actions-menu button:hover {
+    background-color: #374151 !important;
+    color: #f9fafb !important;
+}
+
+.dark .category-badge {
+    background-color: rgba(99, 102, 241, 0.2) !important;
+    color: #a5b4fc !important;
+}
+
+.dark .news-card-footer small {
+    color: #9ca3af !important;
+}
+
+.dark .news-card-footer .text-xs {
+    color: #9ca3af !important;
+}
+
+.dark .lazy-placeholder i {
+    color: #4b5563 !important;
+}
+
+.dark .news-card-image {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
+}
+
+.dark .news-card.loading {
+    background: linear-gradient(90deg, #1f2937 25%, #374151 50%, #1f2937 75%) !important;
+}
+
+/* Also support media query dark mode */
+@media (prefers-color-scheme: dark) {
+    .news-card {
+        background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
+        border-color: #374151 !important;
+    }
+
+    .news-card:hover {
+        border-color: #4b5563 !important;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    .news-card-content {
+        background: #1f2937 !important;
+    }
+
+    .news-card:hover .news-card-content {
+        background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
+    }
+
+    .news-card-title {
+        color: #f9fafb !important;
+    }
+
+    .news-card:hover .news-card-title {
+        color: #818cf8 !important;
+    }
+
+    .news-card-description {
+        color: #9ca3af !important;
+    }
+
+    .news-card:hover .news-card-description {
+        color: #d1d5db !important;
+    }
+
+    .actions-trigger {
+        color: #9ca3af !important;
+    }
+
+    .actions-trigger:hover {
+        background: linear-gradient(135deg, #374151 0%, #4b5563 100%) !important;
+        color: #f9fafb !important;
+    }
+
+    .actions-menu {
+        background-color: #1f2937 !important;
+        border-color: #374151 !important;
+    }
+
+    .actions-menu a,
+    .actions-menu button {
+        color: #d1d5db !important;
+    }
+
+    .actions-menu a:hover,
+    .actions-menu button:hover {
+        background-color: #374151 !important;
+        color: #f9fafb !important;
+    }
+
+    .category-badge {
+        background-color: rgba(99, 102, 241, 0.2) !important;
+        color: #a5b4fc !important;
+    }
+
+    .news-card-footer small {
+        color: #9ca3af !important;
+    }
+
+    .news-card-footer .text-xs {
+        color: #9ca3af !important;
+    }
+
+    .lazy-placeholder i {
+        color: #4b5563 !important;
+    }
+
+    .news-card-image {
+        background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
+    }
+
+    .news-card.loading {
+        background: linear-gradient(90deg, #1f2937 25%, #374151 50%, #1f2937 75%) !important;
+    }
+}

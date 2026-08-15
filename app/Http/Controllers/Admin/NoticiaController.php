@@ -94,7 +94,7 @@ class NoticiaController extends Controller
             ->where('publicada', true)
             ->firstOrFail();
 
-        $imagenUrl = asset('storage/' . $noticia->imagen);
+        $imagenUrl = $noticia->imagenUrl;
 
         $noticias = Noticia::select('id', 'titulo', 'imagen', 'created_at')
             ->where('publicada', true)
@@ -114,7 +114,10 @@ class NoticiaController extends Controller
         $validatedData = $request->validated();
 
         // Validate content length
-        $contentLengthError = $this->sanitizationService->validateContentLength($validatedData['contenido']);
+        $contentLengthError = $this->sanitizationService->validateContentLength(
+            $validatedData['contenido'], 
+            config('uhtv.security.max_content_length', 250000)
+        );
         if ($contentLengthError) {
             return redirect()->back()
                 ->withInput()
@@ -205,7 +208,10 @@ class NoticiaController extends Controller
             $noticia = Noticia::findOrFail($id);
 
             // Validate content length
-            $contentLengthError = $this->sanitizationService->validateContentLength($validatedData['contenido']);
+            $contentLengthError = $this->sanitizationService->validateContentLength(
+                $validatedData['contenido'], 
+                config('uhtv.security.max_content_length', 250000)
+            );
             if ($contentLengthError) {
                 return redirect()->back()
                     ->withInput()

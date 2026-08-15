@@ -541,3 +541,53 @@
         color: #6366f1;
     }
 }
+
+/* Class-based Dark Mode support for enhanced-filters */
+.dark .enhanced-filters {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+}
+
+.dark .filters-title,
+.dark .filter-label,
+.dark .active-filters-title {
+    color: #f9fafb !important;
+}
+
+.dark .filter-input {
+    background: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #f9fafb !important;
+}
+
+.dark .filter-input:focus {
+    border-color: #6366f1 !important;
+}
+
+.dark .filter-btn.secondary {
+    background: #374151 !important;
+    color: #d1d5db !important;
+    border-color: #4b5563 !important;
+}
+
+.dark .view-toggle {
+    background: #374151 !important;
+    border-color: #4b5563 !important;
+}
+
+.dark .view-toggle-btn {
+    color: #d1d5db !important;
+}
+
+.dark .view-toggle-btn.active {
+    background: #4b5563 !important;
+    color: #6366f1 !important;
+}
+
+.dark .filters-header {
+    border-bottom-color: #374151 !important;
+}
+
+.dark .active-filters {
+    border-top-color: #374151 !important;
+}

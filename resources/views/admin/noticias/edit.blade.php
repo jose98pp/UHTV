@@ -179,7 +179,7 @@
                             </div>
                         </div>
                     </div>
-                @elseif($noticia->imagen)
+                @elseif($noticia->imagen && !$noticia->has_valid_image)
                     <div id="current-image-container" class="mt-3">
                         <div class="alert alert-warning">
                             <i class="fas fa-exclamation-triangle"></i>

@@ -274,7 +274,7 @@
                                     <div class="activity-item d-flex align-items-center p-3 bg-light">
                                         <div class="flex-shrink-0 me-3">
                                             @if($noticia->imagen)
-                                                <img src="{{ asset('storage/' . $noticia->imagen) }}" 
+                                                <img src="{{ $noticia->imagenUrl }}" 
                                                      alt="{{ $noticia->titulo }}" 
                                                      class="rounded" 
                                                      style="width: 60px; height: 60px; object-fit: cover;">

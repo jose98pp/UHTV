@@ -30,12 +30,10 @@ class ImageValidationService
         }
 
         // Verificar si el archivo existe en el storage público
-        $fullPath = storage_path('app/public/' . $imagePath);
-        
-        if (!file_exists($fullPath)) {
+        if (!Storage::disk('public')->exists($imagePath)) {
             Log::warning('Imagen no encontrada', [
                 'path' => $imagePath,
-                'full_path' => $fullPath
+                'full_path' => Storage::disk('public')->path($imagePath)
             ]);
             return false;
         }
@@ -151,14 +149,13 @@ class ImageValidationService
             ];
         }
 
-        $fullPath = storage_path('app/public/' . $imagePath);
-        $exists = file_exists($fullPath);
+        $exists = Storage::disk('public')->exists($imagePath);
 
         return [
             'exists' => $exists,
             'url' => $exists ? asset('storage/' . $imagePath) : asset(self::DEFAULT_IMAGE),
             'is_default' => !$exists,
-            'size' => $exists ? filesize($fullPath) : null,
+            'size' => $exists ? Storage::disk('public')->size($imagePath) : null,
             'extension' => $exists ? strtolower(pathinfo($imagePath, PATHINFO_EXTENSION)) : null,
             'path' => $imagePath
         ];

@@ -396,10 +396,10 @@ const RichTextEditor = ({ initialContent = '', onChange, onAutoSave }) => {
             sanitized = sanitized.replace(/on\w+\s*=\s*["'][^"']*["']/gi, '');
             sanitized = sanitized.replace(/javascript\s*:/gi, '');
             
-            // Check content length (max 50000 characters)
+            // Check content length (max 250000 characters)
             const textLength = sanitized.replace(/<[^>]*>/g, '').length;
-            if (textLength > 50000) {
-                setValidationError('El contenido es demasiado largo. Máximo 50,000 caracteres.');
+            if (textLength > 250000) {
+                setValidationError('El contenido es demasiado largo. Máximo 250,000 caracteres.');
                 return false;
             }
             

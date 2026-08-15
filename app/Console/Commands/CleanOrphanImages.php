@@ -26,11 +26,13 @@ class CleanOrphanImages extends Command
     protected $description = 'Limpiar imágenes huérfanas que no están asociadas a ninguna noticia';
 
     protected ImageValidationService $imageValidationService;
+    protected \App\Services\ImageStorageService $imageStorageService;
 
     public function __construct(ImageValidationService $imageValidationService)
     {
         parent::__construct();
         $this->imageValidationService = $imageValidationService;
+        $this->imageStorageService = app(\App\Services\ImageStorageService::class);
     }
 
     /**
@@ -82,14 +84,15 @@ class CleanOrphanImages extends Command
     private function getAllNewsImages(): array
     {
         try {
-            $files = Storage::disk('public')->allFiles('noticias');
-            
-            // Filtrar solo archivos de imagen
-            return array_filter($files, function ($file) {
-                $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-                return in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+            $files = [];
+            $this->imageStorageService->streamNewsFiles(function (string $relativePath) use (&$files): void {
+                $extension = strtolower(pathinfo($relativePath, PATHINFO_EXTENSION));
+                if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true)) {
+                    $files[] = $relativePath;
+                }
             });
-            
+
+            return $files;
         } catch (\Exception $e) {
             $this->error("❌ Error al obtener imágenes: " . $e->getMessage());
             return [];

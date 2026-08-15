@@ -11,10 +11,14 @@ const App = () => {
     );
 };
 
-ReactDOM.createRoot(document.getElementById('app')).render(
-    <React.StrictMode>
-        <App /> {/* Renderiza el componente App aquí */}
-    </React.StrictMode>
-);
+// Only render if the element exists
+const appElement = document.getElementById('app');
+if (appElement) {
+    ReactDOM.createRoot(appElement).render(
+        <React.StrictMode>
+            <App />
+        </React.StrictMode>
+    );
+}
 
 export default App;

@@ -83,8 +83,11 @@
                 
                 if (shouldBeDark) {
                     document.documentElement.classList.add('dark');
-                    document.body.classList.add('dark');
+                    if (document.body) {
+                        document.body.classList.add('dark');
+                    }
                     document.documentElement.style.colorScheme = 'dark';
+                    document.documentElement.setAttribute('data-bs-theme', 'dark');
                     
                     // Actualizar meta theme-color inmediatamente
                     const themeColorMeta = document.querySelector('meta[name="theme-color"]');
@@ -93,8 +96,11 @@
                     }
                 } else {
                     document.documentElement.classList.remove('dark');
-                    document.body.classList.remove('dark');
+                    if (document.body) {
+                        document.body.classList.remove('dark');
+                    }
                     document.documentElement.style.colorScheme = 'light';
+                    document.documentElement.setAttribute('data-bs-theme', 'light');
                     
                     // Actualizar meta theme-color inmediatamente
                     const themeColorMeta = document.querySelector('meta[name="theme-color"]');
@@ -160,7 +166,7 @@
           <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-purple-400/20 to-red-400/20"></div>
         </div>
         <div>
-          <h1 class="text-5xl font-bold text-white mb-1 tracking-tight">Estiven<span class="text-red-400">TV</span></h1>
+          <h1 class="text-5xl font-bold text-white mb-1 tracking-tight">Ultima Hora<span class="text-red-400">TV</span></h1>
           <p class="text-purple-200 text-sm font-medium uppercase tracking-widest">Noticias Del Momento</p>
         </div>
       </a>
@@ -242,7 +248,7 @@
   <!-- Sidebar para móviles mejorado -->
   <div
     id="mobileMenu"
-    class="fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-900 shadow-2xl transform -translate-x-full transition-all duration-300 lg:hidden z-50"
+    class="fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-900 shadow-2xl transform -translate-x-full transition-all duration-300 lg:hidden z-50 overflow-y-auto"
   >
     <!-- Header del menú móvil -->
     <div class="bg-gradient-to-r from-purple-600 to-red-600 text-white p-6">
@@ -296,7 +302,7 @@
     </div>
     
     <!-- Redes sociales en el menú móvil -->
-    <div class="absolute bottom-0 left-0 right-0 p-6 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+    <div class="p-6 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-4">
       <h4 class="text-gray-500 dark:text-gray-400 uppercase text-xs font-semibold tracking-wide mb-3">Síguenos</h4>
       <div class="flex space-x-3">
         <a href="https://facebook.com/uhtvbolivia" target="_blank" class="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors duration-300">

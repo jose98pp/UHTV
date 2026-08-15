@@ -53,6 +53,28 @@
                     </div>
                 </div>
 
+                <!-- Portada Middle Banner -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-warning">
+                        <div class="card-header bg-warning text-dark">
+                            <h6 class="mb-0"><i class="fas fa-image me-2"></i>Banner Medio (Portada)</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="position-relative mb-3" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); height: 120px; border-radius: 8px; overflow: hidden;">
+                                <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center text-dark">
+                                    <div class="text-center">
+                                        <i class="fas fa-image fa-3x mb-2 opacity-50"></i>
+                                        <p class="mb-0 small">Centro de Portada</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="small mb-2"><strong>Ubicación:</strong> <code>portada_middle</code></p>
+                            <p class="small mb-2"><strong>Descripción:</strong> Banner en el centro de la página principal</p>
+                            <p class="small mb-0"><strong>Dimensiones recomendadas:</strong> 1200x300px</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Sidebar Banner -->
                 <div class="col-md-4">
                     <div class="card h-100 border-info">
@@ -93,6 +115,94 @@
                             <p class="small mb-2"><strong>Ubicación:</strong> <code>footer</code></p>
                             <p class="small mb-2"><strong>Descripción:</strong> Banner horizontal debajo del menú de navegación</p>
                             <p class="small mb-0"><strong>Dimensiones recomendadas:</strong> 1200x200px</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Top Banner -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-danger">
+                        <div class="card-header bg-danger text-white">
+                            <h6 class="mb-0"><i class="fas fa-image me-2"></i>Banner Categoría (Arriba)</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="position-relative mb-3" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); height: 120px; border-radius: 8px; overflow: hidden;">
+                                <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center text-white">
+                                    <div class="text-center">
+                                        <i class="fas fa-image fa-3x mb-2 opacity-50"></i>
+                                        <p class="mb-0 small">Top Categoría</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="small mb-2"><strong>Ubicación:</strong> <code>category_top</code></p>
+                            <p class="small mb-2"><strong>Descripción:</strong> Banner superior en páginas de categorías</p>
+                            <p class="small mb-0"><strong>Dimensiones recomendadas:</strong> 1200x250px</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Bottom Banner -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-secondary">
+                        <div class="card-header bg-secondary text-white">
+                            <h6 class="mb-0"><i class="fas fa-image me-2"></i>Banner Categoría (Abajo)</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="position-relative mb-3" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); height: 120px; border-radius: 8px; overflow: hidden;">
+                                <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center text-white">
+                                    <div class="text-center">
+                                        <i class="fas fa-image fa-3x mb-2 opacity-50"></i>
+                                        <p class="mb-0 small">Bottom Categoría</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="small mb-2"><strong>Ubicación:</strong> <code>category_bottom</code></p>
+                            <p class="small mb-2"><strong>Descripción:</strong> Banner inferior en páginas de categorías</p>
+                            <p class="small mb-0"><strong>Dimensiones recomendadas:</strong> 1200x250px</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Show Top Banner -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-dark">
+                        <div class="card-header bg-dark text-white">
+                            <h6 class="mb-0"><i class="fas fa-image me-2"></i>Banner Noticia (Arriba)</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="position-relative mb-3" style="background: linear-gradient(135deg, #343a40 0%, #23272b 100%); height: 120px; border-radius: 8px; overflow: hidden;">
+                                <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center text-white">
+                                    <div class="text-center">
+                                        <i class="fas fa-image fa-3x mb-2 opacity-50"></i>
+                                        <p class="mb-0 small">Top Noticia</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="small mb-2"><strong>Ubicación:</strong> <code>show_top</code></p>
+                            <p class="small mb-2"><strong>Descripción:</strong> Banner superior en páginas de detalle de noticias</p>
+                            <p class="small mb-0"><strong>Dimensiones recomendadas:</strong> 1200x250px</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Show Bottom Banner -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-light">
+                        <div class="card-header bg-light text-dark">
+                            <h6 class="mb-0"><i class="fas fa-image me-2"></i>Banner Noticia (Abajo)</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="position-relative mb-3" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); height: 120px; border-radius: 8px; overflow: hidden;">
+                                <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center text-dark">
+                                    <div class="text-center">
+                                        <i class="fas fa-image fa-3x mb-2 opacity-50"></i>
+                                        <p class="mb-0 small">Bottom Noticia</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="small mb-2"><strong>Ubicación:</strong> <code>show_bottom</code></p>
+                            <p class="small mb-2"><strong>Descripción:</strong> Banner inferior en páginas de detalle de noticias</p>
+                            <p class="small mb-0"><strong>Dimensiones recomendadas:</strong> 1200x250px</p>
                         </div>
                     </div>
                 </div>
@@ -140,8 +250,13 @@
                                     @php
                                         $locationInfo = [
                                             'portada_top' => ['label' => 'Header Principal', 'color' => 'primary', 'icon' => 'fa-image'],
+                                            'portada_middle' => ['label' => 'Portada Medio', 'color' => 'warning', 'icon' => 'fa-image'],
                                             'sidebar' => ['label' => 'Sidebar Derecho', 'color' => 'info', 'icon' => 'fa-sidebar'],
-                                            'footer' => ['label' => 'Footer Horizontal', 'color' => 'success', 'icon' => 'fa-rectangle-ad']
+                                            'footer' => ['label' => 'Footer Horizontal', 'color' => 'success', 'icon' => 'fa-rectangle-ad'],
+                                            'category_top' => ['label' => 'Categoría Arriba', 'color' => 'danger', 'icon' => 'fa-image'],
+                                            'category_bottom' => ['label' => 'Categoría Abajo', 'color' => 'secondary', 'icon' => 'fa-image'],
+                                            'show_top' => ['label' => 'Noticia Arriba', 'color' => 'dark', 'icon' => 'fa-image'],
+                                            'show_bottom' => ['label' => 'Noticia Abajo', 'color' => 'light', 'icon' => 'fa-image']
                                         ];
                                         $info = $locationInfo[$banner->location] ?? ['label' => $banner->location, 'color' => 'secondary', 'icon' => 'fa-question'];
                                     @endphp

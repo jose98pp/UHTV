@@ -22,7 +22,7 @@
                                 <i class="fas fa-image text-gray-400 text-4xl"></i>
                             </div>
                         </div>
-                        @if($noticia->imagen)
+                        @if($noticia->imagen && !$noticia->has_valid_image)
                             <div class="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full" title="Imagen no encontrada">
                                 <i class="fas fa-exclamation-triangle mr-1"></i>Error
                             </div>

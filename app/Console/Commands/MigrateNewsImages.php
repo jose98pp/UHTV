@@ -55,18 +55,11 @@ class MigrateNewsImages extends Command
             }
         }
 
-        $this->info('Escaneando archivos existentes...');
-        $fileMap = $this->buildFileMap();
-        $this->info('Encontrados ' . count($fileMap) . ' archivos en total.');
+        $this->info('Iniciando migración (procesando por lotes, sin escanear todo el disco)...');
         $this->newLine();
 
-        $this->info('Iniciando migración...');
-        $this->newLine();
-
-        // Ejecutar migración
-        $results = $this->option('dry-run') 
-            ? $this->dryRunMigration($fileMap) 
-            : $this->runMigration($fileMap);
+        // Ejecutar migración usando ImageStorageService con soporte dry-run
+        $results = $this->imageStorageService->migrateExistingImages($this->option('dry-run'));
 
         // Mostrar resultados
         $this->displayResults($results);
@@ -76,11 +69,11 @@ class MigrateNewsImages extends Command
 
     private function buildFileMap(): array
     {
-        $allFiles = \Illuminate\Support\Facades\Storage::disk('public')->allFiles('noticias');
         $map = [];
-        foreach ($allFiles as $file) {
-            $map[basename($file)] = $file;
-        }
+        $this->imageStorageService->streamNewsFiles(function (string $relativePath) use (&$map): void {
+            $map[basename($relativePath)] = $relativePath;
+        });
+
         return $map;
     }
 

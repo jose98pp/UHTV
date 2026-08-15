@@ -32,7 +32,7 @@ class NoticiaRequest extends FormRequest
             'contenido' => [
                 'required',
                 'string',
-                'max:50000',
+                'max:' . config('uhtv.security.max_content_length', 250000),
                 'min:50'
             ],
             'category_id' => 'required|exists:categories,id',
@@ -87,7 +87,7 @@ class NoticiaRequest extends FormRequest
             // Content validation messages
             'contenido.required' => 'El contenido es obligatorio.',
             'contenido.min' => 'El contenido debe tener al menos 50 caracteres.',
-            'contenido.max' => 'El contenido no puede exceder 50,000 caracteres.',
+            'contenido.max' => 'El contenido no puede exceder ' . number_format(config('uhtv.security.max_content_length', 250000)) . ' caracteres.',
             
             // Category validation messages
             'category_id.required' => 'La categoría es obligatoria.',
@@ -151,10 +151,7 @@ class NoticiaRequest extends FormRequest
             $validator->errors()->add('contenido', 'El contenido tiene demasiadas etiquetas HTML para la cantidad de texto. Simplifique el formato.');
         }
 
-        // Check for potentially dangerous scripts
-        if (preg_match('/<script|javascript:|on\w+\s*=/i', $content)) {
-            $validator->errors()->add('contenido', 'El contenido contiene elementos no permitidos por seguridad.');
-        }
+
 
         // Check content quality - ensure it's not just HTML tags
         if ($textLength < 30) {

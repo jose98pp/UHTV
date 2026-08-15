@@ -18,7 +18,7 @@
             </span>
           </div>
           
-          <div id="newsCarousel" class="carousel slide h-full" data-bs-ride="carousel">
+          <div id="newsCarousel" class="carousel slide carousel-fade h-full group" data-bs-ride="carousel">
             <div class="carousel-inner h-full">
               @foreach($noticias->take(5) as $index => $noticia)
                 <div class="carousel-item h-full @if($index === 0) active @endif">
@@ -60,14 +60,14 @@
               @endforeach
             </div>
             
-            <!-- Controles del carrusel mejorados -->
-            <button class="carousel-control-prev absolute left-4 top-1/2 transform -translate-y-1/2 z-10" type="button" data-bs-target="#newsCarousel" data-bs-slide="prev">
+            <!-- Controles del carrusel mejorados (visibles al pasar el cursor) -->
+            <button class="carousel-control-prev absolute left-4 top-1/2 transform -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" type="button" data-bs-target="#newsCarousel" data-bs-slide="prev">
               <div class="bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-full p-3 transition-all duration-300 shadow-lg">
                 <i class="fas fa-chevron-left text-white text-lg"></i>
               </div>
               <span class="sr-only">Anterior</span>
             </button>
-            <button class="carousel-control-next absolute right-4 top-1/2 transform -translate-y-1/2 z-10" type="button" data-bs-target="#newsCarousel" data-bs-slide="next">
+            <button class="carousel-control-next absolute right-4 top-1/2 transform -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" type="button" data-bs-target="#newsCarousel" data-bs-slide="next">
               <div class="bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-full p-3 transition-all duration-300 shadow-lg">
                 <i class="fas fa-chevron-right text-white text-lg"></i>
               </div>
@@ -90,7 +90,7 @@
       <!-- Sidebar: Videos y Noticias Destacadas -->
       <div class="lg:col-span-1 space-y-6">
         <!-- Últimos Videos -->
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700">
           <div class="bg-gradient-to-r from-red-600 to-red-700 text-white p-4">
             <h3 class="font-bold text-lg flex items-center">
               <i class="fab fa-youtube mr-2"></i>
@@ -145,8 +145,8 @@
         <!-- Banner Publicitario -->
         @if(isset($banners['sidebar']) && $banners['sidebar']->count() > 0)
             @foreach($banners['sidebar'] as $banner)
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
-                    <div class="bg-gray-100 text-gray-700 p-3 text-center">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mb-6 border border-gray-100 dark:border-gray-700">
+                    <div class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 p-3 text-center">
                         <span class="text-xs font-medium uppercase tracking-wide">Publicidad</span>
                     </div>
                     <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="block">
@@ -237,76 +237,75 @@
           <!-- Grid de Noticias de la Categoría -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($noticiasPorCategoria[$categoria->id]->take(6) as $index => $noticia)
-              <article class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 @if($index === 0) md:col-span-2 md:row-span-2 @endif">
-                
-                <!-- Imagen de la Noticia -->
-                <div class="relative overflow-hidden">
-                  <a href="{{ route('show', $noticia->id) }}" class="block">
+              <a href="{{ route('show', $noticia->id) }}" class="block">
+                <article class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 @if($index === 0) md:col-span-2 md:row-span-2 @endif">
+                  
+                  <!-- Imagen de la Noticia -->
+                  <div class="relative overflow-hidden">
                     <img src="{{ $noticia->imagenUrl ?? asset('images/default-news.svg') }}" 
                          alt="{{ $noticia->titulo }}" 
                          class="w-full @if($index === 0) h-64 md:h-80 @else h-48 @endif object-cover transition-transform duration-500 hover:scale-105"
                          loading="lazy"
                          onerror="handleImageError(this)">
-                  </a>
-                  
-                  <!-- Etiqueta de categoría -->
-                  <div class="absolute top-4 left-4">
-                    <span class="bg-gradient-to-r from-purple-600 to-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide shadow-lg">
-                      {{ $categoria->name }}
-                    </span>
-                  </div>
-                  
-                  <!-- Indicador de noticia principal -->
-                  @if($index === 0)
-                    <div class="absolute top-4 right-4">
-                      <span class="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                        PRINCIPAL
+                    
+                    <!-- Etiqueta de categoría -->
+                    <div class="absolute top-4 left-4">
+                      <span class="bg-gradient-to-r from-purple-600 to-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide shadow-lg">
+                        {{ $categoria->name }}
                       </span>
                     </div>
-                  @endif
-                  
-                  <!-- Overlay sutil -->
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
-                
-                <!-- Contenido -->
-                <div class="p-4 @if($index === 0) md:p-6 @endif">
-                  <!-- Metadata -->
-                  <div class="mb-3">
-                    <span class="text-gray-500 dark:text-gray-400 text-sm flex items-center">
-                      <i class="fas fa-clock mr-2 text-purple-600"></i>
-                      {{ \Carbon\Carbon::parse($noticia->created_at)->locale('es')->diffForHumans() }}
-                    </span>
+                    
+                    <!-- Indicador de noticia principal -->
+                    @if($index === 0)
+                      <div class="absolute top-4 right-4">
+                        <span class="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                          PRINCIPAL
+                        </span>
+                      </div>
+                    @endif
+                    
+                    <!-- Overlay sutil -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
                   
-                  <!-- Título y contenido -->
-                  <a href="{{ route('show', $noticia->id) }}" class="block group">
-                    <h4 class="font-bold text-gray-900 dark:text-gray-100 mb-2 @if($index === 0) text-xl md:text-2xl @else text-lg @endif leading-tight line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300">
-                      {{ $noticia->titulo }}
-                    </h4>
-                    @if($index === 0)
-                      <p class="text-gray-600 dark:text-gray-300 text-base line-clamp-3 leading-relaxed mb-4">
-                        {{ $noticia->excerptLimpio ?? Str::limit(strip_tags($noticia->contenido), 200) }}
-                      </p>
-                    @else
-                      <p class="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 leading-relaxed">
-                        {{ $noticia->excerptLimpio ?? Str::limit(strip_tags($noticia->contenido), 100) }}
-                      </p>
-                    @endif
-                  </a>
-                  
-                  <!-- Botón de acción -->
-                  @if($index === 0)
-                    <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                      <a href="{{ route('show', $noticia->id) }}" 
-                         class="inline-flex items-center text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-semibold text-sm transition-colors duration-300 group">
-                        Leer noticia completa
-                        <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform duration-300"></i>
-                      </a>
+                  <!-- Contenido -->
+                  <div class="p-4 @if($index === 0) md:p-6 @endif">
+                    <!-- Metadata -->
+                    <div class="mb-3">
+                      <span class="text-gray-500 dark:text-gray-400 text-sm flex items-center">
+                        <i class="fas fa-clock mr-2 text-purple-600"></i>
+                        {{ \Carbon\Carbon::parse($noticia->created_at)->locale('es')->diffForHumans() }}
+                      </span>
                     </div>
-                  @endif
-                </div>
-              </article>
+                    
+                    <!-- Título y contenido -->
+                    <div class="block group">
+                      <h4 class="font-bold text-gray-900 dark:text-gray-100 mb-2 @if($index === 0) text-xl md:text-2xl @else text-lg @endif leading-tight line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300">
+                        {{ $noticia->titulo }}
+                      </h4>
+                      @if($index === 0)
+                        <p class="text-gray-600 dark:text-gray-300 text-base line-clamp-3 leading-relaxed mb-4">
+                          {{ $noticia->excerptLimpio ?? Str::limit(strip_tags($noticia->contenido), 200) }}
+                        </p>
+                      @else
+                        <p class="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 leading-relaxed">
+                          {{ $noticia->excerptLimpio ?? Str::limit(strip_tags($noticia->contenido), 100) }}
+                        </p>
+                      @endif
+                    </div>
+                    
+                    <!-- Botón de acción -->
+                    @if($index === 0)
+                      <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                        <div class="inline-flex items-center text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-semibold text-sm transition-colors duration-300 group">
+                          Leer noticia completa
+                          <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform duration-300"></i>
+                        </div>
+                      </div>
+                    @endif
+                  </div>
+                </article>
+              </a>
             @endforeach
           </div>
         </div>
@@ -339,79 +338,78 @@
 
 
 <!-- Sección de Últimas Noticias - Diseño Moderno -->
-<section class="py-12 bg-white">
+<section class="py-12 bg-white dark:bg-gray-900 transition-colors duration-300">
   <div class="container mx-auto px-4">
     <div class="text-center mb-12">
-      <h2 class="text-4xl font-bold text-gray-900 mb-4">Últimas Noticias</h2>
+      <h2 class="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">Últimas Noticias</h2>
       <div class="w-32 h-1 bg-gradient-to-r from-red-600 to-purple-600 mx-auto rounded-full"></div>
-      <p class="text-gray-600 mt-4 text-lg">Las noticias más recientes e importantes del momento</p>
+      <p class="text-gray-600 dark:text-gray-300 mt-4 text-lg">Las noticias más recientes e importantes del momento</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       @foreach($ultimasNoticias->take(6) as $noticia)
-        <article class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100">
-          <div class="relative overflow-hidden">
-            <a href="{{ route('show', $noticia->id) }}" class="block">
+        <a href="{{ route('show', $noticia->id) }}" class="block">
+          <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 dark:border-gray-700">
+            <div class="relative overflow-hidden">
               <img src="{{ $noticia->imagenUrl ?? asset('images/default-news.svg') }}" 
                    alt="{{ $noticia->titulo }}" 
                    class="w-full h-56 object-cover transition-transform duration-500 hover:scale-110"
                    loading="lazy"
                    onerror="handleImageError(this)">
-            </a>
-            
-            <!-- Etiqueta de Categoría -->
-            <div class="absolute top-4 left-4">
-              <span class="bg-gradient-to-r from-purple-600 to-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide shadow-lg">
-                {{ $noticia->category->name ?? 'General' }}
-              </span>
-            </div>
-            
-            <!-- Indicador de "Nuevo" para noticias recientes -->
-            @if(\Carbon\Carbon::parse($noticia->created_at)->diffInHours() < 6)
-              <div class="absolute top-4 right-4">
-                <span class="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold animate-pulse">
-                  NUEVO
+              
+              <!-- Etiqueta de Categoría -->
+              <div class="absolute top-4 left-4">
+                <span class="bg-gradient-to-r from-purple-600 to-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide shadow-lg">
+                  {{ $noticia->category->name ?? 'General' }}
                 </span>
               </div>
-            @endif
-            
-            <!-- Overlay sutil -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-          </div>
-          
-          <div class="p-6">
-            <!-- Metadata -->
-            <div class="mb-4 flex items-center justify-between">
-              <span class="text-gray-500 text-sm flex items-center">
-                <i class="fas fa-clock mr-2 text-red-600"></i>
-                {{ \Carbon\Carbon::parse($noticia->created_at)->locale('es')->diffForHumans() }}
-              </span>
-              <span class="text-gray-400 text-xs flex items-center">
-                <i class="fas fa-eye mr-1"></i>
-                Leer más
-              </span>
+              
+              <!-- Indicador de "Nuevo" para noticias recientes -->
+              @if(\Carbon\Carbon::parse($noticia->created_at)->diffInHours() < 6)
+                <div class="absolute top-4 right-4">
+                  <span class="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold animate-pulse">
+                    NUEVO
+                  </span>
+                </div>
+              @endif
+              
+              <!-- Overlay sutil -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
             </div>
             
-            <!-- Título y Contenido -->
-            <a href="{{ route('show', $noticia->id) }}" class="block group">
-              <h3 class="font-bold text-gray-900 mb-3 text-lg leading-tight line-clamp-2 group-hover:text-purple-600 transition-colors duration-300">
-                {{ $noticia->titulo }}
-              </h3>
-              <p class="text-gray-600 text-sm line-clamp-3 leading-relaxed">
-                {{ $noticia->excerptLimpio ?? Str::limit(strip_tags($noticia->contenido), 120) }}
-              </p>
-            </a>
-            
-            <!-- Botón de Acción -->
-            <div class="mt-6 pt-4 border-t border-gray-100">
-              <a href="{{ route('show', $noticia->id) }}" 
-                 class="inline-flex items-center text-purple-600 hover:text-purple-800 font-semibold text-sm transition-colors duration-300 group">
-                Continuar leyendo
-                <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform duration-300"></i>
-              </a>
+            <div class="p-6">
+              <!-- Metadata -->
+              <div class="mb-4 flex items-center justify-between">
+                <span class="text-gray-500 dark:text-gray-400 text-sm flex items-center">
+                  <i class="fas fa-clock mr-2 text-red-600"></i>
+                  {{ \Carbon\Carbon::parse($noticia->created_at)->locale('es')->diffForHumans() }}
+                </span>
+                <span class="text-gray-400 dark:text-gray-550 text-xs flex items-center">
+                  <i class="fas fa-eye mr-1"></i>
+                  Leer más
+                </span>
+              </div>
+              
+              <!-- Título y Contenido -->
+              <div class="block group">
+                <h3 class="font-bold text-gray-900 dark:text-gray-100 mb-3 text-lg leading-tight line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300">
+                  {{ $noticia->titulo }}
+                </h3>
+                <p class="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 leading-relaxed">
+                  {{ $noticia->excerptLimpio ?? Str::limit(strip_tags($noticia->contenido), 120) }}
+                </p>
+              </div>
+              
+              <!-- Botón de Acción -->
+              <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+                <div class="inline-flex items-center text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-semibold text-sm transition-colors duration-300 group">
+                  Continuar leyendo
+                  <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform duration-300"></i>
+                </div>
+              </div>
             </div>
-          </div>
-        </article>
+          </article>
+        </a>
       @endforeach
     </div>
     
@@ -427,10 +425,10 @@
 </section>
 
 <!-- Banner Publicitario Horizontal -->
-<section class="py-6 bg-white">
+<section class="py-6 bg-white dark:bg-gray-900 transition-colors duration-300">
   <div class="container mx-auto px-4">
     <div class="text-center mb-4">
-      <span class="text-gray-500 text-sm font-medium">PUBLICIDAD</span>
+      <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">PUBLICIDAD</span>
     </div>
     <div class="flex justify-center">
       <a href="https://radiobetania.com/" target="_blank" rel="noopener noreferrer" class="block max-w-4xl"> 

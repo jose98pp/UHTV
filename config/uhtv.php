@@ -36,7 +36,7 @@ return [
         'content_sanitization' => env('UHTV_SANITIZE_CONTENT', true),
         'log_errors' => env('UHTV_LOG_ERRORS', true),
         'max_title_length' => env('UHTV_MAX_TITLE_LENGTH', 255),
-        'max_content_length' => env('UHTV_MAX_CONTENT_LENGTH', 50000),
+        'max_content_length' => env('UHTV_MAX_CONTENT_LENGTH', 250000),
     ],
 
     'performance' => [

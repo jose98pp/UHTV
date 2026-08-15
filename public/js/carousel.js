@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (carousel && typeof bootstrap !== 'undefined') {
         try {
             const bsCarousel = new bootstrap.Carousel(carousel, {
-                interval: 5000,
+                interval: 1500,
                 wrap: true,
                 pause: 'hover'
             });

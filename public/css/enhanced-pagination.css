@@ -337,3 +337,52 @@
         transform: none;
     }
 }
+
+/* Class-based Dark Mode support for enhanced-pagination */
+.dark .enhanced-pagination-wrapper {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #f9fafb !important;
+}
+
+.dark .pagination-text {
+    color: #9ca3af !important;
+}
+
+.dark .enhanced-pagination .page-link {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #f9fafb !important;
+}
+
+.dark .enhanced-pagination .page-link:hover {
+    background-color: #4b5563 !important;
+    border-color: #6b7280 !important;
+    color: #f9fafb !important;
+}
+
+.dark .enhanced-pagination .page-item.disabled .page-link {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #6b7280 !important;
+}
+
+.dark .page-size-selector .form-label,
+.dark .page-jump .form-label {
+    color: #f9fafb !important;
+}
+
+.dark .page-size-selector .form-text {
+    color: #9ca3af !important;
+}
+
+.dark .pagination-controls {
+    border-top-color: #374151 !important;
+}
+
+.dark .page-size-selector .form-select,
+.dark .page-jump .form-control {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #f9fafb !important;
+}

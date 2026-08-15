@@ -125,7 +125,7 @@ class ContentSanitizationService
     /**
      * Validate content length and return error message if invalid
      */
-    public function validateContentLength(?string $content, int $maxLength = 50000): ?string
+    public function validateContentLength(?string $content, int $maxLength = 1000000): ?string
     {
         if (empty($content)) {
             return "El contenido no puede estar vacío.";
