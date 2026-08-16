@@ -161,50 +161,183 @@
 
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-  <!-- Header Mejorado - Inspirado en Brújula Digital -->
-  <header class="relative bg-gradient-to-r from-purple-800 via-purple-600 to-red-600 dark:from-purple-900 dark:via-purple-700 dark:to-red-700 bg-cover bg-center min-h-[140px] flex items-center justify-center text-white overflow-hidden" 
+  <!-- Topbar estilo El Deber -->
+  <div class="w-full bg-[#f8fafc] dark:bg-[#0f172a] border-b border-[#e2e8f0] dark:border-[#334155] py-2 px-4 text-xs transition-colors duration-300">
+    <div class="container mx-auto flex flex-col md:flex-row justify-between items-center text-gray-600 dark:text-gray-300 gap-2">
+      <!-- Date Left -->
+      <div id="topbar-date-text" class="text-xs font-semibold tracking-wide text-gray-500 dark:text-gray-400">
+        Cargando fecha...
+      </div>
+      <!-- Right Socials -->
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-2.5">
+          <a href="https://facebook.com/uhtvbolivia" target="_blank" class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-800 hover:bg-blue-600 hover:text-white flex items-center justify-center text-gray-600 dark:text-gray-300 transition-all duration-300">
+            <i class="fab fa-facebook-f text-[11px]"></i>
+          </a>
+          <a href="https://www.youtube.com/@UHTVBolivia" target="_blank" class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-800 hover:bg-red-600 hover:text-white flex items-center justify-center text-gray-600 dark:text-gray-300 transition-all duration-300">
+            <i class="fab fa-youtube text-[11px]"></i>
+          </a>
+          <a href="https://instagram.com/uhtvbolivia" target="_blank" class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-800 hover:bg-pink-600 hover:text-white flex items-center justify-center text-gray-600 dark:text-gray-300 transition-all duration-300">
+            <i class="fab fa-instagram text-[11px]"></i>
+          </a>
+          <a href="https://x.com/UhtvBol" target="_blank" class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-800 hover:bg-black hover:text-white flex items-center justify-center text-gray-600 dark:text-gray-300 transition-all duration-300">
+            <i class="fab fa-x-twitter text-[11px]"></i>
+          </a>
+          <a href="https://tiktok.com/@uhtvbolivia" target="_blank" class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-800 hover:bg-black hover:text-white flex items-center justify-center text-gray-600 dark:text-gray-300 transition-all duration-300">
+            <i class="fab fa-tiktok text-[11px]"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header Principal estilo El Deber con Imagen de Fondo -->
+  <header class="relative bg-gradient-to-r from-purple-800 via-purple-600 to-red-600 dark:from-purple-900 dark:via-purple-700 dark:to-red-700 bg-cover bg-center min-h-[140px] flex items-center justify-center text-white overflow-hidden py-6 px-4 transition-colors duration-300"
           style="background-image: url('{{ isset($banners['portada_top']) && $banners['portada_top']->count() > 0 ? asset($banners['portada_top']->first()->image_path) : asset('images/banner.png') }}');">
-    <!-- Overlay con gradiente mejorado -->
-    <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/70 dark:from-black/80 dark:via-black/60 dark:to-black/80"></div>
     
-    <!-- Elementos decorativos -->
+    <!-- Overlay de oscurecimiento para legibilidad premium -->
+    <div class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/55 to-black/75 dark:from-black/85 dark:via-black/65 dark:to-black/85"></div>
+    
+    <!-- Elementos decorativos de fondo -->
     <div class="absolute inset-0 opacity-10">
       <div class="absolute top-4 left-4 w-32 h-32 bg-white rounded-full blur-3xl"></div>
       <div class="absolute bottom-4 right-4 w-24 h-24 bg-purple-300 rounded-full blur-2xl"></div>
     </div>
-    
-    <div class="relative text-center z-10 py-6">
-      <a href="/" class="flex items-center justify-center space-x-4 mb-4 group">
-        <div class="relative">
-          <img src="/images/Logo.jpg" alt="UltimaHoraTV" class="w-20 h-20 rounded-full border-4 border-white/30 shadow-2xl transition-transform duration-300 group-hover:scale-110">
-          <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-purple-400/20 to-red-400/20"></div>
+
+    <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4 relative z-10">
+      <!-- Left Column: Weather Animated Ticker -->
+      <div class="flex items-center w-full md:w-1/3 justify-start">
+        <!-- Ticker de clima animado -->
+        <div id="weather-ticker" class="flex items-center transition-all duration-300 opacity-100 transform translate-y-0" style="min-width: 200px;">
+          <span class="flex items-center gap-2">
+            <i class="fas fa-sun text-yellow-400 text-lg"></i>
+            <span class="font-bold text-white text-sm">28°</span>
+            <span class="text-xs text-gray-200">- Santa Cruz de la Sierra</span>
+          </span>
         </div>
-        <div>
-          <h1 class="text-5xl font-bold text-white mb-1 tracking-tight">Ultima Hora<span class="text-red-400">TV</span></h1>
-          <p class="text-purple-200 text-sm font-medium uppercase tracking-widest">Noticias Del Momento</p>
-        </div>
-      </a>
+      </div>
       
-      <!-- Redes Sociales Mejoradas -->
-      <div class="flex justify-center space-x-3 mt-4">
-        <a href="https://facebook.com/uhtvbolivia" target="_blank" class="bg-white/10 backdrop-blur-sm hover:bg-blue-600 text-white p-3 rounded-full transition-all duration-300 transform hover:scale-110 hover:shadow-lg">
-          <i class="fab fa-facebook text-lg"></i>
+      <!-- Center Column: Logo y Marca -->
+      <div class="flex justify-center w-full md:w-1/3">
+        <a href="/" class="flex items-center space-x-3 group">
+          <div class="relative">
+            <img src="/images/Logo.jpg" alt="UltimaHoraTV" class="w-14 h-14 rounded-full border border-white/20 shadow-md transition-transform duration-300 group-hover:scale-105">
+            <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-white/10 to-white/5"></div>
+          </div>
+          <div class="text-left">
+            <h1 class="text-3xl font-extrabold text-white tracking-tight leading-none mb-1">Ultima Hora<span class="text-red-400">TV</span></h1>
+            <p class="text-[9px] text-purple-200 font-semibold uppercase tracking-widest leading-none">Noticias Del Momento</p>
+          </div>
         </a>
-        <a href="https://www.youtube.com/@UHTVBolivia" target="_blank" class="bg-white/10 backdrop-blur-sm hover:bg-red-600 text-white p-3 rounded-full transition-all duration-300 transform hover:scale-110 hover:shadow-lg">
-          <i class="fab fa-youtube text-lg"></i>
-        </a>
-        <a href="https://instagram.com/uhtvbolivia" target="_blank" class="bg-white/10 backdrop-blur-sm hover:bg-pink-600 text-white p-3 rounded-full transition-all duration-300 transform hover:scale-110 hover:shadow-lg">
-          <i class="fab fa-instagram text-lg"></i>
-        </a>
-        <a href="https://x.com/UhtvBol" target="_blank" class="bg-white/10 backdrop-blur-sm hover:bg-gray-800 text-white p-3 rounded-full transition-all duration-300 transform hover:scale-110 hover:shadow-lg">
-          <i class="fab fa-x-twitter text-lg"></i>
-        </a>
-        <a href="https://tiktok.com/@uhtvbolivia" target="_blank" class="bg-white/10 backdrop-blur-sm hover:bg-black text-white p-3 rounded-full transition-all duration-300 transform hover:scale-110 hover:shadow-lg">
-          <i class="fab fa-tiktok text-lg"></i>
-        </a>
+      </div>
+      
+      <!-- Right Column: Live Badge + Dark Mode Toggle -->
+      <div class="flex items-center justify-end space-x-4 w-full md:w-1/3">
+        <div class="flex items-center bg-red-600 text-white text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full shadow-sm animate-pulse">
+          <span class="w-1.5 h-1.5 rounded-full bg-white mr-1.5"></span>
+          En Vivo
+        </div>
+        <!-- Selector de tema oscuro -->
+        <button data-dark-mode-toggle class="p-2 rounded-full hover:bg-white/10 text-white transition-colors" aria-label="Cambiar tema" style="background: none; border: none; cursor: pointer;">
+          <i class="fas fa-sun text-yellow-400 sun-icon hidden"></i>
+          <i class="fas fa-moon moon-icon text-gray-100"></i>
+        </button>
       </div>
     </div>
   </header>
+
+  <!-- Script del Clima Rotativo Dinámico e Inicializaciones -->
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          // 1. Inicialización de la Fecha del Topbar en Español
+          const dateElement = document.getElementById('topbar-date-text');
+          if (dateElement) {
+              const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+              const today = new Date();
+              let dateString = today.toLocaleDateString('es-ES', options);
+              
+              // Capitalizar la primera letra de las palabras relevantes
+              dateString = dateString.split(' ').map(word => {
+                  if (word.length > 2 && word !== 'de') {
+                      return word.charAt(0).toUpperCase() + word.slice(1);
+                  }
+                  return word;
+              }).join(' ');
+              
+              dateElement.innerHTML = `<i class="far fa-calendar-alt mr-1.5 text-purple-600 dark:text-purple-400"></i> ${dateString}, Bolivia`;
+          }
+
+          // 2. Lógica del Clima Rotativo Animado
+          const weatherData = [
+              { id: 'sc', name: 'Santa Cruz de la Sierra', temp: 28, code: 0, lat: -17.7863, lon: -63.1812 },
+              { id: 'lp', name: 'La Paz', temp: 15, code: 3, lat: -16.5001, lon: -68.1193 },
+              { id: 'cb', name: 'Cochabamba', temp: 22, code: 2, lat: -17.3895, lon: -66.1568 }
+          ];
+
+          let currentIndex = 0;
+          const ticker = document.getElementById('weather-ticker');
+
+          function getWeatherIconClass(code) {
+              if (code === 0) return 'fa-sun text-yellow-400';
+              if ([1, 2].includes(code)) return 'fa-cloud-sun text-yellow-300';
+              if (code === 3) return 'fa-cloud text-gray-300';
+              if ([45, 48].includes(code)) return 'fa-smog text-gray-400';
+              if ([51, 53, 55, 56, 57, 80, 81, 82].includes(code)) return 'fa-cloud-rain text-blue-300';
+              if ([61, 63, 65, 66, 67].includes(code)) return 'fa-cloud-showers-heavy text-blue-400';
+              if ([71, 73, 75, 77, 85, 86].includes(code)) return 'fa-snowflake text-blue-100';
+              if ([95, 96, 99].includes(code)) return 'fa-cloud-bolt text-yellow-300';
+              return 'fa-cloud-sun text-yellow-300';
+          }
+
+          async function updateAllWeather() {
+              for (let city of weatherData) {
+                  try {
+                      const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,weather_code`;
+                      const response = await fetch(url);
+                      if (response.ok) {
+                          const data = await response.json();
+                          city.temp = Math.round(data.current.temperature_2m);
+                          city.code = data.current.weather_code;
+                      }
+                  } catch (e) {
+                      console.warn(`Error fetching weather for ${city.name}:`, e);
+                  }
+              }
+              renderWeather();
+          }
+
+          function renderWeather() {
+              if (!ticker) return;
+              const city = weatherData[currentIndex];
+              const iconClass = getWeatherIconClass(city.code);
+              
+              ticker.innerHTML = `
+                  <span class="flex items-center gap-1.5 transition-all duration-300">
+                      <i class="fas ${iconClass} text-lg"></i>
+                      <span class="font-bold text-white text-sm">${city.temp}°</span>
+                      <span class="text-xs text-gray-200">- ${city.name}</span>
+                  </span>
+              `;
+          }
+
+          function rotateWeather() {
+              if (!ticker) return;
+              ticker.style.opacity = '0';
+              ticker.style.transform = 'translateY(-5px)';
+              
+              setTimeout(() => {
+                  currentIndex = (currentIndex + 1) % weatherData.length;
+                  renderWeather();
+                  ticker.style.opacity = '1';
+                  ticker.style.transform = 'translateY(0)';
+              }, 300);
+          }
+
+          // Inicializar clima rotativo
+          updateAllWeather();
+          setInterval(rotateWeather, 3800);
+      });
+  </script>
 
 <!-- Navbar Mejorada -->
 <nav class="bg-white dark:bg-gray-900 shadow-xl sticky top-0 left-0 w-full z-50 border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
@@ -251,11 +384,6 @@
       </button>
     </form>
     
-    <!-- Toggle de modo oscuro -->
-    <button data-dark-mode-toggle class="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-300 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
-      <i class="fas fa-sun sun-icon text-lg hidden"></i>
-      <i class="fas fa-moon moon-icon text-lg"></i>
-    </button>
   </div>
 </div>
 
@@ -549,6 +677,79 @@
     
     <!-- Bootstrap JS - Solo una versión -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+@if(isset($banners['popup']) && $banners['popup']->count() > 0)
+  @php
+    $popupBanner = $banners['popup']->first();
+  @endphp
+  <!-- Modal Publicitario Emergente Global -->
+  <div id="promoModal" style="position: fixed; inset: 0; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(4px); transition: opacity 0.3s ease; opacity: 0; pointer-events: none;">
+    <div id="promoModalContent" class="relative max-w-lg w-full mx-4" style="transform: scale(0.9); opacity: 0; transition: transform 0.3s ease, opacity 0.3s ease;">
+      
+      <!-- Contenedor con marco grueso gris oscuro e imagen -->
+      <div class="relative bg-black rounded overflow-hidden shadow-2xl" style="border: 8px solid #2d3748; outline: 2px solid #1a202c;">
+        
+        <!-- Botón de cerrar rojo 'X' en la esquina superior derecha interna -->
+        <button onclick="closePromoModal()" class="absolute top-3 right-4 z-10 text-red-500 hover:text-red-400 transition-colors duration-200 focus:outline-none" aria-label="Cerrar" style="background: none; border: none; cursor: pointer;">
+          <i class="fas fa-times text-2xl filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"></i>
+        </button>
+
+        <a href="{{ $popupBanner->link ?? '#' }}" {{ $popupBanner->link ? 'target="_blank" rel="noopener noreferrer"' : '' }} class="block overflow-hidden group">
+          <img src="{{ asset($popupBanner->image_path) }}" alt="{{ $popupBanner->title }}" 
+               class="w-full h-auto object-cover max-h-[70vh] transition-transform duration-500 group-hover:scale-[1.01]">
+        </a>
+      </div>
+      
+      <!-- Indicación de teclado sutil debajo del modal -->
+      <div class="text-center mt-4 animate-pulse">
+        <span class="text-xs bg-black/60 text-gray-300 px-3 py-1.5 rounded-full border border-white/10 uppercase tracking-widest font-mono shadow-md">Presiona [Z] para cerrar</span>
+      </div>
+      
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('promoModal');
+        const modalContent = document.getElementById('promoModalContent');
+        
+        if (modal && modalContent) {
+            // Mostrar modal tras 1.5 segundos
+            setTimeout(() => {
+                modal.style.opacity = '1';
+                modal.style.pointerEvents = 'auto';
+                modalContent.style.transform = 'scale(1)';
+                modalContent.style.opacity = '1';
+                
+                // Prevenir scroll en la página mientras el modal está abierto
+                document.body.style.overflow = 'hidden';
+            }, 1500);
+        }
+
+        // Escuchador de teclado para la tecla 'z' o 'Z'
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'z' || e.key === 'Z' || e.keyCode === 90) {
+                closePromoModal();
+            }
+        });
+    });
+
+    function closePromoModal() {
+        const modal = document.getElementById('promoModal');
+        const modalContent = document.getElementById('promoModalContent');
+        
+        if (modal && modalContent) {
+            modalContent.style.transform = 'scale(0.9)';
+            modalContent.style.opacity = '0';
+            modal.style.opacity = '0';
+            modal.style.pointerEvents = 'none';
+            
+            // Restaurar scroll de la página
+            document.body.style.overflow = '';
+        }
+    }
+  </script>
+@endif
 </body>
 
 </html>
