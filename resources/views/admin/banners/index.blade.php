@@ -206,6 +206,28 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Popup Banner -->
+                <div class="col-md-4">
+                    <div class="card h-100 border-primary" style="border-color: #6f42c1 !important;">
+                        <div class="card-header text-white" style="background-color: #6f42c1 !important;">
+                            <h6 class="mb-0"><i class="fas fa-window-restore me-2"></i>Publicidad Emergente (Popup)</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="position-relative mb-3" style="background: linear-gradient(135deg, #6f42c1 0%, #8c68cd 100%); height: 120px; border-radius: 8px; overflow: hidden;">
+                                <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center text-white">
+                                    <div class="text-center">
+                                        <i class="fas fa-window-restore fa-3x mb-2 opacity-50"></i>
+                                        <p class="mb-0 small">Popup Portada</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="small mb-2"><strong>Ubicación:</strong> <code>popup</code></p>
+                            <p class="small mb-2"><strong>Descripción:</strong> Ventana emergente publicitaria al cargar la portada (cerrable con la tecla 'Z')</p>
+                            <p class="small mb-0"><strong>Dimensiones recomendadas:</strong> 800x800px o formato vertical/cuadrado</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

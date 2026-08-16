@@ -40,6 +40,7 @@
     <script>
         tailwind.config = {
             darkMode: 'class',
+            important: true,
             theme: {
                 extend: {
                     colors: {
@@ -142,6 +143,19 @@
         /* Estilos base para modo oscuro */
         .dark {
             color-scheme: dark;
+        }
+        
+        .dark body, body.dark {
+            background-color: #0f172a !important;
+            color: #f1f5f9 !important;
+        }
+        
+        .dark .bg-white, .dark .bg-gray-50, .dark .bg-gray-100 {
+            background-color: #1e293b !important;
+        }
+
+        .dark .text-gray-900 {
+            color: #f1f5f9 !important;
         }
     </style>
 

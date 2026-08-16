@@ -137,6 +137,7 @@
                                     <option value="category_bottom" {{ old('location') == 'category_bottom' ? 'selected' : '' }}>Categoría - Abajo</option>
                                     <option value="show_top" {{ old('location') == 'show_top' ? 'selected' : '' }}>Noticia - Arriba</option>
                                     <option value="show_bottom" {{ old('location') == 'show_bottom' ? 'selected' : '' }}>Noticia - Abajo</option>
+                                    <option value="popup" {{ old('location') == 'popup' ? 'selected' : '' }}>Publicidad Emergente (Popup - Portada)</option>
                                 </select>
                                 @error('location')
                                     <div class="invalid-feedback">{{ $message }}</div>
