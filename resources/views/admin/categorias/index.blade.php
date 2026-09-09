@@ -343,7 +343,7 @@
                             </div>
                             <div>
                                 <h6 class="mb-0 font-weight-bold text-primary">{{ $category->name }}</h6>
-                                <small class="text-muted">ID: {{ $category->id }}</small>
+                                <small class="text-muted"><code>/{{ $category->slug }}</code> &bull; ID: {{ $category->id }}</small>
                             </div>
                         </div>
                         <div class="dropdown">
@@ -351,6 +351,11 @@
                                 <i class="fas fa-ellipsis-v"></i>
                             </button>
                             <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="{{ $category->url }}" target="_blank">
+                                        <i class="fas fa-external-link-alt text-success"></i> Ver en Sitio
+                                    </a>
+                                </li>
                                 <li>
                                     <a class="dropdown-item" href="{{ route('admin.categorias.edit', $category->id) }}">
                                         <i class="fas fa-edit text-warning"></i> Editar

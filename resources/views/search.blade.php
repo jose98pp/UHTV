@@ -65,7 +65,7 @@
                     @foreach($noticias as $noticia)
                         <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 dark:border-gray-700">
                             <div class="relative overflow-hidden">
-                                <a href="{{ route('show', $noticia->id) }}" class="block">
+                                <a href="{{ $noticia->url }}" class="block">
                                     <img src="{{ $noticia->imagenUrl ?? asset('images/default-news.svg') }}" 
                                          alt="{{ $noticia->titulo }}" 
                                          class="w-full h-56 object-cover transition-transform duration-500 hover:scale-110"
@@ -102,7 +102,7 @@
                                 </div>
                                 
                                 <!-- Título y Contenido -->
-                                <a href="{{ route('show', $noticia->id) }}" class="block group">
+                                <a href="{{ $noticia->url }}" class="block group">
                                     <h3 class="font-bold text-gray-900 dark:text-gray-100 mb-3 text-lg leading-tight line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300">
                                         {{ $noticia->titulo }}
                                     </h3>
@@ -113,7 +113,7 @@
                                 
                                 <!-- Botón de Acción -->
                                 <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
-                                    <a href="{{ route('show', $noticia->id) }}" 
+                                    <a href="{{ $noticia->url }}" 
                                        class="inline-flex items-center text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-semibold text-sm transition-colors duration-300 group">
                                         Leer noticia completa
                                         <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform duration-300"></i>
@@ -178,7 +178,7 @@
             </h2>
             <div class="flex flex-wrap justify-center gap-4">
                 @foreach($categorias as $categoria)
-                    <a href="{{ route('categoria.noticias', $categoria->id) }}" 
+                    <a href="{{ $categoria->url }}" 
                        class="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-purple-600 hover:to-red-600 hover:text-white px-6 py-3 rounded-full transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-1">
                         {{ $categoria->name }}
                     </a>

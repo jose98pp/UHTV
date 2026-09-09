@@ -68,6 +68,15 @@
         </div>
 
         <div class="form-group mb-3">
+            <label for="slug" class="form-label">Slug / URL amigable (opcional)</label>
+            <input type="text" name="slug" id="slug" class="form-control" value="{{ old('slug', $category->slug) }}" placeholder="ej: politica, deportes">
+            <small class="text-muted">Define la URL pública: <code>{{ url('/') }}/<strong>nombre-categoria</strong></code></small>
+            @error('slug')
+                <small class="text-danger d-block">{{ $message }}</small>
+            @enderror
+        </div>
+
+        <div class="form-group mb-3">
             <label for="descripcion" class="form-label">Descripción (opcional)</label>
             
             {{-- Include help card --}}

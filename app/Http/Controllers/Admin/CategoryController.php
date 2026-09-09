@@ -35,6 +35,7 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:categories',
+            'slug' => 'nullable|string|max:255|unique:categories,slug',
             'descripcion' => 'nullable|string',
         ]);
 
@@ -59,6 +60,7 @@ class CategoryController extends Controller
 
         $categories = new Category();
         $categories->name = $request->name;
+        $categories->slug = $request->slug ? \Illuminate\Support\Str::slug($request->slug) : \Illuminate\Support\Str::slug($request->name);
         $categories->descripcion = $request->descripcion ? 
             $this->sanitizationService->sanitizeContent($request->descripcion) : null;
         $categories->save();
@@ -82,6 +84,7 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:categories,name,' . $id,
+            'slug' => 'nullable|string|max:255|unique:categories,slug,' . $id,
             'descripcion' => 'nullable|string',
         ]);
 
@@ -107,6 +110,7 @@ class CategoryController extends Controller
 
         $categories = Category::findOrFail($id);
         $categories->name = $request->name;
+        $categories->slug = $request->slug ? \Illuminate\Support\Str::slug($request->slug) : ($categories->slug ?: \Illuminate\Support\Str::slug($request->name));
         $categories->descripcion = $request->descripcion ? 
             $this->sanitizationService->sanitizeContent($request->descripcion) : null;
         $categories->save();

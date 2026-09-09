@@ -233,10 +233,21 @@
       
       <!-- Right Column: Live Badge + Dark Mode Toggle -->
       <div class="flex items-center justify-end space-x-4 w-full md:w-1/3">
-        <div class="flex items-center bg-red-600 text-white text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full shadow-sm animate-pulse">
-          <span class="w-1.5 h-1.5 rounded-full bg-white mr-1.5"></span>
-          En Vivo
-        </div>
+        @if(isset($transmisionEnVivo) && $transmisionEnVivo)
+          <button type="button" 
+                  data-open-live-modal 
+                  data-stream-embed="{{ $transmisionEnVivo->embed_url }}"
+                  data-stream-title="{{ $transmisionEnVivo->titulo }}"
+                  class="group relative inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-red-600 via-red-500 to-red-600 hover:from-red-500 hover:to-red-700 text-white text-[11px] font-extrabold uppercase tracking-wider shadow-lg hover:shadow-red-500/40 transition-all duration-300 transform hover:scale-105 focus:outline-none cursor-pointer border border-white/20"
+                  title="Transmitiendo En Vivo: {{ $transmisionEnVivo->titulo }}">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+            </span>
+            <span>En Vivo</span>
+            <i class="fas fa-play text-[8px] opacity-80 group-hover:opacity-100 transition-opacity"></i>
+          </button>
+        @endif
         <!-- Selector de tema oscuro -->
         <button data-dark-mode-toggle class="p-2 rounded-full hover:bg-white/10 text-white transition-colors" aria-label="Cambiar tema" style="background: none; border: none; cursor: pointer;">
           <i class="fas fa-sun text-yellow-400 sun-icon hidden"></i>
@@ -360,7 +371,7 @@
   <!-- Menú para pantallas grandes -->
   <div class="hidden lg:flex space-x-8 mx-auto">
     @forelse($categorias ?? [] as $categoria)
-      <a href="{{ route('categoria.noticias', $categoria->id) }}" 
+      <a href="{{ $categoria->url }}" 
          class="text-gray-700 dark:text-gray-300 font-semibold hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-300 relative group py-2">
         {{ $categoria->name }}
         <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-red-600 transition-all duration-300 group-hover:w-full"></span>
@@ -411,6 +422,15 @@
         <i class="fas fa-home text-lg"></i>
         <span class="font-semibold">Inicio</span>
       </a>
+      @if(isset($transmisionEnVivo) && $transmisionEnVivo)
+        <a href="{{ route('transmisiones.en-vivo') }}" class="flex items-center space-x-3 text-red-600 dark:text-red-400 hover:text-red-700 font-semibold py-3 border-b border-gray-100 dark:border-gray-700">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600"></span>
+          </span>
+          <span>🔴 En Vivo Ahora</span>
+        </a>
+      @endif
       
       <!-- Búsqueda móvil -->
       <div class="mt-4">
@@ -432,7 +452,7 @@
       <h3 class="text-gray-500 dark:text-gray-400 uppercase text-sm font-semibold tracking-wide mb-4">Categorías</h3>
       <div class="space-y-2">
         @forelse($categorias ?? [] as $categoria)
-          <a href="{{ route('categoria.noticias', $categoria->id) }}" 
+          <a href="{{ $categoria->url }}" 
              class="flex items-center space-x-3 text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all duration-300 py-3 px-4 rounded-lg">
             <i class="fas fa-folder text-sm"></i>
             <span class="font-medium">{{ $categoria->name }}</span>
@@ -528,27 +548,65 @@
   });
 </script>
 
-    <!-- Contenedor de Publicidad -->
-    <!-- Banner Publicitario -->
-    <!-- Contenedor de Publicidad -->
-    <!-- Banner Publicitario -->
-    @if(isset($banners['footer']) && $banners['footer']->count() > 0)
-        @foreach($banners['footer'] as $banner)
-            <div class="publicidad w-full flex justify-center items-center my-6 px-4">
-                <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="block w-full max-w-5xl transition-transform hover:scale-[1.01] duration-300"> 
-                    <img src="{{ asset($banner->image_path) }}" 
-                         alt="{{ $banner->title }}" 
-                         class="w-full h-auto rounded-xl shadow-lg object-cover border border-gray-200 dark:border-gray-700" 
-                         loading="lazy">
-                </a>
-            </div>
-        @endforeach
-    @endif
-    
+  @if(isset($transmisionEnVivo) && $transmisionEnVivo)
+    <!-- Alerta En Vivo Principal -->
+    <aside id="liveStreamAlert" class="bg-gradient-to-r from-red-700 via-red-600 to-red-800 text-white shadow-xl border-y border-red-500/40 relative z-30 transition-all duration-300" aria-label="Alerta de Transmisión en Vivo">
+      <div class="container mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center space-x-3 overflow-hidden min-w-0">
+          <span class="relative flex h-3 w-3 flex-shrink-0">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-90"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+          </span>
+          <span class="bg-black/40 text-white text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full border border-white/20 flex-shrink-0">
+            🔴 EN VIVO AHORA
+          </span>
+          <span class="text-xs sm:text-sm font-bold truncate text-white">
+            {{ $transmisionEnVivo->titulo }}
+          </span>
+        </div>
+        <div class="flex items-center space-x-2 flex-shrink-0 ml-auto">
+          <button type="button" 
+                  data-open-live-modal 
+                  data-stream-embed="{{ $transmisionEnVivo->embed_url }}"
+                  data-stream-title="{{ $transmisionEnVivo->titulo }}"
+                  class="bg-white text-red-600 hover:bg-gray-100 font-extrabold text-xs px-3.5 py-1.5 rounded-full shadow transition-all duration-200 flex items-center gap-1.5 transform hover:scale-105 cursor-pointer">
+            <i class="fas fa-play text-[9px]"></i>
+            <span>Ver Transmisión</span>
+          </button>
+          <button type="button" 
+                  onclick="document.getElementById('liveStreamAlert').style.display='none'" 
+                  class="text-white/80 hover:text-white p-1 focus:outline-none transition-colors" 
+                  title="Cerrar aviso">
+            <i class="fas fa-times text-xs"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+  @endif
+
     <!-- Contenido Principal -->
     <main class="container my-4">
         @yield('content')
     </main>
+
+    <!-- Banner Publicitario Footer (Pre-Footer) -->
+    @if(isset($banners['footer']) && $banners['footer']->count() > 0)
+        <div class="publicidad-footer w-full flex flex-col justify-center items-center my-8 px-4">
+            <div class="text-center mb-2">
+                <span class="text-gray-400 dark:text-gray-500 text-xs font-semibold uppercase tracking-wider">Publicidad</span>
+            </div>
+            @foreach($banners['footer'] as $banner)
+                <div class="w-full flex justify-center mb-4">
+                    <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="block w-full max-w-5xl transition-transform hover:scale-[1.01] duration-300 group"> 
+                        <img src="{{ asset($banner->image_path) }}" 
+                             alt="{{ $banner->title }}" 
+                             class="w-full h-auto rounded-2xl shadow-lg object-cover border border-gray-200 dark:border-gray-700" 
+                             loading="lazy">
+                    </a>
+                </div>
+            @endforeach
+        </div>
+    @endif
 
    <!-- Footer Moderno - Inspirado en la imagen -->
 <footer class="bg-gray-800 dark:bg-gray-900 text-white py-12 border-t border-gray-700">
@@ -572,7 +630,7 @@
                 <ul class="space-y-2">
                     @forelse($categorias ?? [] as $categoria)
                         <li>
-                            <a href="{{ route('categoria.noticias', $categoria->id) }}" 
+                            <a href="{{ $categoria->url }}" 
                                class="text-gray-400 hover:text-purple-400 transition-colors duration-300 text-sm">
                                 {{ $categoria->name }}
                             </a>
@@ -750,6 +808,10 @@
     }
   </script>
 @endif
+
+  <!-- Modal de Streaming En Vivo y Podcasts -->
+  @include('partials.live-modal')
+
 </body>
 
 </html>

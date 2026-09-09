@@ -11,7 +11,7 @@
                 <i class="fas fa-home mr-2"></i>Inicio
             </a>
             <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500"></i>
-            <a href="{{ route('categoria.noticias', $noticia->category->id) }}" class="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 transition-colors duration-300 font-medium">
+            <a href="{{ $noticia->category ? $noticia->category->url : route('portada') }}" class="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 transition-colors duration-300 font-medium">
                 {{ $noticia->category->name ?? 'Noticias' }}
             </a>
             <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500"></i>
@@ -19,6 +19,26 @@
         </nav>
     </div>
 </section>
+
+<!-- Banner Publicitario Show Top -->
+@if(isset($banners['show_top']) && $banners['show_top']->count() > 0)
+    <section class="py-6 bg-gray-50 dark:bg-gray-800/50 transition-colors duration-300 border-b border-gray-100 dark:border-gray-800">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-2">
+                <span class="text-gray-400 dark:text-gray-500 text-xs font-semibold uppercase tracking-wider">Publicidad</span>
+            </div>
+            @foreach($banners['show_top'] as $banner)
+                <div class="flex justify-center mb-4">
+                    <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="block max-w-5xl w-full group">
+                        <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
+                             class="w-full h-auto rounded-2xl shadow-lg hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700" 
+                             loading="lazy">
+                    </a>
+                </div>
+            @endforeach
+        </div>
+    </section>
+@endif
 
 <!-- Artículo Principal - Diseño Moderno -->
 <article class="bg-white dark:bg-gray-900 transition-colors duration-300">
@@ -248,7 +268,7 @@
                 @foreach($noticias as $otraNoticia)
                     <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 dark:border-gray-700">
                         <div class="relative overflow-hidden">
-                            <a href="{{ route('show', $otraNoticia->id) }}" class="block">
+                            <a href="{{ $otraNoticia->url }}" class="block">
                                 <img src="{{ $otraNoticia->imagenUrl ?? asset('images/default-news.svg') }}" 
                                      alt="{{ $otraNoticia->titulo }}" 
                                      class="w-full h-56 object-cover transition-transform duration-500 hover:scale-110"
@@ -276,7 +296,7 @@
                             </div>
                             
                             <!-- Título y Contenido -->
-                            <a href="{{ route('show', $otraNoticia->id) }}" class="block group">
+                            <a href="{{ $otraNoticia->url }}" class="block group">
                                 <h3 class="font-bold text-gray-900 dark:text-gray-100 mb-3 text-lg leading-tight line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300">
                                     {{ $otraNoticia->titulo }}
                                 </h3>
@@ -287,7 +307,7 @@
                             
                             <!-- Botón de Acción -->
                             <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
-                                <a href="{{ route('show', $otraNoticia->id) }}" 
+                                <a href="{{ $otraNoticia->url }}" 
                                    class="inline-flex items-center text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-semibold text-sm transition-colors duration-300 group">
                                     Leer noticia
                                     <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform duration-300"></i>

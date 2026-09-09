@@ -30,4 +30,39 @@ class Noticia extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function getSlugAttribute(): string
+    {
+        $slug = \Illuminate\Support\Str::slug($this->titulo);
+        return !empty($slug) ? $slug : 'noticia';
+    }
+
+    public function getSlugWithIdAttribute(): string
+    {
+        return $this->slug . '_' . $this->id;
+    }
+
+    public function getCategorySlugAttribute(): string
+    {
+        if ($this->category) {
+            return $this->category->slug ?: \Illuminate\Support\Str::slug($this->category->name);
+        }
+        return 'general';
+    }
+
+    public function getUrlAttribute(): string
+    {
+        return route('show', [
+            'category' => $this->category_slug,
+            'slug' => $this->slug_with_id,
+        ]);
+    }
+
+    public function getUrlParamsAttribute(): array
+    {
+        return [
+            'category' => $this->category_slug,
+            'slug' => $this->slug_with_id,
+        ];
+    }
 }

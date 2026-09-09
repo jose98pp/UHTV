@@ -15,14 +15,16 @@ use App\Http\Controllers\ProfileController;
 // Ruta principal (Portada)
 Route::get('/', [PortadaController::class, 'index'])->name('portada');
 
-// Ruta para mostrar las noticias por categoría
-Route::get('/categoria/{id}', [PortadaController::class, 'noticiasPorCategoria'])->name('categoria.noticias');
-
-// Ruta para mostrar el detalle de una noticia
-Route::get('/noticia/{id}', [PortadaController::class, 'show'])->name('show');
+// Redirecciones 301 legacy para mantener SEO y compatibilidad con enlaces antiguos
+Route::get('/noticia/{id}', [PortadaController::class, 'legacyShow'])->where('id', '[0-9]+')->name('noticia.legacy');
+Route::get('/categoria/{id}', [PortadaController::class, 'legacyCategory'])->where('id', '[0-9]+')->name('categoria.legacy');
 
 // Ruta para búsqueda de noticias
 Route::get('/buscar', [PortadaController::class, 'search'])->name('search');
+
+// Rutas para Transmisiones En Vivo, Podcasts y Clips
+Route::get('/en-vivo', [\App\Http\Controllers\TransmisionPublicController::class, 'index'])->name('transmisiones.en-vivo');
+Route::get('/transmisiones/data/{id}', [\App\Http\Controllers\TransmisionPublicController::class, 'showJson'])->name('transmisiones.json');
 
 // Ruta de prueba para imágenes (solo en desarrollo)
 if (app()->environment('local')) {
@@ -71,6 +73,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Rutas para el CRUD de banners
     Route::resource('banners', \App\Http\Controllers\Admin\BannerController::class);
 
+    // Rutas para el CRUD de transmisiones en vivo, podcasts y clips
+    Route::post('transmisiones/preview', [\App\Http\Controllers\Admin\TransmisionController::class, 'preview'])->name('transmisiones.preview');
+    Route::post('transmisiones/{id}/toggle-live', [\App\Http\Controllers\Admin\TransmisionController::class, 'toggleLive'])->name('transmisiones.toggle-live');
+    Route::post('transmisiones/{id}/toggle-active', [\App\Http\Controllers\Admin\TransmisionController::class, 'toggleActive'])->name('transmisiones.toggle-active');
+    Route::resource('transmisiones', \App\Http\Controllers\Admin\TransmisionController::class);
+
     // Ruta para cerrar sesión (logout)
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
@@ -90,5 +98,20 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
 // Incluye las rutas de autenticación generadas automáticamente por Laravel
 require __DIR__ . '/auth.php';
+
+// ---------------------------------
+// Rutas Públicas SEO para Noticias y Categorías
+// Colocadas al final para no colisionar con rutas estáticas ni de administración
+// ---------------------------------
+
+// Detalle de noticia con URL amigable: /{categoria}/{slug}_{id} (ej: /pais/gobierno-anuncia-nuevas-medidas_125)
+Route::get('/{category}/{slug}', [PortadaController::class, 'show'])
+    ->where('slug', '.*_[0-9]+')
+    ->name('show');
+
+// Noticias por categoría con URL amigable: /{categoria} (ej: /pais, /politica, /economia)
+Route::get('/{category}', [PortadaController::class, 'noticiasPorCategoria'])
+    ->name('categoria.noticias');

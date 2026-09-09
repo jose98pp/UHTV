@@ -24,6 +24,26 @@
     </div>
 </section>
 
+<!-- Banner Publicitario Category Top -->
+@if(isset($banners['category_top']) && $banners['category_top']->count() > 0)
+    <section class="py-4">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-2">
+                <span class="text-gray-400 dark:text-gray-500 text-xs font-semibold uppercase tracking-wider">Publicidad</span>
+            </div>
+            @foreach($banners['category_top'] as $banner)
+                <div class="flex justify-center mb-4">
+                    <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="block max-w-5xl w-full group">
+                        <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
+                             class="w-full h-auto rounded-2xl shadow-lg hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700" 
+                             loading="lazy">
+                    </a>
+                </div>
+            @endforeach
+        </div>
+    </section>
+@endif
+
 <!-- Noticias de la Categoría -->
 <section class="py-4">
     <div class="container mx-auto">
@@ -32,7 +52,7 @@
                 <div class="md:flex h-full">
                     <!-- Imagen -->
                     <div class="md:w-2/5 relative overflow-hidden">
-                        <a href="{{ route('show', $noticia->id) }}" class="block h-full">
+                        <a href="{{ $noticia->url }}" class="block h-full">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
                             <img src="{{ $noticia->imagenUrl ?? asset('images/default-news.svg') }}" 
                                  alt="{{ $noticia->titulo }}" 
@@ -60,7 +80,7 @@
                                 </span>
                             </div>
                             
-                            <a href="{{ route('show', $noticia->id) }}" class="block">
+                            <a href="{{ $noticia->url }}" class="block">
                                 <h2 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4 leading-tight group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300">
                                     {{ $noticia->titulo }}
                                 </h2>
@@ -79,7 +99,7 @@
                                     <i class="far fa-share-square"></i>
                                 </button>
                             </div>
-                            <a href="{{ route('show', $noticia->id) }}" 
+                            <a href="{{ $noticia->url }}" 
                                class="inline-flex items-center bg-gray-50 dark:bg-gray-700 hover:bg-purple-600 dark:hover:bg-purple-600 text-gray-700 dark:text-gray-200 hover:text-white px-6 py-2 rounded-full font-semibold transition-all duration-300 group-hover:shadow-md">
                                 Leer artículo <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform"></i>
                             </a>
@@ -221,7 +241,7 @@ function changePerPage(perPage) {
             @foreach($noticias as $otraNoticia)
                 <article class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 group border border-gray-100 dark:border-gray-700">
                     <div class="relative overflow-hidden h-48">
-                        <a href="{{ route('show', $otraNoticia->id) }}">
+                        <a href="{{ $otraNoticia->url }}">
                             <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors z-10"></div>
                             <img src="{{ $otraNoticia->imagenUrl ?? asset('images/default-news.svg') }}" 
                                  alt="{{ $otraNoticia->titulo }}" 
@@ -241,7 +261,7 @@ function changePerPage(perPage) {
                                 {{ \Carbon\Carbon::parse($otraNoticia->created_at)->locale('es')->diffForHumans() }}
                             </span>
                         </div>
-                        <a href="{{ route('show', $otraNoticia->id) }}">
+                        <a href="{{ $otraNoticia->url }}">
                             <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
                                 {{ $otraNoticia->titulo }}
                             </h3>

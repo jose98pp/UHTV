@@ -11,9 +11,9 @@
       <!-- Carrusel Principal de Noticias -->
       <div class="lg:col-span-3">
         <div class="relative bg-white rounded-xl shadow-xl overflow-hidden h-full">
-          <!-- Etiqueta de "ÚLTIMAS NOTICIAS" -->
+          <!-- Etiqueta de "ÚLTIMAS NOTICIAS" / Indicador Principal -->
           <div class="absolute top-4 left-4 z-20">
-            <span class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wide shadow-lg">
+            <span class="bg-gradient-to-r from-[#0099ff] via-[#4f46e5] to-[#9333ea] text-white px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wide shadow-lg border border-white/20">
               <i class="fas fa-bolt mr-2"></i>Últimas Noticias
             </span>
           </div>
@@ -23,7 +23,7 @@
               @foreach($noticias->take(5) as $index => $noticia)
                 <div class="carousel-item h-full @if($index === 0) active @endif">
                   <div class="relative h-full">
-                    <a href="{{ route('show', $noticia->id) }}" class="block h-full">
+                    <a href="{{ $noticia->url }}" class="block h-full">
                       <img src="{{ $noticia->imagenUrl ?? asset('images/default-news.svg') }}" 
                            alt="{{ $noticia->titulo }}" 
                            class="w-full h-full min-h-[450px] object-cover"
@@ -35,11 +35,11 @@
                     <!-- Contenido sobre la imagen -->
                     <div class="absolute bottom-0 left-0 right-0 p-8 text-white">
                       <div class="mb-3">
-                        <span class="bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">
+                        <span class="bg-gradient-to-r from-[#0099ff] via-[#4f46e5] to-[#9333ea] text-white px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide shadow-md border border-white/20">
                           {{ $noticia->category->name ?? 'Destacado' }}
                         </span>
                       </div>
-                      <a href="{{ route('show', $noticia->id) }}" class="text-white no-underline block">
+                      <a href="{{ $noticia->url }}" class="text-white no-underline block">
                         <h2 class="text-3xl font-bold mb-3 leading-tight hover:text-purple-300 transition-colors duration-300 line-clamp-2">
                           {{ $noticia->titulo }}
                         </h2>
@@ -89,25 +89,55 @@
 
       <!-- Sidebar: Videos y Noticias Destacadas -->
       <div class="lg:col-span-1 space-y-6">
-        <!-- Últimos Videos -->
+        <!-- Videos UHTV -->
+        @php
+            $portadaRecientes = $transmisionesRecientes ?? collect();
+            $portadaVivo = $transmisionEnVivo ?? null;
+            $portadaStream = $portadaVivo ?? ($portadaRecientes->first() ?? null);
+            $sidebarEmbed = $portadaStream ? $portadaStream->embed_url : 'https://www.youtube.com/embed?listType=playlist&list=UUx8c9O9qP3IjtnEKkEr-Bng';
+            $sidebarTitle = $portadaStream ? $portadaStream->titulo : 'Videos de UHTV';
+        @endphp
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700">
-          <div class="bg-gradient-to-r from-red-600 to-red-700 text-white p-4">
+          <div class="bg-gradient-to-r from-red-600 to-red-700 text-white p-4 flex items-center justify-between">
             <h3 class="font-bold text-lg flex items-center">
               <i class="fab fa-youtube mr-2"></i>
-              En Vivo
+              <span>Videos UHTV</span>
             </h3>
+            @if($portadaStream && $portadaStream->en_vivo)
+              <span class="inline-flex items-center gap-1 bg-white text-red-600 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full shadow-sm animate-pulse">
+                <span class="w-1.5 h-1.5 rounded-full bg-red-600"></span>
+                VIVO
+              </span>
+            @endif
           </div>
           <div class="p-4">
-            <div class="relative pb-[56.25%] rounded-lg overflow-hidden">
+            <div class="relative pb-[56.25%] rounded-lg overflow-hidden shadow-inner bg-black">
               <iframe 
                 class="absolute top-0 left-0 w-full h-full"
-                src="https://www.youtube.com/embed?listType=playlist&list=UUx8c9O9qP3IjtnEKkEr-Bng" 
-                title="Últimos Videos de UHTV Bolivia" 
+                src="{{ $sidebarEmbed }}" 
+                title="{{ $sidebarTitle }}" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                 allowfullscreen
                 loading="lazy">
               </iframe>
             </div>
+            @if($portadaStream)
+              <div class="mt-3">
+                <h4 class="font-bold text-gray-900 dark:text-gray-100 text-sm line-clamp-2 mb-2">
+                  {{ $portadaStream->titulo }}
+                </h4>
+                <div class="flex items-center justify-between text-xs pt-2 border-t border-gray-100 dark:border-gray-700">
+                  <button type="button" 
+                          data-open-live-modal
+                          data-stream-embed="{{ $portadaStream->embed_url }}"
+                          data-stream-title="{{ $portadaStream->titulo }}"
+                          class="text-red-600 dark:text-red-400 font-bold hover:underline flex items-center gap-1 focus:outline-none">
+                    <i class="fas fa-expand-alt text-[10px]"></i>
+                    <span>Abrir en Modal</span>
+                  </button>
+                </div>
+              </div>
+            @endif
           </div>
         </div>
 
@@ -126,7 +156,7 @@
                   {{ $index + 1 }}
                 </span>
                 <div class="flex-1">
-                  <a href="{{ route('show', $noticia->id) }}" class="block">
+                  <a href="{{ $noticia->url }}" class="block">
                     <h4 class="font-semibold text-gray-900 dark:text-gray-100 text-sm leading-tight hover:text-purple-600 dark:hover:text-purple-400 transition-colors line-clamp-2">
                       {{ $noticia->titulo }}
                     </h4>
@@ -166,7 +196,7 @@
 <section class="bg-uhtv-purple-700 dark:bg-uhtv-purple-900 text-white py-2 overflow-hidden border-y border-uhtv-purple-500 dark:border-uhtv-purple-800 relative shadow-md z-10">
   <div class="container mx-auto px-4 flex items-center">
     <!-- Etiqueta "Último Momento" -->
-    <div class="bg-red-600 text-white text-xs font-bold uppercase px-3 py-1 rounded-full mr-4 flex-shrink-0 animate-pulse shadow-sm z-20 relative">
+    <div class="bg-gradient-to-r from-[#0099ff] via-[#4f46e5] to-[#9333ea] text-white text-xs font-bold uppercase px-3.5 py-1.5 rounded-full mr-4 flex-shrink-0 animate-pulse shadow-sm z-20 relative border border-white/20">
       <i class="fas fa-circle text-[8px] mr-2 align-middle"></i>Último Momento
     </div>
     
@@ -175,7 +205,7 @@
       <div class="ticker">
         @foreach($ultimasNoticias->take(10) as $noticia)
           <div class="ticker__item inline-block px-4 text-sm font-medium hover:text-uhtv-purple-200 transition-colors">
-            <a href="{{ route('show', $noticia->id) }}" class="flex items-center">
+            <a href="{{ $noticia->url }}" class="flex items-center">
               <span class="text-uhtv-purple-300 mr-2">[{{ $noticia->created_at->format('H:i') }}]</span>
               {{ $noticia->titulo }}
             </a>
@@ -207,6 +237,12 @@
     0% { transform: translateX(0); }
     100% { transform: translateX(-100%); }
   }
+  /* Indicadores del carrusel con degradé celeste a lila */
+  .carousel-indicators button.active {
+    background: linear-gradient(90deg, #0099ff, #9333ea) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 10px rgba(0, 153, 255, 0.5);
+  }
 </style>
 
 <!-- Sección de Noticias por Categorías - Estilo Brújula Digital -->
@@ -214,7 +250,7 @@
   <div class="container mx-auto px-4">
     <div class="text-center mb-12">
       <h2 class="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">Noticias por Categorías</h2>
-      <div class="w-32 h-1 bg-gradient-to-r from-purple-600 to-red-600 mx-auto rounded-full"></div>
+      <div class="w-32 h-1 bg-gradient-to-r from-[#0099ff] via-[#4f46e5] to-[#9333ea] mx-auto rounded-full"></div>
       <p class="text-gray-600 dark:text-gray-300 mt-4 text-lg">Mantente informado con las últimas noticias de cada sección</p>
     </div>
 
@@ -226,9 +262,9 @@
           <div class="flex items-center justify-between mb-8">
             <div class="flex items-center space-x-4">
               <h3 class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ $categoria->name }}</h3>
-              <div class="w-16 h-1 bg-gradient-to-r from-purple-600 to-red-600 rounded-full"></div>
+              <div class="w-16 h-1 bg-gradient-to-r from-[#0099ff] via-[#4f46e5] to-[#9333ea] rounded-full"></div>
             </div>
-            <a href="{{ route('categoria.noticias', $categoria->id) }}" 
+            <a href="{{ $categoria->url }}" 
                class="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-semibold flex items-center transition-colors duration-300">
               Ver todas <i class="fas fa-arrow-right ml-2"></i>
             </a>
@@ -237,7 +273,7 @@
           <!-- Grid de Noticias de la Categoría -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($noticiasPorCategoria[$categoria->id]->take(6) as $index => $noticia)
-              <a href="{{ route('show', $noticia->id) }}" class="block">
+              <a href="{{ $noticia->url }}" class="block">
                 <article class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 @if($index === 0) md:col-span-2 md:row-span-2 @endif">
                   
                   <!-- Imagen de la Noticia -->
@@ -250,7 +286,7 @@
                     
                     <!-- Etiqueta de categoría -->
                     <div class="absolute top-4 left-4">
-                      <span class="bg-gradient-to-r from-purple-600 to-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide shadow-lg">
+                      <span class="bg-gradient-to-r from-[#0099ff] via-[#4f46e5] to-[#9333ea] text-white px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg border border-white/20">
                         {{ $categoria->name }}
                       </span>
                     </div>
@@ -258,7 +294,7 @@
                     <!-- Indicador de noticia principal -->
                     @if($index === 0)
                       <div class="absolute top-4 right-4">
-                        <span class="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                        <span class="bg-gradient-to-r from-[#0099ff] via-[#4f46e5] to-[#9333ea] text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg border border-white/20">
                           PRINCIPAL
                         </span>
                       </div>
@@ -321,7 +357,7 @@
           <p class="text-gray-600 dark:text-gray-300 mb-8 text-lg">Descubre todas nuestras categorías de noticias</p>
           <div class="flex flex-wrap justify-center gap-4">
             @foreach($categorias as $categoria)
-              <a href="{{ route('categoria.noticias', $categoria->id) }}" 
+              <a href="{{ $categoria->url }}" 
                  class="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-purple-600 hover:to-red-600 hover:text-white px-6 py-3 rounded-full transition-all duration-300 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-1 border border-gray-200 dark:border-gray-600">
                 {{ $categoria->name }}
               </a>
@@ -336,19 +372,38 @@
 <!-- Script de carrusel optimizado -->
 <script src="{{ asset('js/carousel.js') }}"></script>
 
+<!-- Banner Publicitario Portada Medio -->
+@if(isset($banners['portada_middle']) && $banners['portada_middle']->count() > 0)
+    <section class="py-6 bg-gray-50 dark:bg-gray-850 transition-colors duration-300">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-2">
+                <span class="text-gray-400 dark:text-gray-500 text-xs font-semibold uppercase tracking-wider">Publicidad</span>
+            </div>
+            @foreach($banners['portada_middle'] as $banner)
+                <div class="flex justify-center mb-4">
+                    <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="block max-w-5xl w-full group">
+                        <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
+                             class="w-full h-auto rounded-2xl shadow-lg hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700" 
+                             loading="lazy">
+                    </a>
+                </div>
+            @endforeach
+        </div>
+    </section>
+@endif
 
 <!-- Sección de Últimas Noticias - Diseño Moderno -->
 <section class="py-12 bg-white dark:bg-gray-900 transition-colors duration-300">
   <div class="container mx-auto px-4">
     <div class="text-center mb-12">
       <h2 class="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">Últimas Noticias</h2>
-      <div class="w-32 h-1 bg-gradient-to-r from-red-600 to-purple-600 mx-auto rounded-full"></div>
+      <div class="w-32 h-1 bg-gradient-to-r from-[#0099ff] via-[#4f46e5] to-[#9333ea] mx-auto rounded-full"></div>
       <p class="text-gray-600 dark:text-gray-300 mt-4 text-lg">Las noticias más recientes e importantes del momento</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       @foreach($ultimasNoticias->take(6) as $noticia)
-        <a href="{{ route('show', $noticia->id) }}" class="block">
+        <a href="{{ $noticia->url }}" class="block">
           <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 dark:border-gray-700">
             <div class="relative overflow-hidden">
               <img src="{{ $noticia->imagenUrl ?? asset('images/default-news.svg') }}" 
@@ -359,7 +414,7 @@
               
               <!-- Etiqueta de Categoría -->
               <div class="absolute top-4 left-4">
-                <span class="bg-gradient-to-r from-purple-600 to-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide shadow-lg">
+                <span class="bg-gradient-to-r from-[#0099ff] via-[#4f46e5] to-[#9333ea] text-white px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg border border-white/20">
                   {{ $noticia->category->name ?? 'General' }}
                 </span>
               </div>
@@ -367,7 +422,7 @@
               <!-- Indicador de "Nuevo" para noticias recientes -->
               @if(\Carbon\Carbon::parse($noticia->created_at)->diffInHours() < 6)
                 <div class="absolute top-4 right-4">
-                  <span class="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold animate-pulse">
+                  <span class="bg-gradient-to-r from-[#0099ff] via-[#4f46e5] to-[#9333ea] text-white px-2.5 py-1 rounded-full text-xs font-bold animate-pulse shadow-md border border-white/20">
                     NUEVO
                   </span>
                 </div>

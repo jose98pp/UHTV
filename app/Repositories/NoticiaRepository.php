@@ -14,7 +14,8 @@ class NoticiaRepository
      */
     public function getPublishedNews($limit = null, $paginate = false)
     {
-        $query = Noticia::where('publicada', true)
+        $query = Noticia::with('category')
+            ->where('publicada', true)
             ->orderBy('created_at', 'desc');
 
         if ($paginate) {
@@ -29,7 +30,8 @@ class NoticiaRepository
      */
     public function getNewsByCategory($categoryId, $limit = null)
     {
-        $query = Noticia::where('publicada', true)
+        $query = Noticia::with('category')
+            ->where('publicada', true)
             ->where('category_id', $categoryId)
             ->orderBy('created_at', 'desc');
 
@@ -41,7 +43,8 @@ class NoticiaRepository
      */
     public function getNewsExcludingCategory($categoryId, $limit = 6)
     {
-        return Noticia::where('publicada', true)
+        return Noticia::with('category')
+            ->where('publicada', true)
             ->where('category_id', '!=', $categoryId)
             ->orderBy('created_at', 'desc')
             ->take($limit)
@@ -53,7 +56,8 @@ class NoticiaRepository
      */
     public function getRelatedNews($excludeId, $limit = 5)
     {
-        $noticias = Noticia::select('id', 'titulo', 'imagen', 'contenido', 'created_at')
+        $noticias = Noticia::with('category')
+            ->select('id', 'titulo', 'imagen', 'contenido', 'category_id', 'created_at')
             ->where('publicada', true)
             ->where('id', '!=', $excludeId)
             ->orderBy('created_at', 'desc')
@@ -75,7 +79,8 @@ class NoticiaRepository
      */
     public function getPublishedNewsById($id)
     {
-        $noticia = Noticia::where('id', $id)
+        $noticia = Noticia::with('category')
+            ->where('id', $id)
             ->where('publicada', true)
             ->firstOrFail();
             
