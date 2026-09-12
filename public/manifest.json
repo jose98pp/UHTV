@@ -1,0 +1,53 @@
+{
+  "name": "Última Hora TV",
+  "short_name": "UHTV",
+  "description": "Portal digital de noticias, actualidad y transmisiones en vivo de Bolivia y el mundo",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#111827",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait-primary",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "/images/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/icons/icon-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/images/icons/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "En Vivo & Podcasts",
+      "short_name": "En Vivo",
+      "url": "/en-vivo?source=pwa",
+      "description": "Mira las transmisiones en vivo y videos de UHTV"
+    },
+    {
+      "name": "Portada de Noticias",
+      "short_name": "Portada",
+      "url": "/?source=pwa",
+      "description": "Últimas noticias y reportajes del día"
+    }
+  ],
+  "categories": ["news", "magazines", "entertainment"]
+}

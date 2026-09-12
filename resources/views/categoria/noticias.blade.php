@@ -2,6 +2,31 @@
 
 @section('title', $categoria->name . ' - UHTV')
 
+@section('meta')
+    @php
+        $seoDescription = "Últimas noticias y reportajes sobre " . $categoria->name . " en Última Hora TV. Información actualizada minuto a minuto.";
+        $seoUrl = $categoria->url ?? url()->current();
+        $firstNews = $noticiasCategoria->first();
+        $seoImage = ($firstNews && $firstNews->has_valid_image) ? asset($firstNews->imagen) : asset('images/logo.png');
+    @endphp
+    <meta name="description" content="{{ $seoDescription }}">
+    <link rel="canonical" href="{{ $seoUrl }}">
+    
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Última Hora TV">
+    <meta property="og:url" content="{{ $seoUrl }}">
+    <meta property="og:title" content="{{ $categoria->name }} - Noticias y Actualidad | UHTV">
+    <meta property="og:description" content="{{ $seoDescription }}">
+    <meta property="og:image" content="{{ $seoImage }}">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $categoria->name }} - Noticias y Actualidad | UHTV">
+    <meta name="twitter:description" content="{{ $seoDescription }}">
+    <meta name="twitter:image" content="{{ $seoImage }}">
+@endsection
+
 @section('content')
 <!-- Header de Categoría -->
 <section class="relative overflow-hidden rounded-3xl mb-8 shadow-2xl">
@@ -36,7 +61,8 @@
                     <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="block max-w-5xl w-full group">
                         <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
                              class="w-full h-auto rounded-2xl shadow-lg hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700" 
-                             loading="lazy">
+                             loading="lazy"
+                             decoding="async">
                     </a>
                 </div>
             @endforeach
@@ -56,6 +82,8 @@
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
                             <img src="{{ $noticia->imagenUrl ?? asset('images/default-news.svg') }}" 
                                  alt="{{ $noticia->titulo }}" 
+                                 loading="lazy"
+                                 decoding="async"
                                  class="w-full h-64 md:h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
                             
                             <!-- Categoría Badge en imagen (Móvil) -->
@@ -213,7 +241,9 @@ function changePerPage(perPage) {
                         <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
                         <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="relative block bg-white dark:bg-gray-900 rounded-xl p-1">     
                             <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
-                                 class="w-full h-auto rounded-lg shadow-sm">
+                                 class="w-full h-auto rounded-lg shadow-sm"
+                                 loading="lazy"
+                                 decoding="async">
                             <div class="absolute top-2 right-2 bg-black/50 text-white text-[10px] px-2 py-0.5 rounded uppercase tracking-wider">Publicidad</div>
                         </a>
                     </div>
@@ -245,6 +275,8 @@ function changePerPage(perPage) {
                             <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors z-10"></div>
                             <img src="{{ $otraNoticia->imagenUrl ?? asset('images/default-news.svg') }}" 
                                  alt="{{ $otraNoticia->titulo }}" 
+                                 loading="lazy"
+                                 decoding="async"
                                  class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
                             <div class="absolute top-3 left-3 z-20">
                                 <span class="bg-purple-600 text-white px-2 py-1 rounded text-xs font-bold shadow-md">

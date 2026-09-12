@@ -1,0 +1,73 @@
+name: Build, Test & Deploy UHTV
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    name: Build & Test Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql, bcmath, curl, gd, zip
+          coverage: none
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Composer Dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Install NPM Dependencies & Build Assets with Vite
+        run: |
+          npm ci
+          npm run build
+
+      - name: Setup Environment Variables
+        run: |
+          cp .env.example .env || touch .env
+          php artisan key:generate
+
+      - name: Run Tests
+        run: php artisan test --filter="HeaderBcbExchangeTest|DatabaseIndexesTest|HtaccessConfigTest|PwaTest|TransmisionAdminTest"
+
+  production-cache-and-deploy:
+    name: Optimize Production Caches
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo_mysql, bcmath, curl, gd, zip
+
+      - name: Install Dependencies for Production
+        run: composer install --no-dev --prefer-dist --optimize-autoloader
+
+      - name: Verify Laravel Optimization Commands
+        run: |
+          cp .env.example .env || touch .env
+          php artisan key:generate
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          echo "Production caches verified successfully!"

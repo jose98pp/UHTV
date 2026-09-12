@@ -128,7 +128,7 @@
                                     data-type="{{ $item->tipo_nombre }}"
                                     data-url="{{ route('transmisiones.en-vivo') }}">
                                 <div class="relative w-full h-20 rounded-lg overflow-hidden mb-1.5 bg-black">
-                                    <img src="{{ $item->effective_thumbnail }}" alt="{{ $item->titulo }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/images/Logo.jpg'">
+                                    <img src="{{ $item->effective_thumbnail }}" alt="{{ $item->titulo }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async" onerror="this.src='/images/Logo.jpg'">
                                     @if($item->en_vivo)
                                         <span class="absolute top-1 left-1 bg-red-600 text-white text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded shadow">
                                             VIVO

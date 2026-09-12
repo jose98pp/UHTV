@@ -69,6 +69,8 @@
                                     <img src="{{ $noticia->imagenUrl ?? asset('images/default-news.svg') }}" 
                                          alt="{{ $noticia->titulo }}" 
                                          class="w-full h-56 object-cover transition-transform duration-500 hover:scale-110"
+                                         loading="lazy"
+                                         decoding="async"
                                          onerror="handleImageError(this)">
                                 </a>
                                 

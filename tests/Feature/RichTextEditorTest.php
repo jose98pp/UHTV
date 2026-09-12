@@ -6,7 +6,7 @@ use App\Models\Category;
 use App\Models\Noticia;
 use App\Models\User;
 use App\Services\ContentSanitizationService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -14,7 +14,7 @@ use Tests\TestCase;
 
 class RichTextEditorTest extends TestCase
 {
-    use RefreshDatabase, WithFaker;
+    use DatabaseTransactions, WithFaker;
 
     protected $user;
     protected $category;

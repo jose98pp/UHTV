@@ -26,6 +26,34 @@ Route::get('/buscar', [PortadaController::class, 'search'])->name('search');
 Route::get('/en-vivo', [\App\Http\Controllers\TransmisionPublicController::class, 'index'])->name('transmisiones.en-vivo');
 Route::get('/transmisiones/data/{id}', [\App\Http\Controllers\TransmisionPublicController::class, 'showJson'])->name('transmisiones.json');
 
+// Ruta para Sitemap XML (Google SEO)
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
+
+// ---------------------------------
+// Rutas PWA (Web App Manifest & Service Worker)
+// ---------------------------------
+Route::get('/manifest.json', function () {
+    return response(file_get_contents(public_path('manifest.json')), 200, [
+        'Content-Type' => 'application/manifest+json; charset=utf-8',
+        'Cache-Control' => 'public, max-age=3600',
+    ]);
+})->name('pwa.manifest');
+
+Route::get('/sw.js', function () {
+    return response(file_get_contents(public_path('sw.js')), 200, [
+        'Content-Type' => 'application/javascript; charset=utf-8',
+        'Service-Worker-Allowed' => '/',
+        'Cache-Control' => 'no-cache, no-store, must-revalidate',
+    ]);
+})->name('pwa.sw');
+
+Route::get('/offline.html', function () {
+    return response(file_get_contents(public_path('offline.html')), 200, [
+        'Content-Type' => 'text/html; charset=utf-8',
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
+})->name('pwa.offline');
+
 // Ruta de prueba para imágenes (solo en desarrollo)
 if (app()->environment('local')) {
     Route::get('/test-images', function() {
@@ -63,6 +91,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/noticias/filter', [NoticiaController::class, 'filter'])->name('noticias.filter');
     Route::get('/noticias/create', [NoticiaController::class, 'create'])->name('noticias.create');
     Route::post('/noticias', [NoticiaController::class, 'store'])->name('noticias.store');
+    Route::post('/noticias/bulk-action', [NoticiaController::class, 'bulkAction'])->name('noticias.bulk-action');
+    Route::post('/noticias/{id}/toggle-status', [NoticiaController::class, 'toggleStatus'])->name('noticias.toggle-status');
     Route::get('/noticias/{id}/edit', [NoticiaController::class, 'edit'])->name('noticias.edit');
     Route::put('/noticias/{id}', [NoticiaController::class, 'update'])->name('noticias.update');
     Route::delete('/noticias/{id}', [NoticiaController::class, 'destroy'])->name('noticias.destroy');

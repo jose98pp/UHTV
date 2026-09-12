@@ -1,2 +1,6 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /admin/
+Disallow: /profile
+
+Sitemap: https://ultimahoratv.com/sitemap.xml

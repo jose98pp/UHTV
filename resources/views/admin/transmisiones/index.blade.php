@@ -180,7 +180,7 @@
                             <tr class="{{ $item->en_vivo ? 'table-danger table-opacity-10' : '' }}">
                                 <td class="ps-3">
                                     <div class="position-relative rounded-2 overflow-hidden shadow-sm" style="width: 72px; height: 48px; background: #000;">
-                                        <img src="{{ $item->effective_thumbnail }}" alt="{{ $item->titulo }}" class="w-100 h-100 object-fit-cover" onerror="this.src='/images/Logo.jpg'">
+                                        <img src="{{ $item->effective_thumbnail }}" alt="{{ $item->titulo }}" class="w-100 h-100 object-fit-cover" loading="lazy" decoding="async" onerror="this.src='/images/Logo.jpg'">
                                         @if($item->en_vivo)
                                             <span class="position-absolute top-0 start-0 badge bg-danger text-white p-1 rounded-0" style="font-size: 0.55rem;">
                                                 <i class="fas fa-circle fa-fade"></i> VIVO

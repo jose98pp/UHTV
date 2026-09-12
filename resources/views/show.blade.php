@@ -2,6 +2,66 @@
 
 @section('title', $noticia->titulo . ' - UHTV')
 
+@section('meta')
+    @php
+        $seoDescription = Str::limit(strip_tags($noticia->excerptLimpio ?? $noticia->contenido), 155);
+        $seoImage = $noticia->has_valid_image ? asset($noticia->imagen) : asset('images/logo.png');
+        $seoUrl = $noticia->url ?? url()->current();
+    @endphp
+    <meta name="description" content="{{ $seoDescription }}">
+    <link rel="canonical" href="{{ $seoUrl }}">
+    
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="Última Hora TV">
+    <meta property="og:url" content="{{ $seoUrl }}">
+    <meta property="og:title" content="{{ $noticia->titulo }}">
+    <meta property="og:description" content="{{ $seoDescription }}">
+    <meta property="og:image" content="{{ $seoImage }}">
+    <meta property="article:published_time" content="{{ optional($noticia->created_at)->toIso8601String() }}">
+    <meta property="article:modified_time" content="{{ optional($noticia->updated_at)->toIso8601String() }}">
+    <meta property="article:section" content="{{ $noticia->category->name ?? 'Noticias' }}">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $noticia->titulo }}">
+    <meta name="twitter:description" content="{{ $seoDescription }}">
+    <meta name="twitter:image" content="{{ $seoImage }}">
+
+    <!-- Structured Data (JSON-LD) para Google News / Rich Snippets -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "NewsArticle",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "{{ $seoUrl }}"
+        },
+        "headline": {{ json_encode($noticia->titulo) }},
+        "description": {{ json_encode($seoDescription) }},
+        "image": [
+            "{{ $seoImage }}"
+        ],
+        "datePublished": "{{ optional($noticia->created_at)->toIso8601String() }}",
+        "dateModified": "{{ optional($noticia->updated_at)->toIso8601String() }}",
+        "author": {
+            "@type": "Organization",
+            "name": "Redacción UHTV",
+            "url": "{{ url('/') }}"
+        },
+        "publisher": {
+            "@type": "NewsMediaOrganization",
+            "name": "Última Hora TV",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "{{ asset('images/logo.png') }}"
+            }
+        },
+        "articleSection": {{ json_encode($noticia->category->name ?? 'General') }}
+    }
+    </script>
+@endsection
+
 @section('content')
 <!-- Breadcrumb Mejorado -->
 <section class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 py-4 border-b border-gray-200 dark:border-gray-600 transition-colors duration-300">
@@ -32,7 +92,8 @@
                     <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="block max-w-5xl w-full group">
                         <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
                              class="w-full h-auto rounded-2xl shadow-lg hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700" 
-                             loading="lazy">
+                             loading="lazy"
+                             decoding="async">
                     </a>
                 </div>
             @endforeach
@@ -126,6 +187,8 @@
                         <img src="{{ $imagenUrl }}" 
                              alt="{{ $noticia->titulo }}" 
                              class="w-full h-auto object-cover"
+                             fetchpriority="high"
+                             decoding="async"
                              onerror="handleImageError(this)">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
                     </div>
@@ -246,7 +309,9 @@
                 <div class="flex justify-center mb-6">
                     <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="block max-w-4xl"> 
                         <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
-                             class="w-full h-auto rounded-lg shadow-lg hover:opacity-90 transition">
+                             class="w-full h-auto rounded-lg shadow-lg hover:opacity-90 transition"
+                             loading="lazy"
+                             decoding="async">
                     </a>
                 </div>
             @endforeach
@@ -272,6 +337,8 @@
                                 <img src="{{ $otraNoticia->imagenUrl ?? asset('images/default-news.svg') }}" 
                                      alt="{{ $otraNoticia->titulo }}" 
                                      class="w-full h-56 object-cover transition-transform duration-500 hover:scale-110"
+                                     loading="lazy"
+                                     decoding="async"
                                      onerror="handleImageError(this)">
                             </a>
                             

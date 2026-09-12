@@ -101,7 +101,12 @@
                         {{ $message }}
                     </div>
                 @enderror
-                <small class="form-text text-muted">Mínimo 5 caracteres, máximo 255 caracteres.</small>
+                <div class="d-flex justify-content-between align-items-center mt-1">
+                    <small class="form-text text-muted">
+                        <span id="titulo-char-count">0</span> / 255 caracteres (mínimo 5)
+                    </small>
+                    <small id="titulo-seo-badge" class="badge bg-secondary">Muy corto</small>
+                </div>
             </div>
 
             <div class="form-group mb-3">
@@ -112,6 +117,15 @@
                 
                 <input type="hidden" name="contenido" id="contenido-hidden" value="{{ old('contenido', $noticia->contenido) }}" required>
                 <div id="editor-container"></div>
+                <div class="d-flex flex-wrap align-items-center justify-content-between p-2 bg-light rounded border mt-2 text-muted small">
+                    <div class="d-flex gap-3">
+                        <span><i class="fas fa-file-word text-primary me-1"></i><strong id="content-word-count">0</strong> palabras</span>
+                        <span><i class="fas fa-font text-secondary me-1"></i><strong id="content-char-count">0</strong> caracteres</span>
+                    </div>
+                    <div>
+                        <span><i class="fas fa-stopwatch text-info me-1"></i>Lectura estimada: <strong id="content-reading-time">1 min</strong></span>
+                    </div>
+                </div>
                 <div id="content-validation-error" class="text-danger mt-2" style="display: none;"></div>
                 @if ($errors->has('contenido'))
                     <div class="text-danger mt-2">
@@ -164,6 +178,7 @@
                             </div>
                             <div class="card-body text-center">
                                 <img 
+                                    id="current-image-preview"
                                     src="{{ $noticia->image_info['url'] }}" 
                                     alt="Imagen actual" 
                                     style="max-width: 100%; max-height: 300px; border-radius: 8px;"
@@ -298,20 +313,25 @@
                 <label class="form-check-label" for="publicada">¿Publicar ahora?</label>
             </div>
 
-            <div class="form-group">
+            <div class="form-group d-flex flex-wrap gap-2">
                 <button type="submit" class="btn btn-primary btn-lg" id="submit-btn">
-                    <i class="fas fa-save"></i> Actualizar Noticia
+                    <i class="fas fa-save me-1"></i> Actualizar Noticia
                 </button>
-                <a href="{{ route('admin.noticias.index') }}" class="btn btn-secondary btn-lg ml-2">
-                    <i class="fas fa-times"></i> Cancelar
+                <button type="button" class="btn btn-info btn-lg text-white" onclick="openLivePreview()">
+                    <i class="fas fa-eye me-1"></i> Vista Previa en Vivo
+                </button>
+                <a href="{{ route('admin.noticias.index') }}" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-times me-1"></i> Cancelar
                 </a>
                 @if($noticia->publicada)
-                    <a href="{{ $noticia->url }}" target="_blank" class="btn btn-info btn-lg ml-2">
-                        <i class="fas fa-eye"></i> Ver Noticia
+                    <a href="{{ $noticia->url }}" target="_blank" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-external-link-alt me-1"></i> Ver en Portal
                     </a>
                 @endif
             </div>
         </form>
+
+        @include('admin.noticias.partials.live-preview-modal')
     </div>
 @push('scripts')
 <!-- React libraries (carga tradicional para mayor estabilidad) -->
@@ -391,10 +411,71 @@
             }
             
             // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Actualizando...';
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Actualizando...';
+            });
+
+            // Real-time counter logic
+            const tituloInput = document.getElementById('titulo');
+            const tituloCharCount = document.getElementById('titulo-char-count');
+            const tituloSeoBadge = document.getElementById('titulo-seo-badge');
+
+            function updateTitleStats() {
+                if (!tituloInput || !tituloCharCount) return;
+                const len = tituloInput.value.length;
+                tituloCharCount.innerText = len;
+                if (len < 10) {
+                    tituloSeoBadge.className = 'badge bg-secondary';
+                    tituloSeoBadge.innerText = 'Muy corto';
+                } else if (len >= 10 && len < 40) {
+                    tituloSeoBadge.className = 'badge bg-warning text-dark';
+                    tituloSeoBadge.innerText = 'Aceptable';
+                } else if (len >= 40 && len <= 70) {
+                    tituloSeoBadge.className = 'badge bg-success';
+                    tituloSeoBadge.innerText = 'Óptimo para Google (SEO)';
+                } else {
+                    tituloSeoBadge.className = 'badge bg-info text-dark';
+                    tituloSeoBadge.innerText = 'Título extenso';
+                }
+            }
+
+            if (tituloInput) {
+                tituloInput.addEventListener('input', updateTitleStats);
+                updateTitleStats();
+            }
+
+            function updateContentStats() {
+                const editorEditable = document.querySelector('#editor-container [contenteditable]');
+                const hiddenContent = document.getElementById('contenido-hidden');
+                let text = '';
+                if (editorEditable) {
+                    text = editorEditable.innerText || '';
+                } else if (hiddenContent) {
+                    text = hiddenContent.value.replace(/<[^>]*>/g, ' ');
+                }
+                const cleanText = text.trim();
+                const words = cleanText ? cleanText.split(/\s+/).filter(Boolean).length : 0;
+                const chars = cleanText.length;
+                const minutes = Math.max(1, Math.ceil(words / 200));
+
+                const wordCountEl = document.getElementById('content-word-count');
+                const charCountEl = document.getElementById('content-char-count');
+                const readTimeEl = document.getElementById('content-reading-time');
+
+                if (wordCountEl) wordCountEl.innerText = words;
+                if (charCountEl) charCountEl.innerText = chars;
+                if (readTimeEl) readTimeEl.innerText = `${minutes} min`;
+            }
+
+            // Check content stats periodically and on input
+            setTimeout(updateContentStats, 600);
+            setInterval(updateContentStats, 1000);
+            document.addEventListener('input', function(e) {
+                if (e.target && e.target.closest('#editor-container')) {
+                    updateContentStats();
+                }
+            });
         });
-    });
-</script>
-@endpush
-@endsection
+    </script>
+    @endpush
+    @endsection

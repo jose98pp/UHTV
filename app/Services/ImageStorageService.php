@@ -70,6 +70,9 @@ class ImageStorageService
                 'size' => $file->getSize(),
             ]);
 
+            // Generar versión WebP optimizada si la extensión GD/Imagick está disponible
+            $this->generateWebpVersion($storedPath);
+
             return $storedPath;
         } catch (\Exception $e) {
             Log::error('Error al almacenar imagen por categoría', [
@@ -79,6 +82,50 @@ class ImageStorageService
             ]);
             throw $e;
         }
+    }
+
+    /**
+     * Generar versión WebP si la extensión GD/Imagick está disponible
+     */
+    public function generateWebpVersion(string $relativePublicPath, int $quality = 82): ?string
+    {
+        if (!function_exists('imagewebp') || !function_exists('imagecreatefromstring')) {
+            return null;
+        }
+
+        try {
+            $fullPath = Storage::disk('public')->path($relativePublicPath);
+            if (!file_exists($fullPath)) {
+                return null;
+            }
+
+            $pathInfo = pathinfo($fullPath);
+            if (strtolower($pathInfo['extension'] ?? '') === 'webp') {
+                return $relativePublicPath;
+            }
+
+            $webpFullPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '.webp';
+            $imageContent = file_get_contents($fullPath);
+            $image = @imagecreatefromstring($imageContent);
+
+            if ($image) {
+                if (function_exists('imagepalettetotruecolor')) {
+                    imagepalettetotruecolor($image);
+                }
+                imagealphablending($image, true);
+                imagesavealpha($image, true);
+
+                imagewebp($image, $webpFullPath, $quality);
+                imagedestroy($image);
+
+                $dirname = ($pathInfo['dirname'] !== '.' && $pathInfo['dirname'] !== '') ? dirname($relativePublicPath) . '/' : '';
+                return $dirname . $pathInfo['filename'] . '.webp';
+            }
+        } catch (\Throwable $e) {
+            Log::warning('No se pudo generar versión WebP de la imagen: ' . $e->getMessage());
+        }
+
+        return null;
     }
 
     /**

@@ -260,6 +260,8 @@
                                     <img src="{{ asset($banner->image_path) }}" 
                                          alt="{{ $banner->title }}" 
                                          class="img-thumbnail" 
+                                         loading="lazy"
+                                         decoding="async"
                                          style="max-height: 60px; max-width: 100px; object-fit: cover;">
                                 </td>
                                 <td>

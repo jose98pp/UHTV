@@ -68,6 +68,32 @@ class ImageValidationService
     }
 
     /**
+     * Obtener URL de versión WebP si existe, o null
+     */
+    public function getWebpUrlIfExists(?string $imagePath): ?string
+    {
+        if (empty($imagePath)) {
+            return null;
+        }
+
+        $pathInfo = pathinfo($imagePath);
+        $extension = strtolower($pathInfo['extension'] ?? '');
+
+        if ($extension === 'webp') {
+            return $this->getImageUrlOrDefault($imagePath);
+        }
+
+        $dirname = ($pathInfo['dirname'] !== '.' && $pathInfo['dirname'] !== '') ? $pathInfo['dirname'] . '/' : '';
+        $webpPath = $dirname . $pathInfo['filename'] . '.webp';
+
+        if (Storage::disk('public')->exists($webpPath)) {
+            return asset('storage/' . $webpPath);
+        }
+
+        return null;
+    }
+
+    /**
      * Generar URL segura de imagen con validaciones
      *
      * @param string $imagePath

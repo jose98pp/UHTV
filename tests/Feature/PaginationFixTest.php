@@ -6,11 +6,11 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\Noticia;
 use App\Models\Category;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class PaginationFixTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {

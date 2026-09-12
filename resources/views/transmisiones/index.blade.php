@@ -197,6 +197,8 @@
                         <img src="{{ $item->effective_thumbnail }}" 
                              alt="{{ $item->titulo }}" 
                              class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                             loading="lazy"
+                             decoding="async"
                              onerror="this.src='/images/Logo.jpg'">
 
                         <!-- Overlay Oscuro al Hover -->

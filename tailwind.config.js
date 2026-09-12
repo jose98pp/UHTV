@@ -11,6 +11,7 @@ export default {
     ],
 
     darkMode: 'class', // Habilitar modo oscuro basado en clase
+    important: true,
 
     theme: {
         extend: {

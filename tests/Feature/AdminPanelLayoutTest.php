@@ -9,8 +9,14 @@ class AdminPanelLayoutTest extends TestCase
 {
     protected function getAdminUser()
     {
-        return User::where('email', 'bryan.costas@ultimahoratv.com')->first()
-            ?? User::where('role', 'admin')->first();
+        return User::firstOrCreate(
+            ['email' => 'bryan.costas@ultimahoratv.com'],
+            [
+                'name' => 'Bryan Costas',
+                'password' => bcrypt('password123'),
+                'role' => 'admin',
+            ]
+        );
     }
 
     /** @test */

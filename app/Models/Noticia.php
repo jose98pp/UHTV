@@ -21,6 +21,27 @@ class Noticia extends Model
         'views',
     ];
 
+    protected static function booted(): void
+    {
+        static::saved(function ($noticia) {
+            static::clearNewsCache($noticia);
+        });
+
+        static::deleted(function ($noticia) {
+            static::clearNewsCache($noticia);
+        });
+    }
+
+    public static function clearNewsCache(?Noticia $noticia = null): void
+    {
+        \Illuminate\Support\Facades\Cache::forget('homepage_data');
+        \Illuminate\Support\Facades\Cache::forget('all_categories');
+        \Illuminate\Support\Facades\Cache::forget('sitemap_xml_data');
+        if ($noticia && $noticia->category_id) {
+            \Illuminate\Support\Facades\Cache::forget("category_{$noticia->category_id}_data");
+        }
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class,'category_id');

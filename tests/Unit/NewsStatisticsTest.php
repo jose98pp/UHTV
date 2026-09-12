@@ -3,14 +3,14 @@
 namespace Tests\Unit;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use App\Models\Noticia;
 use App\Models\Category;
 use Carbon\Carbon;
 
 class NewsStatisticsTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     /** @test */
     public function it_calculates_total_news_correctly()

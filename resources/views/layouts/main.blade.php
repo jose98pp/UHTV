@@ -12,7 +12,71 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="theme-color" content="#7c3aed">
     
-    <title>@yield('title', 'Última Hora TV')</title>
+    <title>@yield('title', 'Última Hora TV - Noticias del Momento')</title>
+    
+    <!-- Metaetiquetas SEO y Redes Sociales (OpenGraph / Twitter Cards) -->
+    @sectionMissing('meta')
+        <meta name="description" content="Periódico digital de noticias en Bolivia y el mundo. Cobertura en directo, política, economía, deportes y transmisiones en vivo.">
+        <meta property="og:site_name" content="Última Hora TV">
+        <meta property="og:title" content="@yield('title', 'Última Hora TV - Noticias del Momento')">
+        <meta property="og:description" content="Periódico digital de noticias en Bolivia y el mundo. Cobertura en directo, política, economía, deportes y transmisiones en vivo.">
+        <meta property="og:image" content="{{ asset('images/Logo.jpg') }}">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:type" content="website">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:site" content="@UHTVBolivia">
+        <meta name="twitter:title" content="@yield('title', 'Última Hora TV - Noticias del Momento')">
+        <meta name="twitter:description" content="Periódico digital de noticias en Bolivia y el mundo. Cobertura en directo, política, economía, deportes y transmisiones en vivo.">
+        <meta name="twitter:image" content="{{ asset('images/Logo.jpg') }}">
+    @else
+        @yield('meta')
+    @endif
+
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="{{ route('sitemap') }}">
+
+    <!-- PWA y Metadatos Móviles -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="UHTV">
+    <link rel="apple-touch-icon" href="{{ asset('images/icons/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/icons/icon.svg') }}">
+
+    <!-- Datos Estructurados Schema.org (Google NewsMediaOrganization & WebSite) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "NewsMediaOrganization",
+          "@id": "{{ url('/') }}/#organization",
+          "name": "Última Hora TV",
+          "url": "{{ url('/') }}",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "{{ asset('images/Logo.jpg') }}"
+          },
+          "sameAs": [
+            "https://www.facebook.com/ultimahoratvbolivia",
+            "https://www.youtube.com/@UHTVBolivia",
+            "https://tiktok.com/@uhtvbolivia"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "{{ url('/') }}/#website",
+          "url": "{{ url('/') }}",
+          "name": "Última Hora TV",
+          "publisher": { "@id": "{{ url('/') }}/#organization" },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "{{ url('/buscar') }}?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+    </script>
     
     <!-- DNS Prefetch for better performance -->
     <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
@@ -44,13 +108,17 @@
             theme: {
                 extend: {
                     colors: {
-                        'uhtv-purple': {
+                        primary: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
                             600: '#7c3aed',
                             700: '#6d28d9',
-                        },
-                        'uhtv-red': {
-                            600: '#dc2626',
-                            700: '#b91c1c',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
                         }
                     }
                 }
@@ -62,14 +130,14 @@
     <link rel="preload" href="{{ asset('css/optimized.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="{{ asset('css/optimized.css') }}" rel="stylesheet"></noscript>
     
-    <!-- CSS y JS personalizados -->
-    @php
-        use App\Helpers\AssetHelper;
-        $cssFiles = AssetHelper::getAllCssFiles();
-        $jsFiles = ['resources/js/app.jsx'];
-        $allAssets = array_merge($cssFiles, $jsFiles);
-    @endphp
-    @vite($allAssets)
+    <!-- Assets compilados por Vite (CSS y JS) -->
+    @vite([
+        'resources/css/app.css',
+        'resources/css/browser-compatibility.css',
+        'resources/css/dark-mode.css',
+        'resources/css/show-dark-mode.css',
+        'resources/js/app.jsx'
+    ])
 
     <!-- Script de inicialización inmediata para modo oscuro -->
     <script>
@@ -161,36 +229,6 @@
 
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-  <!-- Topbar estilo El Deber -->
-  <div class="w-full bg-[#f8fafc] dark:bg-[#0f172a] border-b border-[#e2e8f0] dark:border-[#334155] py-2 px-4 text-xs transition-colors duration-300">
-    <div class="container mx-auto flex flex-col md:flex-row justify-between items-center text-gray-600 dark:text-gray-300 gap-2">
-      <!-- Date Left -->
-      <div id="topbar-date-text" class="text-xs font-semibold tracking-wide text-gray-500 dark:text-gray-400">
-        Cargando fecha...
-      </div>
-      <!-- Right Socials -->
-      <div class="flex items-center space-x-4">
-        <div class="flex items-center space-x-2.5">
-          <a href="https://facebook.com/uhtvbolivia" target="_blank" class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-800 hover:bg-blue-600 hover:text-white flex items-center justify-center text-gray-600 dark:text-gray-300 transition-all duration-300">
-            <i class="fab fa-facebook-f text-[11px]"></i>
-          </a>
-          <a href="https://www.youtube.com/@UHTVBolivia" target="_blank" class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-800 hover:bg-red-600 hover:text-white flex items-center justify-center text-gray-600 dark:text-gray-300 transition-all duration-300">
-            <i class="fab fa-youtube text-[11px]"></i>
-          </a>
-          <a href="https://instagram.com/uhtvbolivia" target="_blank" class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-800 hover:bg-pink-600 hover:text-white flex items-center justify-center text-gray-600 dark:text-gray-300 transition-all duration-300">
-            <i class="fab fa-instagram text-[11px]"></i>
-          </a>
-          <a href="https://x.com/UhtvBol" target="_blank" class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-800 hover:bg-black hover:text-white flex items-center justify-center text-gray-600 dark:text-gray-300 transition-all duration-300">
-            <i class="fab fa-x-twitter text-[11px]"></i>
-          </a>
-          <a href="https://tiktok.com/@uhtvbolivia" target="_blank" class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-800 hover:bg-black hover:text-white flex items-center justify-center text-gray-600 dark:text-gray-300 transition-all duration-300">
-            <i class="fab fa-tiktok text-[11px]"></i>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Header Principal estilo El Deber con Imagen de Fondo -->
   <header class="relative bg-gradient-to-r from-purple-800 via-purple-600 to-red-600 dark:from-purple-900 dark:via-purple-700 dark:to-red-700 bg-cover bg-center min-h-[140px] flex items-center justify-center text-white overflow-hidden py-6 px-4 transition-colors duration-300"
           style="background-image: url('{{ isset($banners['portada_top']) && $banners['portada_top']->count() > 0 ? asset($banners['portada_top']->first()->image_path) : asset('images/banner.png') }}');">
@@ -231,8 +269,85 @@
         </a>
       </div>
       
-      <!-- Right Column: Live Badge + Dark Mode Toggle -->
-      <div class="flex items-center justify-end space-x-4 w-full md:w-1/3">
+      <!-- Right Column: BCB Currency Exchange + Live Badge + Dark Mode Toggle -->
+      <div class="flex items-center justify-end space-x-3 w-full md:w-1/3">
+        <!-- Widget Cotización BCB (Tipo de Cambio Bolivia) -->
+        <div class="relative" id="widget-tipo-cambio-bcb">
+          <div id="bcb-pill-btn" class="flex items-center gap-2 bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 hover:border-emerald-400/60 px-3 py-1.5 rounded-full text-white shadow-md transition-all duration-300 cursor-pointer select-none group" title="Ver cotizaciones oficiales del BCB">
+            <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded text-[10px] font-black bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 tracking-wider">
+              BCB
+            </span>
+            <div id="bcb-ticker-display" class="flex items-center gap-1.5 text-xs font-semibold tracking-tight transition-all duration-300">
+              <span class="text-white font-bold">USD</span>
+              <span class="text-gray-300 text-[10px] font-normal">C:</span><span class="text-emerald-300 font-bold font-mono text-[11px]">6.86</span>
+              <span class="text-gray-400 font-light">/</span>
+              <span class="text-gray-300 text-[10px] font-normal">V:</span><span class="text-emerald-300 font-bold font-mono text-[11px]">6.96</span>
+            </div>
+            <i id="bcb-chevron-icon" class="fas fa-chevron-down text-[8px] text-gray-300 group-hover:text-white transition-transform duration-200"></i>
+          </div>
+
+          <!-- Dropdown con cotizaciones oficiales BCB -->
+          <div id="bcb-dropdown-panel" class="absolute right-0 top-full mt-2 w-64 bg-gray-900/95 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl p-3.5 z-50 hidden opacity-0 transition-all duration-200 text-white">
+            <div class="flex items-center justify-between border-b border-white/10 pb-2 mb-2.5">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-landmark text-emerald-400 text-sm"></i>
+                <span class="font-bold text-xs uppercase tracking-wide text-white">Cotización Oficial</span>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30">BCB Bolivia</span>
+            </div>
+
+            <div class="space-y-2 text-xs">
+              <!-- Dólar Estadounidense -->
+              <div class="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/30 transition-all">
+                <div class="flex items-center gap-2">
+                  <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-xs font-bold">$</span>
+                  <div>
+                    <div class="font-bold text-white text-xs leading-none">Dólar (USD)</div>
+                    <div class="text-[10px] text-gray-400 leading-tight">Tipo de Cambio Oficial</div>
+                  </div>
+                </div>
+                <div class="text-right font-mono">
+                  <div class="text-[11px]"><span class="text-gray-400 text-[10px]">Compra:</span> <span class="text-emerald-300 font-bold">6.86 Bs</span></div>
+                  <div class="text-[11px]"><span class="text-gray-400 text-[10px]">Venta:</span> <span class="text-emerald-300 font-bold">6.96 Bs</span></div>
+                </div>
+              </div>
+
+              <!-- Euro -->
+              <div class="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/10 hover:border-blue-500/30 transition-all">
+                <div class="flex items-center gap-2">
+                  <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-300 flex items-center justify-center text-xs font-bold">€</span>
+                  <div>
+                    <div class="font-bold text-white text-xs leading-none">Euro (EUR)</div>
+                    <div class="text-[10px] text-gray-400 leading-tight">Referencial BCB</div>
+                  </div>
+                </div>
+                <div class="text-right font-mono text-[11px]">
+                  <span class="text-blue-300 font-bold">7.45 Bs</span>
+                </div>
+              </div>
+
+              <!-- UFV -->
+              <div class="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/10 hover:border-amber-500/30 transition-all">
+                <div class="flex items-center gap-2">
+                  <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center text-xs font-bold">U</span>
+                  <div>
+                    <div class="font-bold text-white text-xs leading-none">UFV</div>
+                    <div class="text-[10px] text-gray-400 leading-tight">Unidad Fomento Vivienda</div>
+                  </div>
+                </div>
+                <div class="text-right font-mono text-[11px]">
+                  <span class="text-amber-300 font-bold">2.54 Bs</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-2.5 pt-2 border-t border-white/10 text-[9px] text-gray-400 text-center flex items-center justify-center gap-1.5">
+              <i class="fas fa-check-circle text-emerald-400 text-[9px]"></i>
+              <span>Fuente oficial Banco Central de Bolivia</span>
+            </div>
+          </div>
+        </div>
+
         @if(isset($transmisionEnVivo) && $transmisionEnVivo)
           <button type="button" 
                   data-open-live-modal 
@@ -257,25 +372,70 @@
     </div>
   </header>
 
-  <!-- Script del Clima Rotativo Dinámico e Inicializaciones -->
+  <!-- Script del Clima Rotativo Dinámico y Cotizaciones BCB -->
   <script>
       document.addEventListener('DOMContentLoaded', function() {
-          // 1. Inicialización de la Fecha del Topbar en Español
-          const dateElement = document.getElementById('topbar-date-text');
-          if (dateElement) {
-              const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-              const today = new Date();
-              let dateString = today.toLocaleDateString('es-ES', options);
-              
-              // Capitalizar la primera letra de las palabras relevantes
-              dateString = dateString.split(' ').map(word => {
-                  if (word.length > 2 && word !== 'de') {
-                      return word.charAt(0).toUpperCase() + word.slice(1);
+          // 1. Lógica de Rotación y Menú de Tipo de Cambio BCB
+          const bcbTicker = document.getElementById('bcb-ticker-display');
+          const bcbContainer = document.getElementById('widget-tipo-cambio-bcb');
+          const bcbPillBtn = document.getElementById('bcb-pill-btn');
+          const bcbDropdown = document.getElementById('bcb-dropdown-panel');
+          const bcbChevron = document.getElementById('bcb-chevron-icon');
+
+          if (bcbTicker && bcbPillBtn && bcbDropdown) {
+              const rates = [
+                  '<span class="text-white font-bold">USD</span> <span class="text-gray-300 text-[10px] font-normal">C:</span><span class="text-emerald-300 font-bold font-mono text-[11px]">6.86</span> <span class="text-gray-400 font-light">/</span> <span class="text-gray-300 text-[10px] font-normal">V:</span><span class="text-emerald-300 font-bold font-mono text-[11px]">6.96</span>',
+                  '<span class="text-white font-bold">EUR</span> <span class="text-gray-300 text-[10px] font-normal">Oficial:</span><span class="text-blue-300 font-bold font-mono text-[11px]">7.45 Bs</span>',
+                  '<span class="text-white font-bold">UFV</span> <span class="text-gray-300 text-[10px] font-normal">Valor:</span><span class="text-amber-300 font-bold font-mono text-[11px]">2.54 Bs</span>'
+              ];
+              let currentRateIndex = 0;
+              let isDropdownOpen = false;
+
+              function toggleBcbDropdown(show) {
+                  isDropdownOpen = (show !== undefined) ? show : bcbDropdown.classList.contains('hidden');
+                  if (isDropdownOpen) {
+                      bcbDropdown.classList.remove('hidden');
+                      requestAnimationFrame(() => {
+                          bcbDropdown.classList.remove('opacity-0');
+                          if (bcbChevron) bcbChevron.classList.add('rotate-180');
+                      });
+                  } else {
+                      bcbDropdown.classList.add('opacity-0');
+                      if (bcbChevron) bcbChevron.classList.remove('rotate-180');
+                      setTimeout(() => {
+                          if (!isDropdownOpen) bcbDropdown.classList.add('hidden');
+                      }, 200);
                   }
-                  return word;
-              }).join(' ');
-              
-              dateElement.innerHTML = `<i class="far fa-calendar-alt mr-1.5 text-purple-600 dark:text-purple-400"></i> ${dateString}, Bolivia`;
+              }
+
+              bcbPillBtn.addEventListener('click', function(e) {
+                  e.stopPropagation();
+                  toggleBcbDropdown();
+              });
+
+              bcbContainer.addEventListener('mouseenter', function() {
+                  toggleBcbDropdown(true);
+              });
+
+              bcbContainer.addEventListener('mouseleave', function() {
+                  toggleBcbDropdown(false);
+              });
+
+              document.addEventListener('click', function(e) {
+                  if (bcbContainer && !bcbContainer.contains(e.target)) {
+                      toggleBcbDropdown(false);
+                  }
+              });
+
+              setInterval(function() {
+                  if (isDropdownOpen) return;
+                  currentRateIndex = (currentRateIndex + 1) % rates.length;
+                  bcbTicker.style.opacity = '0';
+                  setTimeout(function() {
+                      bcbTicker.innerHTML = rates[currentRateIndex];
+                      bcbTicker.style.opacity = '1';
+                  }, 250);
+              }, 4500);
           }
 
           // 2. Lógica del Clima Rotativo Animado
@@ -407,7 +567,7 @@
     <div class="bg-gradient-to-r from-purple-600 to-red-600 text-white p-6">
       <div class="flex justify-between items-center">
         <div class="flex items-center space-x-3">
-          <img src="/images/Logo.jpg" alt="UHTV" class="w-10 h-10 rounded-full">
+          <img src="/images/Logo.jpg" alt="UHTV" class="w-10 h-10 rounded-full" loading="lazy" decoding="async">
           <span class="text-xl font-bold">UHTV</span>
         </div>
         <button id="closeMenu" class="text-white hover:text-gray-200 focus:outline-none transition-colors duration-300">
@@ -601,7 +761,8 @@
                         <img src="{{ asset($banner->image_path) }}" 
                              alt="{{ $banner->title }}" 
                              class="w-full h-auto rounded-2xl shadow-lg object-cover border border-gray-200 dark:border-gray-700" 
-                             loading="lazy">
+                             loading="lazy"
+                             decoding="async">
                     </a>
                 </div>
             @endforeach
@@ -616,7 +777,7 @@
             <!-- Logo y Descripción -->
             <div class="lg:col-span-1">
                 <div class="flex items-center space-x-3 mb-4">
-                    <img src="{{ asset('images/Logo.jpg') }}" alt="ÚltimaHoraTV" class="w-12 h-12 rounded-full" loading="lazy">
+                    <img src="{{ asset('images/Logo.jpg') }}" alt="ÚltimaHoraTV" class="w-12 h-12 rounded-full" loading="lazy" decoding="async">
                     <div>
                         <h3 class="text-xl font-bold text-white">Última<span class="text-purple-400">Hora</span> TV</h3>
                         <p class="text-gray-400 text-sm">Tu fuente confiable de noticias y análisis. © {{ date('Y') }}</p>
@@ -754,7 +915,9 @@
 
         <a href="{{ $popupBanner->link ?? '#' }}" {{ $popupBanner->link ? 'target="_blank" rel="noopener noreferrer"' : '' }} class="block overflow-hidden group">
           <img src="{{ asset($popupBanner->image_path) }}" alt="{{ $popupBanner->title }}" 
-               class="w-full h-auto object-cover max-h-[70vh] transition-transform duration-500 group-hover:scale-[1.01]">
+               class="w-full h-auto object-cover max-h-[70vh] transition-transform duration-500 group-hover:scale-[1.01]"
+               loading="lazy"
+               decoding="async">
         </a>
       </div>
       
@@ -812,6 +975,85 @@
   <!-- Modal de Streaming En Vivo y Podcasts -->
   @include('partials.live-modal')
 
+  <!-- Banner Flotante de Instalación PWA (App Móvil) -->
+  <div id="pwa-install-banner" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-96 bg-gray-900/95 backdrop-blur-md text-white p-4 rounded-2xl shadow-2xl border border-purple-500/30 z-50 transform translate-y-32 opacity-0 transition-all duration-500 pointer-events-none flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+          <img src="{{ asset('images/icons/icon-192x192.png') }}" alt="UHTV App" class="w-12 h-12 rounded-xl shadow-md border border-white/20 flex-shrink-0" loading="lazy" decoding="async">
+          <div>
+              <h6 class="font-bold text-sm text-white leading-tight">Instalar App UHTV</h6>
+              <p class="text-xs text-purple-200 mt-0.5">Accede al instante y lee noticias sin conexión.</p>
+          </div>
+      </div>
+      <div class="flex items-center gap-2">
+          <button id="pwa-install-btn" class="bg-gradient-to-r from-purple-600 to-red-600 hover:from-purple-700 hover:to-red-700 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-md transition-all transform hover:scale-105">
+              Instalar
+          </button>
+          <button id="pwa-dismiss-btn" class="text-gray-400 hover:text-white p-1.5 text-xs transition-colors" title="Cerrar">
+              <i class="fas fa-times"></i>
+          </button>
+      </div>
+  </div>
+
+  <script>
+    // Registro de Service Worker para PWA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js')
+                .then(function(reg) {
+                    console.log('[PWA] Service Worker registrado con éxito:', reg.scope);
+                })
+                .catch(function(err) {
+                    console.warn('[PWA] Error al registrar Service Worker:', err);
+                });
+        });
+    }
+
+    // Manejo del aviso de instalación nativa PWA
+    let deferredInstallPrompt = null;
+    const installBanner = document.getElementById('pwa-install-banner');
+    const installBtn = document.getElementById('pwa-install-btn');
+    const dismissBtn = document.getElementById('pwa-dismiss-btn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+
+        if (!localStorage.getItem('uhtv-pwa-dismissed')) {
+            if (installBanner) {
+                installBanner.classList.remove('translate-y-32', 'opacity-0', 'pointer-events-none');
+            }
+        }
+    });
+
+    if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+            if (!deferredInstallPrompt) return;
+            deferredInstallPrompt.prompt();
+            const { outcome } = await deferredInstallPrompt.userChoice;
+            console.log('[PWA] Respuesta del usuario:', outcome);
+            deferredInstallPrompt = null;
+            if (installBanner) {
+                installBanner.classList.add('translate-y-32', 'opacity-0', 'pointer-events-none');
+            }
+        });
+    }
+
+    if (dismissBtn) {
+        dismissBtn.addEventListener('click', () => {
+            if (installBanner) {
+                installBanner.classList.add('translate-y-32', 'opacity-0', 'pointer-events-none');
+                localStorage.setItem('uhtv-pwa-dismissed', 'true');
+            }
+        });
+    }
+
+    window.addEventListener('appinstalled', () => {
+        console.log('[PWA] Aplicación UHTV instalada exitosamente');
+        if (installBanner) {
+            installBanner.classList.add('translate-y-32', 'opacity-0', 'pointer-events-none');
+        }
+    });
+  </script>
 </body>
 
 </html>

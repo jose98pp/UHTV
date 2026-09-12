@@ -145,6 +145,18 @@
                 </select>
             </div>
 
+            <!-- Sort Filter -->
+            <div class="filter-group">
+                <label class="filter-label" for="sort-select">Ordenar por</label>
+                <select name="sort" id="sort-select" class="filter-input filter-select">
+                    <option value="latest" {{ request('sort') === 'latest' ? 'selected' : '' }}>Más recientes</option>
+                    <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>Más antiguas</option>
+                    <option value="views_desc" {{ request('sort') === 'views_desc' ? 'selected' : '' }}>Más vistas (Popularidad)</option>
+                    <option value="views_asc" {{ request('sort') === 'views_asc' ? 'selected' : '' }}>Menos vistas</option>
+                    <option value="title_asc" {{ request('sort') === 'title_asc' ? 'selected' : '' }}>Título (A - Z)</option>
+                </select>
+            </div>
+
             <!-- Filter Buttons -->
             <div class="filter-buttons">
                 <button type="submit" class="filter-btn primary">
@@ -222,6 +234,29 @@
                 </div>
             </div>
         @endif
+    </div>
+
+    <!-- Bulk Actions Toolbar (Sticky / Floating when items are selected) -->
+    <div id="bulk-actions-toolbar" class="bg-indigo-900 text-white p-3 rounded-xl shadow-lg flex flex-wrap items-center justify-between gap-3 transition-all duration-300 mb-4" style="display: none;">
+        <div class="flex items-center gap-3">
+            <input type="checkbox" id="select-all-checkbox" class="form-check-input w-5 h-5 rounded cursor-pointer text-blue-500" onchange="toggleSelectAll(this)">
+            <label for="select-all-checkbox" class="font-bold text-sm cursor-pointer mb-0">Seleccionar todas</label>
+            <span class="bg-white/20 px-2.5 py-0.5 rounded-full text-xs font-semibold" id="selected-count-badge">0 seleccionadas</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button type="button" class="btn btn-sm btn-success rounded-lg font-semibold" onclick="executeBulkAction('publish')">
+                <i class="fas fa-check-circle me-1"></i> Publicar
+            </button>
+            <button type="button" class="btn btn-sm btn-warning text-dark rounded-lg font-semibold" onclick="executeBulkAction('unpublish')">
+                <i class="fas fa-pause-circle me-1"></i> Pasar a Borrador
+            </button>
+            <button type="button" class="btn btn-sm btn-danger rounded-lg font-semibold" onclick="executeBulkAction('delete')">
+                <i class="fas fa-trash-alt me-1"></i> Eliminar
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-light rounded-lg" onclick="clearSelection()" title="Cancelar selección">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
     </div>
 
     <!-- News Cards -->
@@ -629,6 +664,125 @@ if (document.querySelectorAll('.news-card').length > 8) {
         } else {
             scrollBtn.style.display = 'none';
         }
+    });
+}
+
+// Bulk Actions & Quick Toggle Functions
+function onNewsCheckboxChange() {
+    const checkboxes = document.querySelectorAll('.news-checkbox:checked');
+    const allCheckboxes = document.querySelectorAll('.news-checkbox');
+    const toolbar = document.getElementById('bulk-actions-toolbar');
+    const countBadge = document.getElementById('selected-count-badge');
+    const masterCheckbox = document.getElementById('select-all-checkbox');
+
+    const count = checkboxes.length;
+    if (count > 0) {
+        toolbar.style.display = 'flex';
+        countBadge.innerText = `${count} seleccionada${count > 1 ? 's' : ''}`;
+    } else {
+        toolbar.style.display = 'none';
+    }
+
+    if (masterCheckbox && allCheckboxes.length > 0) {
+        masterCheckbox.checked = (count === allCheckboxes.length);
+    }
+}
+
+function toggleSelectAll(master) {
+    const checkboxes = document.querySelectorAll('.news-checkbox');
+    checkboxes.forEach(cb => cb.checked = master.checked);
+    onNewsCheckboxChange();
+}
+
+function clearSelection() {
+    const checkboxes = document.querySelectorAll('.news-checkbox');
+    checkboxes.forEach(cb => cb.checked = false);
+    const master = document.getElementById('select-all-checkbox');
+    if (master) master.checked = false;
+    onNewsCheckboxChange();
+}
+
+function executeBulkAction(action) {
+    const checked = document.querySelectorAll('.news-checkbox:checked');
+    const ids = Array.from(checked).map(cb => parseInt(cb.value));
+
+    if (ids.length === 0) {
+        alert('Por favor selecciona al menos una noticia.');
+        return;
+    }
+
+    let confirmMsg = `¿Estás seguro de procesar ${ids.length} noticias?`;
+    if (action === 'delete') {
+        confirmMsg = `¡ATENCIÓN! ¿Estás seguro de eliminar permanentemente ${ids.length} noticias seleccionadas?`;
+    } else if (action === 'publish') {
+        confirmMsg = `¿Deseas publicar ${ids.length} noticias seleccionadas?`;
+    } else if (action === 'unpublish') {
+        confirmMsg = `¿Deseas despublicar ${ids.length} noticias seleccionadas y moverlas a borradores?`;
+    }
+
+    if (!confirm(confirmMsg)) return;
+
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    fetch('{{ route("admin.noticias.bulk-action") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': token
+        },
+        body: JSON.stringify({ action: action, ids: ids })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert(data.message || 'Ocurrió un error al ejecutar la acción por lote.');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Error de conexión al procesar la solicitud.');
+    });
+}
+
+function quickToggleStatus(id, btnElement) {
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    fetch(`{{ url('admin/noticias') }}/${id}/toggle-status`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': token
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            if (btnElement) {
+                const label = btnElement.querySelector('.status-label');
+                const icon = btnElement.querySelector('i');
+                if (data.publicada) {
+                    btnElement.className = 'btn btn-sm px-2.5 py-1 text-xs fw-bold rounded-pill shadow-sm border-0 transition-all duration-200 btn-success text-white';
+                    if (label) label.innerText = 'Publicada';
+                    if (icon) icon.className = 'fas fa-check me-1';
+                } else {
+                    btnElement.className = 'btn btn-sm px-2.5 py-1 text-xs fw-bold rounded-pill shadow-sm border-0 transition-all duration-200 btn-warning text-dark';
+                    if (label) label.innerText = 'Borrador';
+                    if (icon) icon.className = 'fas fa-clock me-1';
+                }
+            } else {
+                window.location.reload();
+            }
+        } else {
+            alert('No se pudo cambiar el estado de la noticia.');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Error al conectar con el servidor.');
     });
 }
 </script>

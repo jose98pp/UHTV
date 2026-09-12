@@ -123,65 +123,102 @@
 
     <!-- Stats Cards -->
     <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="dashboard-card p-4">
+        <div class="col-xl-2 col-md-4 col-sm-6 mb-4">
+            <div class="dashboard-card p-3">
                 <div class="d-flex align-items-center">
-                    <div class="stat-icon bg-primary bg-opacity-10 text-primary me-3">
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary me-2" style="width: 45px; height: 45px; font-size: 1.2rem;">
                         <i class="fas fa-newspaper"></i>
                     </div>
                     <div class="flex-grow-1">
                         <div class="text-xs fw-bold text-primary text-uppercase mb-1">
-                            Total Noticias
+                            Noticias
                         </div>
-                        <div class="h4 mb-0 stat-number">{{ $stats['total_published'] ?? 0 }}</div>
+                        <div class="h5 mb-0 stat-number">{{ $stats['total_published'] ?? 0 }}</div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="dashboard-card p-4">
+        <div class="col-xl-2 col-md-4 col-sm-6 mb-4">
+            <div class="dashboard-card p-3">
                 <div class="d-flex align-items-center">
-                    <div class="stat-icon bg-warning bg-opacity-10 text-warning me-3">
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning me-2" style="width: 45px; height: 45px; font-size: 1.2rem;">
                         <i class="fas fa-edit"></i>
                     </div>
                     <div class="flex-grow-1">
                         <div class="text-xs fw-bold text-warning text-uppercase mb-1">
                             Borradores
                         </div>
-                        <div class="h4 mb-0 stat-number">{{ $stats['total_draft'] ?? 0 }}</div>
+                        <div class="h5 mb-0 stat-number">{{ $stats['total_draft'] ?? 0 }}</div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="dashboard-card p-4">
+        <div class="col-xl-2 col-md-4 col-sm-6 mb-4">
+            <div class="dashboard-card p-3">
                 <div class="d-flex align-items-center">
-                    <div class="stat-icon bg-success bg-opacity-10 text-success me-3">
+                    <div class="stat-icon bg-success bg-opacity-10 text-success me-2" style="width: 45px; height: 45px; font-size: 1.2rem;">
                         <i class="fas fa-tags"></i>
                     </div>
                     <div class="flex-grow-1">
                         <div class="text-xs fw-bold text-success text-uppercase mb-1">
                             Categorías
                         </div>
-                        <div class="h4 mb-0 stat-number">{{ $stats['total_categories'] ?? 0 }}</div>
+                        <div class="h5 mb-0 stat-number">{{ $stats['total_categories'] ?? 0 }}</div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="dashboard-card p-4">
+        <div class="col-xl-2 col-md-4 col-sm-6 mb-4">
+            <div class="dashboard-card p-3">
                 <div class="d-flex align-items-center">
-                    <div class="stat-icon bg-info bg-opacity-10 text-info me-3">
-                        <i class="fas fa-clock"></i>
+                    <div class="stat-icon bg-danger bg-opacity-10 text-danger me-2" style="width: 45px; height: 45px; font-size: 1.2rem;">
+                        <i class="fas fa-broadcast-tower"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="text-xs fw-bold text-danger text-uppercase mb-1">
+                            En Vivo
+                        </div>
+                        <div class="h5 mb-0 stat-number">
+                            {{ $stats['transmisiones_live'] ?? 0 }}
+                            @if(($stats['transmisiones_live'] ?? 0) > 0)
+                                <span class="badge bg-danger text-white ms-1" style="font-size: 9px;">ON</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4 col-sm-6 mb-4">
+            <div class="dashboard-card p-3">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon bg-info bg-opacity-10 text-info me-2" style="width: 45px; height: 45px; font-size: 1.2rem;">
+                        <i class="fas fa-ad"></i>
                     </div>
                     <div class="flex-grow-1">
                         <div class="text-xs fw-bold text-info text-uppercase mb-1">
-                            Esta Semana
+                            Banners
                         </div>
-                        <div class="h4 mb-0 stat-number">{{ $stats['recent_news'] ?? 0 }}</div>
+                        <div class="h5 mb-0 stat-number">{{ $stats['banners_active'] ?? 0 }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4 col-sm-6 mb-4">
+            <div class="dashboard-card p-3">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon bg-secondary bg-opacity-10 text-secondary me-2" style="width: 45px; height: 45px; font-size: 1.2rem;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="text-xs fw-bold text-secondary text-uppercase mb-1">
+                            Semana
+                        </div>
+                        <div class="h5 mb-0 stat-number">{{ $stats['recent_news'] ?? 0 }}</div>
                     </div>
                 </div>
             </div>
@@ -190,62 +227,82 @@
     
     <!-- Quick Actions -->
     <div class="row mb-4">
-        <div class="col-lg-4 mb-4">
+        <!-- Gestión de Noticias -->
+        <div class="col-xl-3 col-md-6 mb-4">
             <div class="quick-action-card p-4 h-100 position-relative">
                 <div class="d-flex align-items-center mb-3">
                     <i class="fas fa-newspaper fa-2x me-3"></i>
-                    <h5 class="mb-0 fw-bold">Gestión de Noticias</h5>
+                    <h5 class="mb-0 fw-bold">Noticias</h5>
                 </div>
-                <p class="mb-4 opacity-90">Administra todas las noticias de tu sitio web de manera eficiente.</p>
+                <p class="mb-4 opacity-90 small">Crea, edita y administra todas las noticias de tu portal informativo.</p>
                 <div class="d-grid gap-2">
-                    <a href="{{ route('admin.noticias.index') }}" 
-                       class="btn btn-light">
-                        <i class="fas fa-list me-2"></i>Ver Todas las Noticias
+                    <a href="{{ route('admin.noticias.index') }}" class="btn btn-light btn-sm">
+                        <i class="fas fa-list me-2"></i>Ver Todas
                     </a>
-                    <a href="{{ route('admin.noticias.create') }}" 
-                       class="btn btn-outline-light">
-                        <i class="fas fa-plus me-2"></i>Crear Nueva Noticia
+                    <a href="{{ route('admin.noticias.create') }}" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-plus me-2"></i>Nueva Noticia
                     </a>
                 </div>
             </div>
         </div>
-        
-        <div class="col-lg-4 mb-4">
-            <div class="quick-action-card p-4 h-100 position-relative" style="background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);">
+
+        <!-- Transmisiones En Vivo -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="quick-action-card p-4 h-100 position-relative" style="background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-video fa-2x me-3"></i>
+                        <h5 class="mb-0 fw-bold">En Vivo & TV</h5>
+                    </div>
+                    @if(($stats['transmisiones_live'] ?? 0) > 0)
+                        <span class="badge bg-white text-danger fw-bold text-uppercase px-2 py-1 shadow-sm" style="font-size: 10px;">AL AIRE</span>
+                    @endif
+                </div>
+                <p class="mb-4 opacity-90 small">Transmisiones en vivo, podcasts, clips de YouTube, TikTok y Facebook.</p>
+                <div class="d-grid gap-2">
+                    <a href="{{ route('admin.transmisiones.index') }}" class="btn btn-light btn-sm">
+                        <i class="fas fa-broadcast-tower me-2"></i>Ver Transmisiones
+                    </a>
+                    <a href="{{ route('admin.transmisiones.create') }}" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-plus me-2"></i>Nuevo Streaming
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Banners Publicitarios -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="quick-action-card p-4 h-100 position-relative" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-ad fa-2x me-3"></i>
+                    <h5 class="mb-0 fw-bold">Publicidad</h5>
+                </div>
+                <p class="mb-4 opacity-90 small">Controla banners en portada, categorías, sidebar y detalle de notas.</p>
+                <div class="d-grid gap-2">
+                    <a href="{{ route('admin.banners.index') }}" class="btn btn-light btn-sm">
+                        <i class="fas fa-images me-2"></i>Ver Banners
+                    </a>
+                    <a href="{{ route('admin.banners.create') }}" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-upload me-2"></i>Subir Banner
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categorías -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="quick-action-card p-4 h-100 position-relative" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
                 <div class="d-flex align-items-center mb-3">
                     <i class="fas fa-tags fa-2x me-3"></i>
-                    <h5 class="mb-0 fw-bold">Gestión de Categorías</h5>
+                    <h5 class="mb-0 fw-bold">Categorías</h5>
                 </div>
-                <p class="mb-4 opacity-90">Organiza tus noticias por categorías para mejor navegación.</p>
+                <p class="mb-4 opacity-90 small">Organiza tus secciones temáticas para una navegación intuitiva.</p>
                 <div class="d-grid gap-2">
-                    <a href="{{ route('admin.categorias.index') }}" 
-                       class="btn btn-light">
+                    <a href="{{ route('admin.categorias.index') }}" class="btn btn-light btn-sm">
                         <i class="fas fa-list me-2"></i>Ver Categorías
                     </a>
-                    <a href="{{ route('admin.categorias.create') }}" 
-                       class="btn btn-outline-light">
+                    <a href="{{ route('admin.categorias.create') }}" class="btn btn-outline-light btn-sm">
                         <i class="fas fa-plus me-2"></i>Nueva Categoría
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-4 mb-4">
-            <div class="quick-action-card p-4 h-100 position-relative" style="background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);">
-                <div class="d-flex align-items-center mb-3">
-                    <i class="fas fa-user-cog fa-2x me-3"></i>
-                    <h5 class="mb-0 fw-bold">Mi Perfil</h5>
-                </div>
-                <p class="mb-4 opacity-90">Administra tu perfil y configuraciones personales.</p>
-                <div class="d-grid gap-2">
-                    <a href="{{ route('admin.profile.index') }}" 
-                       class="btn btn-light">
-                        <i class="fas fa-user-edit me-2"></i>Editar Perfil
-                    </a>
-                    <a href="{{ route('portada') }}" 
-                       target="_blank"
-                       class="btn btn-outline-light">
-                        <i class="fas fa-external-link-alt me-2"></i>Ver Sitio Web
                     </a>
                 </div>
             </div>

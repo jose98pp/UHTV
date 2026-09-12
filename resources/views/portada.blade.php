@@ -27,6 +27,7 @@
                       <img src="{{ $noticia->imagenUrl ?? asset('images/default-news.svg') }}" 
                            alt="{{ $noticia->titulo }}" 
                            class="w-full h-full min-h-[450px] object-cover"
+                           @if($index === 0) fetchpriority="high" @else loading="lazy" decoding="async" @endif
                            onerror="handleImageError(this)">
                     </a>
                     <!-- Overlay con gradiente más suave -->
@@ -182,7 +183,8 @@
                     <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="block">
                         <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
                              class="w-full h-auto hover:opacity-90 transition-opacity duration-300"
-                             loading="lazy">
+                             loading="lazy"
+                             decoding="async">
                     </a>
                 </div>
             @endforeach
@@ -282,6 +284,7 @@
                          alt="{{ $noticia->titulo }}" 
                          class="w-full @if($index === 0) h-64 md:h-80 @else h-48 @endif object-cover transition-transform duration-500 hover:scale-105"
                          loading="lazy"
+                         decoding="async"
                          onerror="handleImageError(this)">
                     
                     <!-- Etiqueta de categoría -->
@@ -384,7 +387,8 @@
                     <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="block max-w-5xl w-full group">
                         <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
                              class="w-full h-auto rounded-2xl shadow-lg hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700" 
-                             loading="lazy">
+                             loading="lazy"
+                             decoding="async">
                     </a>
                 </div>
             @endforeach
@@ -410,6 +414,7 @@
                    alt="{{ $noticia->titulo }}" 
                    class="w-full h-56 object-cover transition-transform duration-500 hover:scale-110"
                    loading="lazy"
+                   decoding="async"
                    onerror="handleImageError(this)">
               
               <!-- Etiqueta de Categoría -->
@@ -489,7 +494,8 @@
       <a href="https://radiobetania.com/" target="_blank" rel="noopener noreferrer" class="block max-w-4xl"> 
         <img src="{{ asset('images/betania.jpg') }}" alt="Publicidad Radio Betania" 
              class="w-full h-auto rounded-lg shadow-lg hover:opacity-90 transition"
-             loading="lazy">
+             loading="lazy"
+             decoding="async">
       </a>
     </div>
   </div>

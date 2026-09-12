@@ -64,10 +64,30 @@ class NoticiaController extends Controller
         if (!in_array($perPage, $allowedPerPage)) {
             $perPage = 15;
         }
+
+        // Ordenamiento dinámico
+        $sort = $request->get('sort', 'latest');
+        switch ($sort) {
+            case 'views_desc':
+                $query->orderBy('views', 'desc');
+                break;
+            case 'views_asc':
+                $query->orderBy('views', 'asc');
+                break;
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'title_asc':
+                $query->orderBy('titulo', 'asc');
+                break;
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
         
-        $news = $query->orderBy('created_at', 'desc')->paginate($perPage);
+        $news = $query->paginate($perPage);
         
-        // Mantener parámetros de búsqueda en la paginación
+        // Mantener parámetros de búsqueda y ordenamiento en la paginación
         $news->appends($request->query());
         
         // Add image information for each news item
@@ -480,5 +500,78 @@ class NoticiaController extends Controller
             'recent' => $recentNews,
             'published_percentage' => $totalNews > 0 ? round(($publishedNews / $totalNews) * 100, 1) : 0
         ];
+    }
+
+    /**
+     * Alternar estado de publicación (Publicada / Borrador)
+     */
+    public function toggleStatus($id, Request $request)
+    {
+        $noticia = Noticia::findOrFail($id);
+        $noticia->publicada = !$noticia->publicada;
+        $noticia->save();
+
+        Noticia::clearNewsCache($noticia);
+
+        $statusText = $noticia->publicada ? 'publicada' : 'despublicada (borrador)';
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'publicada' => (bool) $noticia->publicada,
+                'message' => "La noticia ha sido {$statusText} correctamente.",
+            ]);
+        }
+
+        return redirect()->back()->with('success', "La noticia ha sido {$statusText} correctamente.");
+    }
+
+    /**
+     * Ejecutar acciones por lote sobre múltiples noticias
+     */
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'action' => 'required|in:publish,unpublish,delete',
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:noticias,id',
+        ]);
+
+        $ids = $request->ids;
+        $action = $request->action;
+        $count = count($ids);
+
+        switch ($action) {
+            case 'publish':
+                Noticia::whereIn('id', $ids)->update(['publicada' => true]);
+                $message = "Se han publicado {$count} noticias seleccionadas.";
+                break;
+
+            case 'unpublish':
+                Noticia::whereIn('id', $ids)->update(['publicada' => false]);
+                $message = "Se han despublicado {$count} noticias seleccionadas (movidas a borradores).";
+                break;
+
+            case 'delete':
+                $noticiasToDelete = Noticia::whereIn('id', $ids)->get();
+                foreach ($noticiasToDelete as $noticia) {
+                    $noticia->delete();
+                }
+                $message = "Se han eliminado {$count} noticias seleccionadas correctamente.";
+                break;
+        }
+
+        Noticia::clearNewsCache();
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'action' => $action,
+                'count' => $count,
+            ]);
+        }
+
+        return redirect()->back()->with('success', $message);
     }
 }

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="50%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f3f4f6"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  
+  <!-- Rounded Background Container -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+  
+  <!-- Outer glowing accent ring -->
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="none" stroke="#ffffff" stroke-width="4" stroke-opacity="0.25"/>
+  
+  <!-- TV Antenna / Signal Accent -->
+  <circle cx="256" cy="110" r="14" fill="#ffffff" filter="url(#shadow)"/>
+  <path d="M 216 75 C 238 60, 274 60, 296 75" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.8"/>
+  <path d="M 195 50 C 230 28, 282 28, 317 50" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- Brand Typography: UHTV -->
+  <g filter="url(#shadow)">
+    <text x="256" y="300" 
+          font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" 
+          font-size="118" 
+          font-weight="900" 
+          letter-spacing="4" 
+          fill="url(#textGrad)" 
+          text-anchor="middle">UHTV</text>
+  </g>
+
+  <!-- Tagline Banner -->
+  <rect x="106" y="340" width="300" height="48" rx="24" fill="#ffffff" fill-opacity="0.2"/>
+  <text x="256" y="372" 
+        font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" 
+        font-size="22" 
+        font-weight="800" 
+        letter-spacing="6" 
+        fill="#ffffff" 
+        text-anchor="middle">ÚLTIMA HORA</text>
+
+  <!-- Live Pulse Dot Indicator -->
+  <circle cx="256" cy="430" r="10" fill="#ef4444"/>
+  <circle cx="256" cy="430" r="18" fill="none" stroke="#ef4444" stroke-width="3" opacity="0.6"/>
+</svg>
