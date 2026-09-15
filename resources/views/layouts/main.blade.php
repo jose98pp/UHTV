@@ -82,7 +82,6 @@
     <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
     <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
-    <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
     
     <!-- Preconnect for critical resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -99,32 +98,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Dashing+Alternate&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            important: true,
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#f5f3ff',
-                            100: '#ede9fe',
-                            200: '#ddd6fe',
-                            300: '#c4b5fd',
-                            400: '#a78bfa',
-                            500: '#8b5cf6',
-                            600: '#7c3aed',
-                            700: '#6d28d9',
-                            800: '#5b21b6',
-                            900: '#4c1d95',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Tailwind CSS: compiled via Vite (see @vite below) -->
     
     <!-- Optimized CSS - Load with high priority -->
     <link rel="preload" href="{{ asset('css/optimized.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -136,7 +110,7 @@
         'resources/css/browser-compatibility.css',
         'resources/css/dark-mode.css',
         'resources/css/show-dark-mode.css',
-        'resources/js/app.jsx'
+        'resources/js/app.js'
     ])
 
     <!-- Script de inicialización inmediata para modo oscuro -->
@@ -884,15 +858,11 @@
 </footer>
     <!-- Dark Mode Script (debe cargarse antes que otros scripts) -->
     <script src="{{ asset('js/dark-mode.js') }}"></script>
-    
-    <!-- CSS Optimization and Browser Compatibility -->
-    <script src="{{ asset('js/css-optimization.js') }}"></script>
-    
-    <!-- Diagnostics (solo en desarrollo) -->
+
+    @if(config('app.debug'))
+    <!-- Scripts de diagnóstico (solo en entorno de desarrollo) -->
     <script src="{{ asset('js/diagnostics.js') }}"></script>
-    
-    <!-- Error Handler -->
-    <script src="{{ asset('js/error-handler.js') }}"></script>
+    @endif
     
     <!-- Bootstrap JS - Solo una versión -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

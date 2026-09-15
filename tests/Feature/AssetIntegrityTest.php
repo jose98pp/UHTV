@@ -161,7 +161,7 @@ class AssetIntegrityTest extends TestCase
                 'resources/css/browser-compatibility.css',
                 'resources/css/dark-mode.css',
                 'resources/css/show-dark-mode.css',
-                'resources/js/app.jsx'
+                'resources/js/app.js'
             ]
         ];
     }

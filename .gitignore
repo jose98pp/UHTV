@@ -8,6 +8,7 @@
 .env
 .env.backup
 .env.production
+.env.local
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
@@ -17,5 +18,19 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+/.vs
+/.kiro
 vite.config.js.timestamp-*
 
+# Archivos obsoletos / notas de desarrollo
+homepage.html
+test-autoload.php
+react-slick.d.ts
+analisis-uhtv-errores-mejoras.md
+correcciones-noticias-navbar.md
+error-corregido-noticia.md
+mejoras-finales-uhtv.md
+mejoras-implementadas-uhtv.md
+mejoras-visuales-uhtv.md
+rutas-corregidas-uhtv.md
+php.ini
