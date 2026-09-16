@@ -201,9 +201,35 @@
             <!-- Contenido del Artículo -->
             <div class="prose prose-xl max-w-none mb-12 dark:prose-invert">
                 <div class="text-gray-800 dark:text-gray-200 leading-relaxed article-content" style="font-size: 1.2rem; line-height: 1.9;">
-                    {!! $noticia->contenidoSanitizado ?? nl2br(e($noticia->contenido)) !!}
+                    {!! $noticia->contenido_sanitizado !!}
                 </div>
             </div>
+
+            <!-- Galería Multimedia de Fotos Adicionales -->
+            @if(!empty($noticia->galeria_urls) && count($noticia->galeria_urls) > 0)
+                <div class="mb-12">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center transition-colors duration-300">
+                        <i class="fas fa-images text-purple-600 dark:text-purple-400 mr-3"></i>
+                        Galería Multimedia ({{ count($noticia->galeria_urls) }} fotos)
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        @foreach($noticia->galeria_urls as $idx => $fotoUrl)
+                            <div class="group relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300 bg-gray-100 dark:bg-gray-800">
+                                <a href="{{ $fotoUrl }}" target="_blank" class="block aspect-video overflow-hidden">
+                                    <img src="{{ $fotoUrl }}" 
+                                         alt="Foto {{ $idx + 1 }} - {{ $noticia->titulo }}"
+                                         class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                                         loading="lazy">
+                                    <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center text-white">
+                                        <i class="fas fa-search-plus text-2xl drop-shadow"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
 
             <!-- Video de YouTube -->
             @if($noticia->video_youtube)

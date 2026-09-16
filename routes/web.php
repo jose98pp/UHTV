@@ -107,7 +107,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('transmisiones/preview', [\App\Http\Controllers\Admin\TransmisionController::class, 'preview'])->name('transmisiones.preview');
     Route::post('transmisiones/{id}/toggle-live', [\App\Http\Controllers\Admin\TransmisionController::class, 'toggleLive'])->name('transmisiones.toggle-live');
     Route::post('transmisiones/{id}/toggle-active', [\App\Http\Controllers\Admin\TransmisionController::class, 'toggleActive'])->name('transmisiones.toggle-active');
-    Route::resource('transmisiones', \App\Http\Controllers\Admin\TransmisionController::class);
+    Route::delete('transmisiones/{id}', [\App\Http\Controllers\Admin\TransmisionController::class, 'destroy'])->name('transmisiones.destroy');
+    Route::post('transmisiones/{id}/delete', [\App\Http\Controllers\Admin\TransmisionController::class, 'destroy'])->name('transmisiones.delete');
+    Route::resource('transmisiones', \App\Http\Controllers\Admin\TransmisionController::class)->except(['destroy']);
 
     // Ruta para cerrar sesión (logout)
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');

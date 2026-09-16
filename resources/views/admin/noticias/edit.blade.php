@@ -223,7 +223,7 @@
                         <div class="card-body text-center">
                             <img 
                                 id="image-preview" 
-                                src="#" 
+                                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E" 
                                 alt="Vista previa" 
                                 style="max-width: 100%; max-height: 300px; border-radius: 8px;">
                             <div id="image-info" class="mt-2 text-muted small"></div>
@@ -283,7 +283,87 @@
                     container.style.display = 'none';
                     output.src = '';
                 }
+
+                function previewGaleriaImages(event) {
+                    const container = document.getElementById('galeria-preview-container');
+                    container.innerHTML = '';
+                    const files = event.target.files;
+                    if (files && files.length > 0) {
+                        container.style.display = 'flex';
+                        Array.from(files).forEach((file) => {
+                            if (file.type.startsWith('image/')) {
+                                const col = document.createElement('div');
+                                col.className = 'col-6 col-sm-4 col-md-3 position-relative';
+                                const img = document.createElement('img');
+                                img.src = URL.createObjectURL(file);
+                                img.className = 'img-thumbnail w-100 shadow-sm rounded';
+                                img.style.height = '110px';
+                                img.style.objectFit = 'cover';
+                                
+                                const badge = document.createElement('span');
+                                badge.className = 'badge bg-dark position-absolute top-0 start-0 m-2 opacity-75';
+                                badge.innerText = `${(file.size / 1024).toFixed(0)} KB`;
+
+                                col.appendChild(img);
+                                col.appendChild(badge);
+                                container.appendChild(col);
+                            }
+                        });
+                    } else {
+                        container.style.display = 'none';
+                    }
+                }
             </script>
+
+            <!-- Multimedia: Galería de Fotos Adicionales -->
+            <div class="card border-0 shadow-sm rounded-3 mb-3 p-3 bg-light">
+                <div class="d-flex align-items-center mb-1">
+                    <i class="fas fa-images text-primary me-2 fa-lg"></i>
+                    <label for="galeria" class="form-label mb-0 fw-bold">Multimedia: Galería de Fotos Adicionales</label>
+                </div>
+                <p class="text-muted small mb-2">
+                    Agrega más fotos a esta noticia o elimina fotos existentes de la galería.
+                </p>
+
+                @if(!empty($noticia->galeria) && is_array($noticia->galeria) && count($noticia->galeria) > 0)
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">Fotos actuales en la galería (marca para eliminar):</label>
+                        <div class="row g-2">
+                            @foreach($noticia->galeria as $index => $fotoPath)
+                                <div class="col-6 col-sm-4 col-md-3">
+                                    <div class="card h-100 border shadow-xs position-relative overflow-hidden">
+                                        <img src="{{ asset($fotoPath) }}" alt="Foto {{ $index + 1 }}" class="card-img-top" style="height: 100px; object-fit: cover;">
+                                        <div class="card-body p-2 bg-white text-center">
+                                            <div class="form-check form-check-inline m-0">
+                                                <input class="form-check-input" type="checkbox" name="eliminar_galeria[]" value="{{ $fotoPath }}" id="del_foto_{{ $index }}">
+                                                <label class="form-check-label text-danger small fw-semibold" for="del_foto_{{ $index }}">
+                                                    <i class="fas fa-trash-alt me-1"></i> Eliminar
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                <label for="galeria" class="form-label text-muted small fw-bold">Añadir más fotos a la galería:</label>
+                <input 
+                    type="file" 
+                    name="galeria[]" 
+                    id="galeria" 
+                    class="form-control" 
+                    accept="image/jpeg,image/png,image/jpg,image/webp" 
+                    multiple
+                    onchange="previewGaleriaImages(event)">
+                <small class="form-text text-muted">
+                    Formatos permitidos: JPEG, PNG, JPG, WEBP. Tamaño máx: 5MB por foto.
+                </small>
+
+                <!-- Previsualización de nuevas fotos -->
+                <div id="galeria-preview-container" class="row g-2 mt-2" style="display: none;"></div>
+            </div>
 
             <div class="form-group mb-3">
                 <label for="video_youtube" class="form-label">Video de YouTube (opcional):</label>

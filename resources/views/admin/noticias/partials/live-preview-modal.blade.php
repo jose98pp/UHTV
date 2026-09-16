@@ -33,7 +33,7 @@
                         </button>
                     </div>
 
-                    <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white ms-2" onclick="closeLivePreview()" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
             </div>
 
@@ -120,7 +120,7 @@
                     <i class="fas fa-info-circle text-primary me-1"></i>
                     Esta vista previa actualiza dinámicamente el contenido del formulario sin necesidad de recargar.
                 </div>
-                <button type="button" class="btn btn-secondary px-4 rounded-pill" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-secondary px-4 rounded-pill shadow-sm" onclick="closeLivePreview()" data-bs-dismiss="modal">
                     <i class="fas fa-times me-1"></i> Cerrar Vista Previa
                 </button>
             </div>
@@ -147,6 +147,37 @@
             mobileBtn.classList.remove('active', 'btn-light');
             mobileBtn.classList.add('btn-outline-light');
         }
+    }
+
+    function closeLivePreview() {
+        const modalEl = document.getElementById('livePreviewModal');
+        if (!modalEl) return;
+
+        // Pausar video si estaba reproduciendo
+        const ytIframe = document.getElementById('prev-youtube-iframe');
+        if (ytIframe) ytIframe.src = '';
+
+        if (window.bootstrap && window.bootstrap.Modal) {
+            try {
+                const modal = window.bootstrap.Modal.getInstance(modalEl);
+                if (modal) {
+                    modal.hide();
+                }
+            } catch (e) {
+                console.warn('Bootstrap modal instance hide error:', e);
+            }
+        }
+
+        // Limpieza garantizada de estado, display y backdrops
+        modalEl.classList.remove('show');
+        modalEl.style.display = 'none';
+        modalEl.setAttribute('aria-hidden', 'true');
+        modalEl.removeAttribute('aria-modal');
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
     }
 
     function openLivePreview() {
@@ -238,9 +269,30 @@
             const modal = window.bootstrap.Modal.getOrCreateInstance(modalEl);
             modal.show();
         } else {
-            // Fallback si modal bootstrap no está montado
             modalEl.classList.add('show');
             modalEl.style.display = 'block';
+            modalEl.setAttribute('aria-modal', 'true');
+            modalEl.removeAttribute('aria-hidden');
+            document.body.classList.add('modal-open');
+            document.body.style.overflow = 'hidden';
         }
     }
+
+    // Cerrar al presionar Escape o al hacer clic fuera del diálogo
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeLivePreview();
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalEl = document.getElementById('livePreviewModal');
+        if (modalEl) {
+            modalEl.addEventListener('click', function(e) {
+                if (e.target === modalEl) {
+                    closeLivePreview();
+                }
+            });
+        }
+    });
 </script>

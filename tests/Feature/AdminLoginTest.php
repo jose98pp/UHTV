@@ -15,11 +15,13 @@ class AdminLoginTest extends TestCase
     {
         parent::setUp();
         
-        // Create admin user
+        // Create or find admin user
+        $email = 'admin_test_' . uniqid() . '@example.com';
+        $this->adminPassword = 'password123';
         $this->admin = User::create([
             'name' => 'Admin Test',
-            'email' => 'admin@test.com',
-            'password' => Hash::make('password123'),
+            'email' => $email,
+            'password' => Hash::make($this->adminPassword),
             'role' => 'admin',
             'is_active' => true,
             'email_verified_at' => now()
@@ -40,8 +42,8 @@ class AdminLoginTest extends TestCase
     public function admin_can_login_with_correct_credentials()
     {
         $response = $this->post(route('admin.login.store'), [
-            'email' => 'admin@test.com',
-            'password' => 'password123'
+            'email' => $this->admin->email,
+            'password' => $this->adminPassword
         ]);
 
         $response->assertRedirect(route('admin.dashboard'));
@@ -52,7 +54,7 @@ class AdminLoginTest extends TestCase
     public function admin_cannot_login_with_incorrect_credentials()
     {
         $response = $this->post(route('admin.login.store'), [
-            'email' => 'admin@test.com',
+            'email' => $this->admin->email,
             'password' => 'wrongpassword'
         ]);
 

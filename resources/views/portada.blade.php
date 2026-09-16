@@ -247,6 +247,179 @@
   }
 </style>
 
+<!-- ============================================================
+     SECCIÓN VIDEOS UHTV - YouTube embeds a lo ancho
+================================================================ -->
+<section class="py-10 bg-gray-950 dark:bg-black border-y-2 border-purple-800/40 transition-colors duration-300">
+  <div class="container mx-auto px-4">
+
+    <!-- Header de la sección -->
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-600 shadow-lg shadow-red-600/40">
+          <i class="fab fa-youtube text-white text-lg"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-extrabold text-white leading-none">Videos <span class="text-red-500">UHTV</span></h2>
+          <p class="text-gray-400 text-xs mt-0.5 uppercase tracking-wider">Canal Oficial · YouTube</p>
+        </div>
+        @php
+          $hayVivo = isset($transmisionEnVivo) && $transmisionEnVivo;
+        @endphp
+        @if($hayVivo)
+          <span class="inline-flex items-center gap-1.5 bg-red-600/20 border border-red-500/50 text-red-400 text-[10px] font-black uppercase px-2.5 py-1 rounded-full animate-pulse ml-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-red-500 inline-block"></span>
+            EN VIVO AHORA
+          </span>
+        @endif
+      </div>
+      <a href="https://www.youtube.com/@UHTVBolivia" target="_blank" rel="noopener noreferrer"
+         class="hidden sm:flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-full transition-all duration-300 shadow hover:shadow-red-600/40 transform hover:-translate-y-0.5">
+        <i class="fab fa-youtube"></i>
+        Ver Canal
+      </a>
+    </div>
+
+    @php
+      $videosGrid = $transmisionesRecientes ?? collect();
+      $videoVivo  = $transmisionEnVivo ?? null;
+      // Si hay stream en vivo, lo ponemos primero
+      if ($videoVivo && $videosGrid->where('id', $videoVivo->id)->isEmpty()) {
+          $videosGrid = $videosGrid->prepend($videoVivo);
+      }
+      // Fallback: embed playlist del canal
+      $playlistEmbed = 'https://www.youtube.com/embed?listType=playlist&list=UUx8c9O9qP3IjtnEKkEr-Bng&rel=0';
+    @endphp
+
+    @if($videosGrid->count() > 0)
+      <!-- Grid de videos: 1 principal grande + hasta 3 secundarios -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+        {{-- Video Principal (en vivo o el más reciente) --}}
+        @php $principal = $videosGrid->first(); @endphp
+        <div class="lg:col-span-2 group">
+          <div class="relative rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10 bg-black">
+            <!-- Etiqueta en vivo o reciente -->
+            <div class="absolute top-3 left-3 z-10">
+              @if($principal->en_vivo ?? false)
+                <span class="inline-flex items-center gap-1 bg-red-600 text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow animate-pulse border border-white/20">
+                  <span class="w-1.5 h-1.5 rounded-full bg-white inline-block"></span> EN VIVO
+                </span>
+              @else
+                <span class="inline-flex items-center gap-1 bg-black/60 backdrop-blur text-gray-200 text-[10px] font-semibold uppercase px-2.5 py-1 rounded-full border border-white/10">
+                  <i class="fab fa-youtube text-red-500 text-xs"></i> UHTV
+                </span>
+              @endif
+            </div>
+            <!-- iframe principal -->
+            <div class="relative pb-[56.25%] bg-black">
+              <iframe
+                class="absolute top-0 left-0 w-full h-full"
+                src="{{ $principal->embed_url ?? $playlistEmbed }}"
+                title="{{ $principal->titulo ?? 'UHTV Bolivia' }}"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+                loading="lazy">
+              </iframe>
+            </div>
+            <!-- Título del video principal -->
+            <div class="p-4 bg-gradient-to-t from-gray-950 to-gray-900/80">
+              <h3 class="text-white font-bold text-base leading-snug line-clamp-2 group-hover:text-red-400 transition-colors">
+                {{ $principal->titulo ?? 'Transmisión UHTV Bolivia' }}
+              </h3>
+              @if(isset($principal->created_at))
+                <p class="text-gray-400 text-xs mt-1 flex items-center gap-1">
+                  <i class="fas fa-clock text-[10px]"></i>
+                  {{ \Carbon\Carbon::parse($principal->created_at)->locale('es')->diffForHumans() }}
+                </p>
+              @endif
+            </div>
+          </div>
+        </div>
+
+        {{-- Videos secundarios (hasta 3) --}}
+        <div class="flex flex-col gap-4">
+          @foreach($videosGrid->skip(1)->take(3) as $video)
+            <div class="group flex-1 min-h-0">
+              <div class="relative rounded-xl overflow-hidden shadow-xl border border-white/10 bg-black h-full">
+                @if($video->en_vivo ?? false)
+                  <div class="absolute top-2 left-2 z-10">
+                    <span class="inline-flex items-center gap-1 bg-red-600 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full shadow animate-pulse">
+                      <span class="w-1 h-1 rounded-full bg-white inline-block"></span> VIVO
+                    </span>
+                  </div>
+                @endif
+                <div class="relative pb-[56.25%] bg-black">
+                  <iframe
+                    class="absolute top-0 left-0 w-full h-full"
+                    src="{{ $video->embed_url }}"
+                    title="{{ $video->titulo ?? 'Video UHTV' }}"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                    loading="lazy">
+                  </iframe>
+                </div>
+                <div class="p-3 bg-gray-900/90">
+                  <h4 class="text-white text-xs font-semibold line-clamp-2 group-hover:text-red-400 transition-colors leading-snug">
+                    {{ $video->titulo ?? 'Video UHTV' }}
+                  </h4>
+                </div>
+              </div>
+            </div>
+          @endforeach
+
+          {{-- Si hay menos de 3 videos secundarios, mostrar el canal --}}
+          @if($videosGrid->count() < 3)
+            <div class="flex-1 rounded-xl overflow-hidden border border-white/10 bg-gray-900 flex flex-col items-center justify-center p-6 gap-3 min-h-[120px]">
+              <i class="fab fa-youtube text-red-500 text-4xl"></i>
+              <p class="text-gray-300 text-sm text-center font-medium">Más videos en nuestro canal de YouTube</p>
+              <a href="https://www.youtube.com/@UHTVBolivia" target="_blank" rel="noopener noreferrer"
+                 class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-5 py-2 rounded-full transition-all duration-300">
+                <i class="fab fa-youtube mr-1"></i> Suscríbete
+              </a>
+            </div>
+          @endif
+        </div>
+
+      </div>
+    @else
+      {{-- Fallback: solo embed del canal playlist --}}
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div class="lg:col-span-2">
+          <div class="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-black">
+            <div class="relative pb-[56.25%] bg-black">
+              <iframe
+                class="absolute top-0 left-0 w-full h-full"
+                src="{{ $playlistEmbed }}"
+                title="UHTV Bolivia - Canal Oficial"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+                loading="lazy">
+              </iframe>
+            </div>
+            <div class="p-4 bg-gray-900">
+              <h3 class="text-white font-bold text-base">Canal Oficial UHTV Bolivia</h3>
+              <p class="text-gray-400 text-xs mt-1">Transmisiones en vivo, noticias y más</p>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col items-center justify-center gap-4 bg-gray-900 rounded-2xl border border-white/10 p-8">
+          <i class="fab fa-youtube text-red-500 text-6xl"></i>
+          <div class="text-center">
+            <h4 class="text-white font-bold text-lg">UHTV Bolivia</h4>
+            <p class="text-gray-400 text-sm mt-1">Noticias · Transmisiones · Análisis</p>
+          </div>
+          <a href="https://www.youtube.com/@UHTVBolivia" target="_blank" rel="noopener noreferrer"
+             class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-full transition-all duration-300 flex items-center gap-2 shadow-lg shadow-red-600/30">
+            <i class="fab fa-youtube"></i> Ver Canal
+          </a>
+        </div>
+      </div>
+    @endif
+
+  </div>
+</section>
+
 <!-- Sección de Noticias por Categorías - Estilo Brújula Digital -->
 <section class="py-12 bg-gray-50 dark:bg-gray-800 transition-colors duration-300">
   <div class="container mx-auto px-4">

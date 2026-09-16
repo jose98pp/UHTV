@@ -248,9 +248,9 @@
                                     </form>
                                 </td>
                                 <td class="text-end pe-3">
-                                    <div class="btn-group btn-group-sm">
+                                    <div class="d-flex justify-content-end align-items-center gap-1">
                                         <button type="button" 
-                                                class="btn btn-outline-primary preview-btn" 
+                                                class="btn btn-sm btn-outline-primary preview-btn" 
                                                 data-title="{{ $item->titulo }}"
                                                 data-embed="{{ $item->embed_url }}"
                                                 data-bs-toggle="modal" 
@@ -258,16 +258,17 @@
                                                 title="Previsualizar video">
                                             <i class="fas fa-play"></i>
                                         </button>
-                                        <a href="{{ route('admin.transmisiones.edit', $item->id) }}" class="btn btn-outline-secondary" title="Editar transmisión">
+                                        <a href="{{ route('admin.transmisiones.edit', $item->id) }}" class="btn btn-sm btn-outline-secondary" title="Editar transmisión">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('admin.transmisiones.destroy', $item->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Estás seguro de eliminar esta transmisión?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-danger" title="Eliminar">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
-                                        </form>
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-danger btn-delete-transmision" 
+                                                data-id="{{ $item->id }}"
+                                                data-title="{{ $item->titulo }}"
+                                                data-action="{{ route('admin.transmisiones.destroy', $item->id) }}"
+                                                title="Eliminar transmisión">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -317,8 +318,42 @@
     </div>
 </div>
 
+<!-- Modal Confirmar Eliminación -->
+<div class="modal fade" id="deleteTransmisionModal" tabindex="-1" aria-labelledby="deleteTransmisionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-danger text-white py-3">
+                <h6 class="modal-title fw-bold" id="deleteTransmisionModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Confirmar Eliminación
+                </h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <div class="rounded-circle bg-danger bg-opacity-10 text-danger d-inline-flex p-3 mb-3">
+                    <i class="fas fa-trash-alt fa-2x"></i>
+                </div>
+                <h5 class="fw-bold mb-2">¿Eliminar esta transmisión?</h5>
+                <p class="text-muted mb-0" id="deleteTransmisionTitleDisplay">Esta acción eliminará el registro permanentemente.</p>
+            </div>
+            <div class="modal-footer bg-light border-0 justify-content-center p-3 gap-2">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Cancelar
+                </button>
+                <form id="deleteTransmisionForm" action="" method="POST" class="d-inline m-0">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger px-4 fw-bold">
+                        <i class="fas fa-trash-alt me-1"></i> Sí, Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Modal de Vista Previa
     const previewModal = document.getElementById('quickPreviewModal');
     const previewIframe = document.getElementById('previewIframe');
     const previewTitle = document.getElementById('quickPreviewModalLabel');
@@ -337,6 +372,51 @@ document.addEventListener('DOMContentLoaded', function() {
             previewIframe.src = '';
         });
     }
+
+    // Modal de Confirmación de Eliminación
+    const deleteModalEl = document.getElementById('deleteTransmisionModal');
+    const deleteForm = document.getElementById('deleteTransmisionForm');
+    const deleteTitleDisplay = document.getElementById('deleteTransmisionTitleDisplay');
+    let deleteModalInstance = null;
+
+    if (deleteModalEl && typeof bootstrap !== 'undefined') {
+        deleteModalInstance = new bootstrap.Modal(deleteModalEl);
+    }
+
+    document.querySelectorAll('.btn-delete-transmision').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const actionUrl = this.getAttribute('data-action');
+            const title = this.getAttribute('data-title') || 'esta transmisión';
+
+            if (deleteForm && deleteTitleDisplay && deleteModalInstance) {
+                deleteForm.action = actionUrl;
+                deleteTitleDisplay.innerHTML = `¿Estás seguro de eliminar <strong>${title}</strong>?<br><span class="text-danger small">Esta acción no se puede deshacer.</span>`;
+                deleteModalInstance.show();
+            } else {
+                if (confirm(`¿Estás seguro de eliminar "${title}"?\nEsta acción no se puede deshacer.`)) {
+                    const fallbackForm = document.createElement('form');
+                    fallbackForm.method = 'POST';
+                    fallbackForm.action = actionUrl;
+                    
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = '_token';
+                    csrfInput.value = document.querySelector('meta[name="csrf-token"]').content;
+                    fallbackForm.appendChild(csrfInput);
+
+                    const methodInput = document.createElement('input');
+                    methodInput.type = 'hidden';
+                    methodInput.name = '_method';
+                    methodInput.value = 'DELETE';
+                    fallbackForm.appendChild(methodInput);
+
+                    document.body.appendChild(fallbackForm);
+                    fallbackForm.submit();
+                }
+            }
+        });
+    });
 });
 </script>
 @endsection

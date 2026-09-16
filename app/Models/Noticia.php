@@ -18,7 +18,13 @@ class Noticia extends Model
         'publicada',
         'video_youtube',
         'imagen',
+        'galeria',
         'views',
+    ];
+
+    protected $casts = [
+        'galeria' => 'array',
+        'publicada' => 'boolean',
     ];
 
     protected static function booted(): void
@@ -85,5 +91,34 @@ class Noticia extends Model
             'category' => $this->category_slug,
             'slug' => $this->slug_with_id,
         ];
+    }
+
+    public function getContenidoSanitizadoAttribute(): string
+    {
+        if (empty($this->contenido)) {
+            return '';
+        }
+
+        try {
+            $sanitizer = app(\App\Services\ContentSanitizationService::class);
+            return $sanitizer->sanitizeContent($this->contenido);
+        } catch (\Throwable $e) {
+            return $this->contenido;
+        }
+    }
+
+    public function getGaleriaUrlsAttribute(): array
+    {
+        if (empty($this->galeria) || !is_array($this->galeria)) {
+            return [];
+        }
+
+        $urls = [];
+        foreach ($this->galeria as $item) {
+            if (is_string($item) && !empty($item)) {
+                $urls[] = str_starts_with($item, 'http') ? $item : asset($item);
+            }
+        }
+        return $urls;
     }
 }

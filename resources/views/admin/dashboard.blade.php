@@ -106,8 +106,11 @@
                             Aquí tienes un resumen de tu actividad y accesos rápidos para gestionar tu contenido.
                         </p>
                     </div>
-                    <div class="col-md-4 text-end">
-                        <div class="d-flex justify-content-end gap-2">
+                    <div class="col-md-5 text-end">
+                        <div class="d-flex justify-content-end gap-2 flex-wrap">
+                            <a href="{{ route('admin.transmisiones.index') }}" class="btn btn-danger">
+                                <i class="fas fa-satellite-dish me-2"></i>En Vivo / Streams
+                            </a>
                             <a href="{{ route('admin.noticias.create') }}" class="btn btn-primary">
                                 <i class="fas fa-plus me-2"></i>Nueva Noticia
                             </a>
@@ -172,24 +175,26 @@
         </div>
         
         <div class="col-xl-2 col-md-4 col-sm-6 mb-4">
-            <div class="dashboard-card p-3">
-                <div class="d-flex align-items-center">
-                    <div class="stat-icon bg-danger bg-opacity-10 text-danger me-2" style="width: 45px; height: 45px; font-size: 1.2rem;">
-                        <i class="fas fa-broadcast-tower"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="text-xs fw-bold text-danger text-uppercase mb-1">
-                            En Vivo
+            <a href="{{ route('admin.transmisiones.index') }}" class="text-decoration-none">
+                <div class="dashboard-card p-3 h-100" style="transition: transform 0.2s ease, box-shadow 0.2s ease;">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon bg-danger bg-opacity-10 text-danger me-2" style="width: 45px; height: 45px; font-size: 1.2rem;">
+                            <i class="fas fa-broadcast-tower"></i>
                         </div>
-                        <div class="h5 mb-0 stat-number">
-                            {{ $stats['transmisiones_live'] ?? 0 }}
-                            @if(($stats['transmisiones_live'] ?? 0) > 0)
-                                <span class="badge bg-danger text-white ms-1" style="font-size: 9px;">ON</span>
-                            @endif
+                        <div class="flex-grow-1">
+                            <div class="text-xs fw-bold text-danger text-uppercase mb-1">
+                                En Vivo
+                            </div>
+                            <div class="h5 mb-0 stat-number text-dark">
+                                {{ $stats['transmisiones_live'] ?? 0 }}
+                                @if(($stats['transmisiones_live'] ?? 0) > 0)
+                                    <span class="badge bg-danger text-white ms-1" style="font-size: 9px;">ON</span>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
 
         <div class="col-xl-2 col-md-4 col-sm-6 mb-4">

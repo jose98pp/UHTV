@@ -81,11 +81,14 @@
     <!-- DNS Prefetch for better performance -->
     <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
     
     <!-- Preconnect for critical resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     
     <!-- Critical CSS - Load synchronously -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -98,20 +101,39 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Dashing+Alternate&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS: compiled via Vite (see @vite below) -->
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            important: true,
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     
     <!-- Optimized CSS - Load with high priority -->
     <link rel="preload" href="{{ asset('css/optimized.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="{{ asset('css/optimized.css') }}" rel="stylesheet"></noscript>
     
     <!-- Assets compilados por Vite (CSS y JS) -->
-    @vite([
-        'resources/css/app.css',
-        'resources/css/browser-compatibility.css',
-        'resources/css/dark-mode.css',
-        'resources/css/show-dark-mode.css',
-        'resources/js/app.js'
-    ])
+    @vite(['resources/css/app.css', 'resources/css/browser-compatibility.css', 'resources/css/dark-mode.css', 'resources/css/show-dark-mode.css', 'resources/js/app.js'])
 
     <!-- Script de inicialización inmediata para modo oscuro -->
     <script>
@@ -203,9 +225,8 @@
 
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-  <!-- Header Principal estilo El Deber con Imagen de Fondo -->
-  <header class="relative bg-gradient-to-r from-purple-800 via-purple-600 to-red-600 dark:from-purple-900 dark:via-purple-700 dark:to-red-700 bg-cover bg-center min-h-[140px] flex items-center justify-center text-white overflow-hidden py-6 px-4 transition-colors duration-300"
-          style="background-image: url('{{ isset($banners['portada_top']) && $banners['portada_top']->count() > 0 ? asset($banners['portada_top']->first()->image_path) : asset('images/banner.png') }}');">
+  <!-- Header Principal -->
+  <header class="relative bg-gradient-to-r from-purple-900 via-purple-700 to-red-700 dark:from-gray-950 dark:via-purple-900 dark:to-red-900 min-h-[110px] flex items-center justify-center text-white overflow-hidden py-4 px-4 transition-colors duration-300">
     
     <!-- Overlay de oscurecimiento para legibilidad premium -->
     <div class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/55 to-black/75 dark:from-black/85 dark:via-black/65 dark:to-black/85"></div>
@@ -483,6 +504,32 @@
           setInterval(rotateWeather, 3800);
       });
   </script>
+
+<!-- ============================================================
+     BANNER PUBLICITARIO - A todo el ancho, entre header y nav
+     Posición: portada_top
+================================================================ -->
+@if(isset($banners['portada_top']) && $banners['portada_top']->count() > 0)
+  <div class="w-full overflow-hidden bg-gray-100 dark:bg-gray-950 border-b-2 border-purple-700/30" style="max-height:130px;">
+    <a href="{{ $banners['portada_top']->first()->link ?? '#' }}" target="_blank" rel="noopener noreferrer sponsored" class="block w-full" title="Publicidad">
+      <img src="{{ asset($banners['portada_top']->first()->image_path) }}"
+           alt="{{ $banners['portada_top']->first()->title ?? 'Publicidad' }}"
+           class="w-full object-cover object-center"
+           style="max-height:130px;"
+           loading="eager"
+           decoding="async">
+    </a>
+  </div>
+@else
+  {{-- Placeholder cuando no hay banner: franja de color con logo/texto --}}
+  <div class="w-full bg-gradient-to-r from-purple-900 via-indigo-800 to-purple-900 dark:from-gray-900 dark:via-indigo-950 dark:to-gray-900 border-b-2 border-purple-600/40 flex items-center justify-center" style="height:80px;">
+    <div class="flex items-center gap-4 opacity-60">
+      <span class="text-white/50 text-xs uppercase tracking-widest font-semibold">Espacio Publicitario</span>
+      <div class="h-px w-24 bg-white/20"></div>
+      <span class="text-white/30 text-[10px] uppercase tracking-wider">728 × 90</span>
+    </div>
+  </div>
+@endif
 
 <!-- Navbar Mejorada -->
 <nav class="bg-white dark:bg-gray-900 shadow-xl sticky top-0 left-0 w-full z-50 border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
@@ -863,6 +910,9 @@
     <!-- Scripts de diagnóstico (solo en entorno de desarrollo) -->
     <script src="{{ asset('js/diagnostics.js') }}"></script>
     @endif
+    
+    <!-- Error Handler -->
+    <script src="{{ asset('js/error-handler.js') }}"></script>
     
     <!-- Bootstrap JS - Solo una versión -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

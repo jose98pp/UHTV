@@ -81,7 +81,7 @@ class ContentSanitizationService
             // Remove or replace other problematic characters
             "\u{2026}" => '...', // Horizontal ellipsis
             // Remove null bytes and control characters (except tabs, newlines, carriage returns)
-            '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/' => '',
+            '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u' => '',
         ];
         
         foreach ($unwantedChars as $search => $replace) {

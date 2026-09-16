@@ -20,7 +20,7 @@ class NewsViewsTest extends TestCase
         parent::setUp();
         
         $this->admin = User::factory()->create([
-            'email' => 'admin@test.com',
+            'email' => 'admin_views_' . uniqid() . '@test.com',
             'password' => bcrypt('password'),
             'role' => 'admin'
         ]);

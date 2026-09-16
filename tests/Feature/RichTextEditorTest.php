@@ -156,8 +156,9 @@ class RichTextEditorTest extends TestCase
     /** @test */
     public function test_update_categoria_with_rich_description()
     {
+        $categoryName = 'Test Cat ' . uniqid();
         $category = Category::create([
-            'name' => 'Test Category',
+            'name' => $categoryName,
             'descripcion' => '<p>Original description</p>'
         ]);
 

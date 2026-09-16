@@ -355,7 +355,7 @@
                     <div class="card-body text-center">
                         <img 
                             id="image-preview" 
-                            src="#" 
+                            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E" 
                             alt="Vista previa" 
                             style="max-width: 100%; max-height: 300px; border-radius: 8px;">
                         <div id="image-info" class="mt-2 text-muted small"></div>
@@ -420,7 +420,62 @@
                 container.style.display = 'none';
                 output.src = '';
             }
+
+            function previewGaleriaImages(event) {
+                const container = document.getElementById('galeria-preview-container');
+                container.innerHTML = '';
+                const files = event.target.files;
+                if (files && files.length > 0) {
+                    container.style.display = 'flex';
+                    Array.from(files).forEach((file) => {
+                        if (file.type.startsWith('image/')) {
+                            const col = document.createElement('div');
+                            col.className = 'col-6 col-sm-4 col-md-3 position-relative';
+                            const img = document.createElement('img');
+                            img.src = URL.createObjectURL(file);
+                            img.className = 'img-thumbnail w-100 shadow-sm rounded';
+                            img.style.height = '110px';
+                            img.style.objectFit = 'cover';
+                            
+                            const badge = document.createElement('span');
+                            badge.className = 'badge bg-dark position-absolute top-0 start-0 m-2 opacity-75';
+                            badge.innerText = `${(file.size / 1024).toFixed(0)} KB`;
+
+                            col.appendChild(img);
+                            col.appendChild(badge);
+                            container.appendChild(col);
+                        }
+                    });
+                } else {
+                    container.style.display = 'none';
+                }
+            }
         </script>
+
+        <!-- Multimedia: Galería de Fotos Adicionales -->
+        <div class="card border-0 shadow-sm rounded-3 mb-3 p-3 bg-light">
+            <div class="d-flex align-items-center mb-1">
+                <i class="fas fa-images text-primary me-2 fa-lg"></i>
+                <label for="galeria" class="form-label mb-0 fw-bold">Multimedia: Galería de Fotos Adicionales (Opcional)</label>
+            </div>
+            <p class="text-muted small mb-2">
+                Selecciona varias fotos a la vez para mostrarlas como galería o carrusel multimedia dentro del artículo.
+            </p>
+            <input 
+                type="file" 
+                name="galeria[]" 
+                id="galeria" 
+                class="form-control" 
+                accept="image/jpeg,image/png,image/jpg,image/webp" 
+                multiple
+                onchange="previewGaleriaImages(event)">
+            <small class="form-text text-muted">
+                Formatos permitidos: JPEG, PNG, JPG, WEBP. Tamaño máx: 5MB por foto.
+            </small>
+
+            <!-- Previsualización de fotos de la galería -->
+            <div id="galeria-preview-container" class="row g-2 mt-2" style="display: none;"></div>
+        </div>
 
         <div class="form-group mb-3">
             <label for="video_youtube" class="form-label">Video de YouTube (opcional):</label>

@@ -10,8 +10,18 @@ class TransmisionAdminTest extends TestCase
 {
     protected function getAdminUser()
     {
-        return User::where('email', 'bryan.costas@ultimahoratv.com')->first()
+        $user = User::where('email', 'bryan.costas@ultimahoratv.com')->first()
             ?? User::where('role', 'admin')->first();
+
+        if (!$user) {
+            $user = User::factory()->create([
+                'email' => 'admin_' . uniqid() . '@example.com',
+                'role' => 'admin',
+                'email_verified_at' => now(),
+            ]);
+        }
+
+        return $user;
     }
 
     /** @test */
@@ -149,5 +159,26 @@ class TransmisionAdminTest extends TestCase
         $this->assertNotNull($ttTrans);
         $this->assertStringContainsString('tiktok.com/embed/v2/7123456789012345678', $ttTrans->embed_url);
         $ttTrans->delete();
+    }
+
+    /** @test */
+    public function admin_can_delete_transmision()
+    {
+        $admin = $this->getAdminUser();
+
+        $transmision = Transmision::create([
+            'titulo' => 'Transmisión a Eliminar ' . uniqid(),
+            'tipo' => 'en_vivo',
+            'plataforma' => 'youtube',
+            'url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            'activo' => true,
+        ]);
+
+        $this->assertDatabaseHas('transmisiones', ['id' => $transmision->id]);
+
+        $response = $this->actingAs($admin)->delete(route('admin.transmisiones.destroy', $transmision->id));
+        $response->assertRedirect(route('admin.transmisiones.index'));
+
+        $this->assertDatabaseMissing('transmisiones', ['id' => $transmision->id]);
     }
 }

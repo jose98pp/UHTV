@@ -21,7 +21,7 @@ class EnhancedPaginationTest extends TestCase
         
         // Create admin user
         $this->admin = User::factory()->create([
-            'email' => 'admin@test.com',
+            'email' => 'admin_pag_' . uniqid() . '@test.com',
             'password' => bcrypt('password'),
             'role' => 'admin'
         ]);

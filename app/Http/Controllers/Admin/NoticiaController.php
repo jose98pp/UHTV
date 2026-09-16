@@ -182,12 +182,31 @@ class NoticiaController extends Controller
             }
         }
 
+        // Multimedia: Procesar galería de fotos adicionales
+        $galeriaPaths = [];
+        if ($request->hasFile('galeria')) {
+            foreach ($request->file('galeria') as $galeriaFile) {
+                if ($galeriaFile && $galeriaFile->isValid()) {
+                    try {
+                        $gPath = $this->imageStorageService->storeImageByCategory(
+                            $galeriaFile,
+                            $validatedData['category_id']
+                        );
+                        $galeriaPaths[] = $gPath;
+                    } catch (\Exception $e) {
+                        Log::warning('Error subiendo imagen de galería: ' . $e->getMessage());
+                    }
+                }
+            }
+        }
+
         $noticia = Noticia::create([
             'titulo' => strip_tags($validatedData['titulo']), // Sanitizar título
             'contenido' => $this->sanitizationService->sanitizeContent($validatedData['contenido']), // Sanitizar contenido
             'category_id' => $validatedData['category_id'],
             'user_id' => auth()->id(), // Asignar el usuario actual
             'imagen' => $imagePath,
+            'galeria' => !empty($galeriaPaths) ? $galeriaPaths : null,
             'video_youtube' => $this->getYouTubeVideoID($validatedData['video_youtube'] ?? null),
             'publicada' => $request->has('publicada'),
         ]);
@@ -290,6 +309,40 @@ class NoticiaController extends Controller
                         ->with('error', 'Error al actualizar la imagen: ' . $e->getMessage());
                 }
             }
+
+            // Multimedia: Gestionar galería de fotos adicionales
+            $currentGaleria = is_array($noticia->galeria) ? $noticia->galeria : [];
+
+            // Eliminar fotos seleccionadas
+            if ($request->has('eliminar_galeria') && is_array($request->eliminar_galeria)) {
+                foreach ($request->eliminar_galeria as $fotoDel) {
+                    try {
+                        $this->imageStorageService->deleteImage($fotoDel);
+                    } catch (\Exception $e) {
+                        Log::warning('No se pudo borrar foto de galeria: ' . $e->getMessage());
+                    }
+                    $currentGaleria = array_values(array_filter($currentGaleria, fn($p) => $p !== $fotoDel));
+                }
+            }
+
+            // Subir nuevas fotos a la galería
+            if ($request->hasFile('galeria')) {
+                foreach ($request->file('galeria') as $galeriaFile) {
+                    if ($galeriaFile && $galeriaFile->isValid()) {
+                        try {
+                            $gPath = $this->imageStorageService->storeImageByCategory(
+                                $galeriaFile,
+                                $validatedData['category_id']
+                            );
+                            $currentGaleria[] = $gPath;
+                        } catch (\Exception $e) {
+                            Log::warning('Error subiendo nueva imagen de galería: ' . $e->getMessage());
+                        }
+                    }
+                }
+            }
+
+            $noticia->galeria = !empty($currentGaleria) ? $currentGaleria : null;
 
             $noticia->update([
                 'titulo' => strip_tags($validatedData['titulo']), // Sanitizar título

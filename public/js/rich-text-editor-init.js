@@ -137,7 +137,10 @@ class RichTextEditorManager {
             const startTime = Date.now();
             
             const checkDependencies = () => {
-                if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined' && typeof RichTextEditor !== 'undefined') {
+                const hasReact = typeof React !== 'undefined' && typeof ReactDOM !== 'undefined';
+                const hasEditor = (typeof RichTextEditor !== 'undefined') || (typeof WordStyleEditor !== 'undefined');
+
+                if (hasReact && hasEditor) {
                     resolve();
                     return;
                 }

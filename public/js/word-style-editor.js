@@ -147,38 +147,97 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave }) => {
     };
 
     // Función para insertar enlaces
+    // Función para insertar enlaces preservando la selección y soportando texto libre
     const insertLink = () => {
         const selection = window.getSelection();
-        const selectedText = selection.toString();
+        let savedRange = null;
+        let selectedText = '';
         
-        if (selectedText.length === 0) {
-            alert('Por favor, seleccione el texto que desea convertir en enlace.');
+        if (selection.rangeCount > 0) {
+            savedRange = selection.getRangeAt(0).cloneRange();
+            selectedText = selection.toString();
+        }
+
+        let linkText = selectedText;
+        if (!linkText || linkText.trim() === '') {
+            const promptText = prompt('Ingrese el texto que mostrará el enlace (o déjelo en blanco para usar la URL):', '');
+            if (promptText === null) return; // Cancelado
+            linkText = promptText.trim();
+        }
+
+        const rawUrl = prompt('Ingrese la dirección web (URL) del enlace:', 'https://');
+        if (!rawUrl || rawUrl.trim() === '' || rawUrl.trim() === 'https://') {
             return;
         }
 
-        const url = prompt('Ingrese la URL del enlace:', 'https://');
-        
-        if (url && url.trim() !== '' && url !== 'https://') {
-            try {
-                new URL(url);
-                handleCommand('createLink', url);
-                
-                // Agregar estilos para enlaces
-                setTimeout(() => {
-                    const links = editorRef.current.querySelectorAll('a[href="' + url + '"]');
+        let cleanUrl = rawUrl.trim();
+        if (!/^https?:\/\//i.test(cleanUrl) && !cleanUrl.startsWith('/') && !cleanUrl.startsWith('mailto:')) {
+            cleanUrl = 'https://' + cleanUrl;
+        }
+
+        if (!linkText || linkText === '') {
+            linkText = cleanUrl;
+        }
+
+        // Restaurar foco al editor
+        if (editorRef.current) {
+            editorRef.current.focus();
+        }
+
+        if (savedRange) {
+            selection.removeAllRanges();
+            selection.addRange(savedRange);
+        }
+
+        if (!selectedText || selectedText.trim() === '') {
+            // Insertar nodo <a> directo en la posición del cursor
+            const a = document.createElement('a');
+            a.href = cleanUrl;
+            a.textContent = linkText;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.style.color = '#007bff';
+            a.style.textDecoration = 'underline';
+
+            if (savedRange) {
+                savedRange.deleteContents();
+                savedRange.insertNode(a);
+                const newRange = document.createRange();
+                newRange.setStartAfter(a);
+                newRange.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+            } else if (editorRef.current) {
+                editorRef.current.appendChild(a);
+            }
+            if (editorRef.current) {
+                const newContent = editorRef.current.innerHTML;
+                setContent(newContent);
+                addToUndoStack(newContent);
+                if (onChange) {
+                    onChange(newContent);
+                }
+            }
+        } else {
+            // Aplicar comando createLink sobre texto seleccionado
+            handleCommand('createLink', cleanUrl);
+            setTimeout(() => {
+                if (editorRef.current) {
+                    const links = editorRef.current.querySelectorAll('a[href="' + cleanUrl + '"]');
                     links.forEach(link => {
                         link.style.color = '#007bff';
                         link.style.textDecoration = 'underline';
-                        
-                        if (url.startsWith('http') && !url.includes(window.location.hostname)) {
-                            link.setAttribute('target', '_blank');
-                            link.setAttribute('rel', 'noopener noreferrer');
-                        }
+                        link.setAttribute('target', '_blank');
+                        link.setAttribute('rel', 'noopener noreferrer');
                     });
-                }, 100);
-            } catch (e) {
-                alert('Por favor, ingrese una URL válida (ejemplo: https://www.ejemplo.com)');
-            }
+                    const newContent = editorRef.current.innerHTML;
+                    setContent(newContent);
+                    addToUndoStack(newContent);
+                    if (onChange) {
+                        onChange(newContent);
+                    }
+                }
+            }, 50);
         }
     };
 

@@ -152,11 +152,19 @@ class TransmisionController extends Controller
      */
     public function destroy($id)
     {
-        $transmision = Transmision::findOrFail($id);
+        $transmision = ($id instanceof Transmision) ? $id : Transmision::findOrFail($id);
+        $titulo = $transmision->titulo;
         $transmision->delete();
 
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Transmisión '{$titulo}' eliminada correctamente.",
+            ]);
+        }
+
         return redirect()->route('admin.transmisiones.index')
-            ->with('success', 'Transmisión eliminada correctamente.');
+            ->with('success', "Transmisión '{$titulo}' eliminada correctamente.");
     }
 
     /**

@@ -260,72 +260,86 @@ const RichTextEditor = ({ initialContent = '', onChange, onAutoSave }) => {
     };
 
     // Función para insertar enlaces
+    // Función para insertar enlaces mejorada con preservación de selección
     const insertLink = () => {
         const selection = window.getSelection();
-        const selectedText = selection.toString();
+        let savedRange = null;
+        let selectedText = '';
         
-        if (selectedText.length === 0) {
-            alert('Por favor, seleccione el texto que desea convertir en enlace.');
+        if (selection.rangeCount > 0) {
+            savedRange = selection.getRangeAt(0).cloneRange();
+            selectedText = selection.toString();
+        }
+
+        let linkText = selectedText;
+        if (!linkText || linkText.trim() === '') {
+            const promptText = prompt('Ingrese el texto que mostrará el enlace (o déjelo en blanco para usar la URL):', '');
+            if (promptText === null) return;
+            linkText = promptText.trim();
+        }
+
+        const rawUrl = prompt('Ingrese la dirección web (URL) del enlace:', 'https://');
+        if (!rawUrl || rawUrl.trim() === '' || rawUrl.trim() === 'https://') {
             return;
         }
 
-        const url = prompt('Ingrese la URL del enlace:', 'https://');
-        
-        if (url && url.trim() !== '' && url !== 'https://') {
-            // Validar URL básica
-            try {
-                new URL(url);
-                handleCommand('createLink', url);
-                
-                // Agregar target="_blank", rel="noopener" y estilos para enlaces
-                setTimeout(() => {
-                    const links = editorRef.current.querySelectorAll('a[href="' + url + '"]');
+        let cleanUrl = rawUrl.trim();
+        if (!/^https?:\/\//i.test(cleanUrl) && !cleanUrl.startsWith('/') && !cleanUrl.startsWith('mailto:')) {
+            cleanUrl = 'https://' + cleanUrl;
+        }
+
+        if (!linkText || linkText === '') {
+            linkText = cleanUrl;
+        }
+
+        if (editorRef.current) {
+            editorRef.current.focus();
+        }
+
+        if (savedRange) {
+            selection.removeAllRanges();
+            selection.addRange(savedRange);
+        }
+
+        if (!selectedText || selectedText.trim() === '') {
+            const a = document.createElement('a');
+            a.href = cleanUrl;
+            a.textContent = linkText;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.style.color = '#007bff';
+            a.style.textDecoration = 'underline';
+            a.style.fontWeight = '500';
+
+            if (savedRange) {
+                savedRange.deleteContents();
+                savedRange.insertNode(a);
+                const newRange = document.createRange();
+                newRange.setStartAfter(a);
+                newRange.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+            } else if (editorRef.current) {
+                editorRef.current.appendChild(a);
+            }
+            if (editorRef.current) {
+                updateContent(editorRef.current.innerHTML);
+            }
+        } else {
+            handleCommand('createLink', cleanUrl);
+            setTimeout(() => {
+                if (editorRef.current) {
+                    const links = editorRef.current.querySelectorAll('a[href="' + cleanUrl + '"]');
                     links.forEach(link => {
-                        // Estilos base para todos los enlaces
                         link.style.color = '#007bff';
                         link.style.textDecoration = 'underline';
                         link.style.fontWeight = '500';
-                        link.style.transition = 'all 0.3s ease';
-                        
-                        if (url.startsWith('http') && !url.includes(window.location.hostname)) {
-                            // Enlaces externos
-                            link.setAttribute('target', '_blank');
-                            link.setAttribute('rel', 'noopener noreferrer');
-                            link.setAttribute('title', 'Enlace externo - Se abre en nueva ventana');
-                            link.style.color = '#28a745';
-                            link.classList.add('external-link');
-                            
-                            // Agregar icono de enlace externo
-                            if (!link.querySelector('.external-icon')) {
-                                const icon = document.createElement('span');
-                                icon.className = 'external-icon';
-                                icon.innerHTML = ' 🔗';
-                                icon.style.fontSize = '0.8em';
-                                icon.style.opacity = '0.7';
-                                link.appendChild(icon);
-                            }
-                        } else {
-                            // Enlaces internos
-                            link.style.color = '#6f42c1';
-                            link.classList.add('internal-link');
-                        }
-                        
-                        // Efectos hover
-                        link.addEventListener('mouseenter', function() {
-                            this.style.backgroundColor = 'rgba(0, 123, 255, 0.1)';
-                            this.style.borderRadius = '3px';
-                            this.style.padding = '2px 4px';
-                        });
-                        
-                        link.addEventListener('mouseleave', function() {
-                            this.style.backgroundColor = 'transparent';
-                            this.style.padding = '0';
-                        });
+                        link.setAttribute('target', '_blank');
+                        link.setAttribute('rel', 'noopener noreferrer');
                     });
-                }, 100);
-            } catch (e) {
-                alert('Por favor, ingrese una URL válida (ejemplo: https://www.ejemplo.com)');
-            }
+                    updateContent(editorRef.current.innerHTML);
+                }
+            }, 50);
         }
     };
 
@@ -705,4 +719,9 @@ const RichTextEditor = ({ initialContent = '', onChange, onAutoSave }) => {
 };
 
 // Exportar el componente
-typeof module !== 'undefined' && (module.exports = RichTextEditor);
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = RichTextEditor;
+}
+if (typeof window !== 'undefined') {
+    window.RichTextEditor = RichTextEditor;
+}

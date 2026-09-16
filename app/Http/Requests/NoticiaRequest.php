@@ -27,13 +27,13 @@ class NoticiaRequest extends FormRequest
                 'string',
                 'max:255',
                 'min:5',
-                'regex:/^[a-zA-Z0-9\s\-\.\,\!\?\:\;\(\)áéíóúÁÉÍÓÚñÑüÜ]+$/' // Allow alphanumeric, spaces, and common punctuation
+                'regex:/^[\p{L}\p{N}\s\-\.\,\!\?\:\;\(\)\"\'\«\»\“\”\¿\¡\/\$\%\&\#\@\+\=\—\–]+$/u'
             ],
             'contenido' => [
                 'required',
                 'string',
                 'max:' . config('uhtv.security.max_content_length', 250000),
-                'min:50'
+                'min:10'
             ],
             'category_id' => 'required|exists:categories,id',
             'video_youtube' => [
@@ -41,6 +41,8 @@ class NoticiaRequest extends FormRequest
                 'url',
                 'regex:/^https:\/\/(www\.)?(youtube\.com|youtu\.be)\/.*$/'
             ],
+            'galeria' => 'nullable|array|max:20',
+            'galeria.*' => 'image|mimes:jpeg,png,jpg,webp|max:5120',
             'publicada' => 'boolean'
         ];
 

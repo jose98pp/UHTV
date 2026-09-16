@@ -220,10 +220,17 @@
                     <button type="submit" class="btn btn-danger btn-lg px-4 fw-bold shadow-sm flex-fill">
                         <i class="fas fa-save me-2"></i> Actualizar Transmisión
                     </button>
-                    <a href="{{ route('admin.transmisiones.index') }}" class="btn btn-light btn-lg px-4 border">
+                    <a href="{{ route('admin.transmisiones.index') }}" class="btn btn-light btn-lg px-3 border">
                         Cancelar
                     </a>
+                    <button type="button" class="btn btn-outline-danger btn-lg px-3" onclick="if(confirm('¿Estás seguro de eliminar permanentemente esta transmisión?\nEsta acción no se puede deshacer.')) { document.getElementById('deleteTransmisionEditForm').submit(); }" title="Eliminar transmisión">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
                 </div>
+                <form id="deleteTransmisionEditForm" action="{{ route('admin.transmisiones.destroy', $transmision->id) }}" method="POST" class="d-none">
+                    @csrf
+                    @method('DELETE')
+                </form>
             </div>
 
             <!-- Columna Derecha: Vista Previa Interactiva en Tiempo Real -->

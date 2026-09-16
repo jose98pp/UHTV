@@ -20,7 +20,7 @@ class EnhancedFiltersTest extends TestCase
         parent::setUp();
         
         $this->admin = User::factory()->create([
-            'email' => 'admin@test.com',
+            'email' => 'admin_filt_' . uniqid() . '@test.com',
             'password' => bcrypt('password'),
             'role' => 'admin'
         ]);
