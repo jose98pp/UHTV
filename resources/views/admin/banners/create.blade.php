@@ -129,14 +129,14 @@
                                 <label for="location" class="form-label">Ubicación</label>
                                 <select class="form-select @error('location') is-invalid @enderror" id="location" name="location" required>
                                     <option value="">Seleccionar ubicación...</option>
-                                    <option value="portada_top" {{ old('location') == 'portada_top' ? 'selected' : '' }}>Portada - Arriba (Header Principal)</option>
-                                    <option value="portada_middle" {{ old('location') == 'portada_middle' ? 'selected' : '' }}>Portada - Medio</option>
-                                    <option value="sidebar" {{ old('location') == 'sidebar' ? 'selected' : '' }}>Barra Lateral (Sidebar)</option>
+                                    <option value="portada_top" {{ old('location') == 'portada_top' ? 'selected' : '' }}>Portada - Entre el Header y el Nav (100% ancho)</option>
+                                    <option value="portada_middle" {{ old('location') == 'portada_middle' ? 'selected' : '' }}>Portada - Arriba del Widget YouTube</option>
+                                    <option value="sidebar" {{ old('location') == 'sidebar' ? 'selected' : '' }}>Portada - Debajo de "Más Leídas" (Sidebar)</option>
                                     <option value="footer" {{ old('location') == 'footer' ? 'selected' : '' }}>Pie de Página (Footer)</option>
                                     <option value="category_top" {{ old('location') == 'category_top' ? 'selected' : '' }}>Categoría - Arriba</option>
                                     <option value="category_bottom" {{ old('location') == 'category_bottom' ? 'selected' : '' }}>Categoría - Abajo</option>
-                                    <option value="show_top" {{ old('location') == 'show_top' ? 'selected' : '' }}>Noticia - Arriba</option>
-                                    <option value="show_bottom" {{ old('location') == 'show_bottom' ? 'selected' : '' }}>Noticia - Abajo</option>
+                                    <option value="show_top" {{ old('location') == 'show_top' ? 'selected' : '' }}>Noticia - Arriba del artículo</option>
+                                    <option value="show_bottom" {{ old('location') == 'show_bottom' ? 'selected' : '' }}>Noticia - Al final, antes del footer</option>
                                     <option value="popup" {{ old('location') == 'popup' ? 'selected' : '' }}>Publicidad Emergente (Popup - Portada)</option>
                                 </select>
                                 @error('location')

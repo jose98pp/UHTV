@@ -248,6 +248,28 @@
 </style>
 
 <!-- ============================================================
+     BANNER PUBLICITARIO - Antes de la sección de Videos UHTV
+================================================================ -->
+@if(isset($banners['portada_middle']) && $banners['portada_middle']->count() > 0)
+  <div class="w-full bg-gray-100 dark:bg-gray-900 py-4 border-b border-gray-200 dark:border-gray-800">
+    <div class="container mx-auto px-4">
+      <p class="text-center text-gray-400 dark:text-gray-500 text-[10px] uppercase tracking-widest font-semibold mb-2">Publicidad</p>
+      @foreach($banners['portada_middle'] as $banner)
+        <div class="flex justify-center mb-3 last:mb-0">
+          <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer sponsored" class="block max-w-5xl w-full group">
+            <img src="{{ asset($banner->image_path) }}"
+                 alt="{{ $banner->title }}"
+                 class="w-full h-auto rounded-xl shadow-md hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700"
+                 loading="lazy"
+                 decoding="async">
+          </a>
+        </div>
+      @endforeach
+    </div>
+  </div>
+@endif
+
+<!-- ============================================================
      SECCIÓN VIDEOS UHTV - YouTube embeds a lo ancho
 ================================================================ -->
 <section class="py-10 bg-gray-950 dark:bg-black border-y-2 border-purple-800/40 transition-colors duration-300">

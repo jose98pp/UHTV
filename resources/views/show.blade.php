@@ -324,26 +324,6 @@
     </div>
 </article>
 
-<!-- Banner Publicitario -->
-@if(isset($banners['show_bottom']) && $banners['show_bottom']->count() > 0)
-    <section class="py-8 bg-gray-50 dark:bg-gray-800 transition-colors duration-300">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-4">
-                <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">PUBLICIDAD</span>
-            </div>
-            @foreach($banners['show_bottom'] as $banner)
-                <div class="flex justify-center mb-6">
-                    <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="block max-w-4xl"> 
-                        <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
-                             class="w-full h-auto rounded-lg shadow-lg hover:opacity-90 transition"
-                             loading="lazy"
-                             decoding="async">
-                    </a>
-                </div>
-            @endforeach
-        </div>
-    </section>
-@endif
 
 <!-- Noticias Relacionadas - Diseño Moderno -->
 <section class="py-16 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 transition-colors duration-300">
@@ -422,4 +402,27 @@
         </div>
     </div>
 </section>
+
+<!-- ============================================================
+     BANNER PUBLICITARIO - Al final de la noticia, antes del footer
+     Ubicación: show_bottom
+================================================================ -->
+@if(isset($banners['show_bottom']) && $banners['show_bottom']->count() > 0)
+  <section class="py-8 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 transition-colors duration-300">
+    <div class="container mx-auto px-4">
+      <p class="text-center text-gray-400 dark:text-gray-500 text-[10px] uppercase tracking-widest font-semibold mb-3">Publicidad</p>
+      @foreach($banners['show_bottom'] as $banner)
+        <div class="flex justify-center mb-4 last:mb-0">
+          <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer sponsored" class="block max-w-5xl w-full group">
+            <img src="{{ asset($banner->image_path) }}"
+                 alt="{{ $banner->title }}"
+                 class="w-full h-auto rounded-xl shadow-lg hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700"
+                 loading="lazy"
+                 decoding="async">
+          </a>
+        </div>
+      @endforeach
+    </div>
+  </section>
+@endif
 @endsection
