@@ -132,8 +132,18 @@
     <link rel="preload" href="{{ asset('css/optimized.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="{{ asset('css/optimized.css') }}" rel="stylesheet"></noscript>
     
-    <!-- Assets compilados por Vite (CSS y JS) -->
-    @vite(['resources/css/app.css', 'resources/css/browser-compatibility.css', 'resources/css/dark-mode.css', 'resources/css/show-dark-mode.css', 'resources/js/app.js'])
+    <!-- Assets compilados por Vite (CSS y JS) con protección ante manifest desactualizado -->
+    @php
+        $manifestPath = public_path('build/manifest.json');
+        $manifestData = file_exists($manifestPath) ? json_decode(@file_get_contents($manifestPath), true) : [];
+        $hasCompleteManifest = is_array($manifestData) && isset($manifestData['resources/js/app.js']) && isset($manifestData['resources/css/dark-mode.css']);
+    @endphp
+
+    @if($hasCompleteManifest)
+        @vite(['resources/css/app.css', 'resources/css/browser-compatibility.css', 'resources/css/dark-mode.css', 'resources/css/show-dark-mode.css', 'resources/js/app.js'])
+    @elseif(is_array($manifestData) && isset($manifestData['resources/css/app.css']))
+        @vite(['resources/css/app.css'])
+    @endif
 
     <!-- Script de inicialización inmediata para modo oscuro -->
     <script>

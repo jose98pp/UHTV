@@ -1,0 +1,39 @@
+{
+  "_vendor-upsvKRUO.js": {
+    "file": "js/chunks/vendor-upsvKRUO.js",
+    "name": "vendor"
+  },
+  "public/images/banner.png": {
+    "file": "images/banner-BpWHoSL3.png",
+    "src": "public/images/banner.png"
+  },
+  "resources/css/app.css": {
+    "file": "css/core/app-BV01laT1.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/css/browser-compatibility.css": {
+    "file": "css/compatibility/browser-compat-Dq5K-PkS.css",
+    "src": "resources/css/browser-compatibility.css",
+    "isEntry": true
+  },
+  "resources/css/dark-mode.css": {
+    "file": "css/themes/dark-mode-DgS_FKZ_.css",
+    "src": "resources/css/dark-mode.css",
+    "isEntry": true
+  },
+  "resources/css/show-dark-mode.css": {
+    "file": "css/pages/show-dark-mode-ZIW49DOX.css",
+    "src": "resources/css/show-dark-mode.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "js/app-BL2BFwCx.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "_vendor-upsvKRUO.js"
+    ]
+  }
+}

@@ -14,7 +14,17 @@
         <link rel="preload" href="{{ asset('css/optimized.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
         <noscript><link rel="stylesheet" href="{{ asset('css/optimized.css') }}"></noscript>
         
-        @vite(['resources/css/app.css', 'resources/css/browser-compatibility.css', 'resources/js/app.js'])
+        @php
+            $manifestPath = public_path('build/manifest.json');
+            $manifestData = file_exists($manifestPath) ? json_decode(@file_get_contents($manifestPath), true) : [];
+            $hasCompleteAppManifest = is_array($manifestData) && isset($manifestData['resources/js/app.js']) && isset($manifestData['resources/css/browser-compatibility.css']);
+        @endphp
+
+        @if($hasCompleteAppManifest)
+            @vite(['resources/css/app.css', 'resources/css/browser-compatibility.css', 'resources/js/app.js'])
+        @elseif(is_array($manifestData) && isset($manifestData['resources/css/app.css']))
+            @vite(['resources/css/app.css'])
+        @endif
 
         <title>{{ config('app.name', 'Admin') }}</title>
 
