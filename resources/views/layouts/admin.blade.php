@@ -20,11 +20,14 @@
         $manifestPath = public_path('build/manifest.json');
         $manifestData = file_exists($manifestPath) ? json_decode(@file_get_contents($manifestPath), true) : [];
         $hasAppJs = is_array($manifestData) && isset($manifestData['resources/js/app.js']);
+        $hasAppJsx = is_array($manifestData) && isset($manifestData['resources/js/app.jsx']);
         $hasAppCss = is_array($manifestData) && isset($manifestData['resources/css/app.css']);
     @endphp
 
     @if($hasAppJs && $hasAppCss)
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @elseif($hasAppJsx && $hasAppCss)
+        @vite(['resources/css/app.css', 'resources/js/app.jsx'])
     @elseif($hasAppCss)
         @vite(['resources/css/app.css'])
     @endif
