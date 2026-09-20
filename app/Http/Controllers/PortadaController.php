@@ -45,8 +45,12 @@ class PortadaController extends Controller
             ->firstOrFail();
 
         // Verificación canónica: Si la categoría o el slug cambiaron, redirigir 301 a la URL canónica
+        // Usamos redirect()->route() para respetar el host y esquema actual (local o producción)
         if ($category !== $noticia->category_slug || $slug !== $noticia->slug_with_id) {
-            return redirect()->to($noticia->url, 301);
+            return redirect()->route('show', [
+                'category' => $noticia->category_slug,
+                'slug' => $noticia->slug_with_id,
+            ], 301);
         }
 
         // Incrementar contador de vistas
@@ -63,7 +67,10 @@ class PortadaController extends Controller
     public function legacyShow($id)
     {
         $noticia = Noticia::with('category')->where('id', $id)->firstOrFail();
-        return redirect()->to($noticia->url, 301);
+        return redirect()->route('show', [
+            'category' => $noticia->category_slug,
+            'slug' => $noticia->slug_with_id,
+        ], 301);
     }
 
     /**
@@ -71,14 +78,49 @@ class PortadaController extends Controller
      */
     public function noticiasPorCategoria($category, Request $request)
     {
+        // 1. Buscar por coincidencia exacta en slug
         $categoria = Category::where('slug', $category)->first();
 
-        // Si se accede por ID numérico en la ruta /{id}, redirigir 301 a /{slug}
+        // 2. Si no se encuentra, buscar por slug generado del nombre o por nombre insensible a mayúsculas
+        if (!$categoria) {
+            $normalizedCategory = \Illuminate\Support\Str::slug($category);
+            $categoria = Category::all()->first(function ($cat) use ($category, $normalizedCategory) {
+                return $cat->slug === $category
+                    || $cat->slug === $normalizedCategory
+                    || \Illuminate\Support\Str::slug($cat->name) === $normalizedCategory
+                    || \Illuminate\Support\Str::lower($cat->name) === \Illuminate\Support\Str::lower($category);
+            });
+
+            // Si se encontró pero su slug en la BD estaba vacío, auto-repararlo inmediatamente
+            if ($categoria) {
+                if (empty($categoria->slug)) {
+                    $categoria->slug = \Illuminate\Support\Str::slug($categoria->name);
+                    $categoria->saveQuietly();
+                }
+
+                // Redirigir 301 al slug canónico si difiere del solicitado
+                if ($categoria->slug && $category !== $categoria->slug) {
+                    return redirect()->route('categoria.noticias', ['category' => $categoria->slug], 301);
+                }
+            }
+        }
+
+        // 3. Si se accede por ID numérico en la ruta /{id}, redirigir 301 a /{slug}
         if (!$categoria && is_numeric($category)) {
             $categoria = Category::find($category);
             if ($categoria) {
-                return redirect()->route('categoria.noticias', ['category' => $categoria->slug], 301);
+                $slug = $categoria->slug ?: \Illuminate\Support\Str::slug($categoria->name);
+                if (empty($categoria->slug)) {
+                    $categoria->slug = $slug;
+                    $categoria->saveQuietly();
+                }
+                return redirect()->route('categoria.noticias', ['category' => $slug], 301);
             }
+        }
+
+        // 4. Si la categoría tiene un slug canónico diferente (ej. URLs antiguas con -1), redirigir 301
+        if ($categoria && $categoria->slug && $category !== $categoria->slug) {
+            return redirect()->route('categoria.noticias', ['category' => $categoria->slug], 301);
         }
 
         if (!$categoria) {
@@ -114,7 +156,8 @@ class PortadaController extends Controller
     public function legacyCategory($id)
     {
         $categoria = Category::findOrFail($id);
-        return redirect()->route('categoria.noticias', ['category' => $categoria->slug], 301);
+        $slug = $categoria->slug ?: \Illuminate\Support\Str::slug($categoria->name);
+        return redirect()->route('categoria.noticias', ['category' => $slug], 301);
     }
 
     public function search(Request $request)

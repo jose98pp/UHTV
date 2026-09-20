@@ -8,6 +8,30 @@ use App\Models\Noticia;
 
 class UrlStructureTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $category = Category::firstOrCreate(
+            ['slug' => 'nacional'],
+            ['name' => 'Nacional']
+        );
+
+        Category::firstOrCreate(
+            ['slug' => 'cultura'],
+            ['name' => 'Cultura']
+        );
+
+        if (Noticia::where('publicada', true)->count() === 0) {
+            Noticia::create([
+                'titulo' => 'Noticia de Prueba para URLs',
+                'contenido' => 'Contenido de prueba para estructura de URLs.',
+                'category_id' => $category->id,
+                'publicada' => true,
+            ]);
+        }
+    }
+
     /**
      * Verificar que la URL de una categoría se genera con su slug /categoria
      */
@@ -115,5 +139,54 @@ class UrlStructureTest extends TestCase
         $response = $this->get('/seccion-totalmente-inexistente-xyz-999');
 
         $response->assertStatus(404);
+    }
+
+    /**
+     * Verificar que todas las categorías principales cargan 200 y muestran noticias
+     */
+     public function test_all_main_categories_load_successfully_with_news()
+     {
+         $mainCategories = ['nacional', 'politica', 'economia', 'mundo', 'sociedad', 'cultura', 'espectaculo', 'deportes', 'negocios'];
+ 
+         foreach ($mainCategories as $slug) {
+             $cat = Category::firstOrCreate(
+                 ['slug' => $slug],
+                 ['name' => ucfirst($slug)]
+             );
+ 
+             if ($cat->noticias()->count() === 0) {
+                 Noticia::create([
+                     'titulo' => 'Noticia de ' . ucfirst($slug),
+                     'contenido' => 'Contenido de prueba para ' . ucfirst($slug),
+                     'category_id' => $cat->id,
+                     'publicada' => true,
+                 ]);
+             }
+ 
+             $response = $this->get('/' . $slug);
+             $response->assertStatus(200);
+             $response->assertViewIs('categoria.noticias');
+             $response->assertDontSee('0 artículos disponibles');
+         }
+     }
+
+    /**
+     * Verificar que si una categoría tiene slug vacío en base de datos, el controlador auto-repara y responde 200
+     */
+    public function test_category_self_heals_when_slug_was_missing()
+    {
+        $cat = Category::where('slug', 'cultura')->first();
+        $this->assertNotNull($cat);
+
+        // Simular slug vacío
+        $cat->slug = '';
+        $cat->saveQuietly();
+
+        $response = $this->get('/cultura');
+        $response->assertStatus(200);
+
+        // Verificar que el slug fue reparado en la BD
+        $cat->refresh();
+        $this->assertEquals('cultura', $cat->slug);
     }
 }
