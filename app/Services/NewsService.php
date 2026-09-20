@@ -50,10 +50,10 @@ class NewsService
                 }
             }
 
-            // Obtener noticias por cada categoría individual para secciones específicas
+            // Obtener noticias por cada categoría individual para secciones específicas (últimas 5)
             $noticiasPorCategoria = [];
             foreach ($categorias as $categoria) {
-                $noticiasCategoria = $this->noticiaRepository->getNewsByCategory($categoria->id, 6);
+                $noticiasCategoria = $this->noticiaRepository->getNewsByCategory($categoria->id, 5);
                 $noticiasPorCategoria[$categoria->id] = $noticiasCategoria->map(function ($noticia) {
                     return $this->processNewsItem($noticia);
                 });

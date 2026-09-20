@@ -287,13 +287,12 @@
 
 /* News Cards Styles */
 .news-card {
-    transform-style: preserve-3d;
-    backface-visibility: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .news-card:hover {
-    transform: translateY(-8px) rotateX(5deg);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
 }
 
 .news-card-image {
@@ -306,7 +305,7 @@
 }
 
 .news-card:hover .news-card-image img {
-    transform: scale(1.05);
+    transform: scale(1.04);
 }
 
 .actions-dropdown {
@@ -314,21 +313,22 @@
 }
 
 .actions-menu {
-    min-width: 12rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    border: 1px solid #e5e7eb;
-    animation: fadeInDown 0.2s ease-out;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 200px !important;
+    min-width: 200px !important;
 }
 
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.actions-menu.hidden {
+    display: none !important;
+}
+
+.actions-menu a,
+.actions-menu button {
+    display: flex !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    align-items: center !important;
 }
 
 /* Card entrance animations */
@@ -761,20 +761,23 @@ function quickToggleStatus(id, btnElement) {
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            if (btnElement) {
-                const label = btnElement.querySelector('.status-label');
-                const icon = btnElement.querySelector('i');
+            const targetBtn = btnElement || document.querySelector(`#news-card-${id} .status-toggle-btn`);
+            if (targetBtn) {
+                const label = targetBtn.querySelector('.status-label');
+                const icon = targetBtn.querySelector('i');
                 if (data.publicada) {
-                    btnElement.className = 'btn btn-sm px-2.5 py-1 text-xs fw-bold rounded-pill shadow-sm border-0 transition-all duration-200 btn-success text-white';
+                    targetBtn.className = 'status-toggle-btn px-2.5 py-1 text-[11px] font-bold rounded-full shadow-md backdrop-blur-md border transition-all duration-200 flex items-center gap-1.5 cursor-pointer bg-emerald-600/90 hover:bg-emerald-600 text-white border-emerald-400/40';
                     if (label) label.innerText = 'Publicada';
-                    if (icon) icon.className = 'fas fa-check me-1';
+                    if (icon) icon.className = 'fas fa-check text-[10px]';
                 } else {
-                    btnElement.className = 'btn btn-sm px-2.5 py-1 text-xs fw-bold rounded-pill shadow-sm border-0 transition-all duration-200 btn-warning text-dark';
+                    targetBtn.className = 'status-toggle-btn px-2.5 py-1 text-[11px] font-bold rounded-full shadow-md backdrop-blur-md border transition-all duration-200 flex items-center gap-1.5 cursor-pointer bg-amber-500/90 hover:bg-amber-500 text-white border-amber-300/40';
                     if (label) label.innerText = 'Borrador';
-                    if (icon) icon.className = 'fas fa-clock me-1';
+                    if (icon) icon.className = 'fas fa-clock text-[10px]';
                 }
-            } else {
-                window.location.reload();
+            }
+            const dropdown = document.getElementById(`dropdown-${id}`);
+            if (dropdown && !dropdown.classList.contains('hidden')) {
+                dropdown.classList.add('hidden');
             }
         } else {
             alert('No se pudo cambiar el estado de la noticia.');

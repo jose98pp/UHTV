@@ -29,10 +29,10 @@ class HeaderBcbExchangeTest extends TestCase
         $response->assertSee('id="bcb-ticker-display"', false);
         $response->assertSee('BCB', false);
         $response->assertSee('USD', false);
-        $response->assertSee('6.86', false);
-        $response->assertSee('6.96', false);
+        $response->assertSee('11.00', false);
+        $response->assertSee('11.10', false);
         $response->assertSee('EUR', false);
-        $response->assertSee('7.45', false);
+        $response->assertSee('11.85', false);
         $response->assertSee('UFV', false);
         $response->assertSee('2.54', false);
         $response->assertSee('Cotización Oficial', false);

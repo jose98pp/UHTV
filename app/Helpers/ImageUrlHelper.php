@@ -38,6 +38,17 @@ class ImageUrlHelper
     }
 
     /**
+     * Obtener URL de versión WebP si existe, o null
+     *
+     * @param string|null $imagePath
+     * @return string|null
+     */
+    public static function getWebpUrl(?string $imagePath): ?string
+    {
+        return app(\App\Services\ImageValidationService::class)->getWebpUrlIfExists($imagePath);
+    }
+
+    /**
      * Resolver la ruta real de una imagen aunque haya sido movida a una subcarpeta por categoría.
      *
      * @param string|null $imagePath

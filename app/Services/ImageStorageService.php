@@ -70,8 +70,8 @@ class ImageStorageService
                 'size' => $file->getSize(),
             ]);
 
-            // Generar versión WebP optimizada si la extensión GD/Imagick está disponible
-            $this->generateWebpVersion($storedPath);
+            // Optimizar imagen (redimensionar si supera 1600px, compresión calidad 85) y generar versión WebP
+            $this->optimizeImage($storedPath);
 
             return $storedPath;
         } catch (\Exception $e) {
@@ -85,9 +85,83 @@ class ImageStorageService
     }
 
     /**
+     * Optimizar una imagen para web:
+     * - Redimensionar si supera el ancho máximo (1600px) sin distorsionar
+     * - Comprimir a calidad óptima (85) que no pierde calidad visual
+     * - Generar automáticamente versión WebP (85% calidad)
+     */
+    public function optimizeImage(string $relativePublicPath, int $maxWidth = 1600, int $maxHeight = 1200, int $quality = 85): bool
+    {
+        if (!function_exists('imagecreatefromstring')) {
+            return false;
+        }
+
+        try {
+            $fullPath = Storage::disk('public')->path($relativePublicPath);
+            if (!file_exists($fullPath)) {
+                return false;
+            }
+
+            $content = @file_get_contents($fullPath);
+            if (!$content) {
+                return false;
+            }
+
+            $img = @imagecreatefromstring($content);
+            if (!$img) {
+                return false;
+            }
+
+            $origWidth = imagesx($img);
+            $origHeight = imagesy($img);
+
+            // Si excede las dimensiones máximas recomendadas para web, redimensionar proporcionalmente
+            if ($origWidth > $maxWidth || $origHeight > $maxHeight) {
+                $ratio = min($maxWidth / $origWidth, $maxHeight / $origHeight);
+                $newWidth = (int) max(1, round($origWidth * $ratio));
+                $newHeight = (int) max(1, round($origHeight * $ratio));
+
+                $resized = imagecreatetruecolor($newWidth, $newHeight);
+
+                $ext = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
+
+                // Preservar transparencia para PNG y GIF
+                if (in_array($ext, ['png', 'gif'])) {
+                    imagecolortransparent($resized, imagecolorallocatealpha($resized, 0, 0, 0, 127));
+                    imagealphablending($resized, false);
+                    imagesavealpha($resized, true);
+                }
+
+                imagecopyresampled($resized, $img, 0, 0, 0, 0, $newWidth, $newHeight, $origWidth, $origHeight);
+                imagedestroy($img);
+                $img = $resized;
+
+                // Guardar la versión optimizada en su formato original
+                if ($ext === 'png') {
+                    imagepng($img, $fullPath, 6);
+                } elseif (in_array($ext, ['jpg', 'jpeg'])) {
+                    imagejpeg($img, $fullPath, $quality);
+                } elseif ($ext === 'webp' && function_exists('imagewebp')) {
+                    imagewebp($img, $fullPath, $quality);
+                }
+            }
+
+            imagedestroy($img);
+
+            // Generar o actualizar versión WebP complementaria
+            $this->generateWebpVersion($relativePublicPath, $quality);
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::warning('No se pudo optimizar la imagen ' . $relativePublicPath . ': ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Generar versión WebP si la extensión GD/Imagick está disponible
      */
-    public function generateWebpVersion(string $relativePublicPath, int $quality = 82): ?string
+    public function generateWebpVersion(string $relativePublicPath, int $quality = 85): ?string
     {
         if (!function_exists('imagewebp') || !function_exists('imagecreatefromstring')) {
             return null;
@@ -187,32 +261,121 @@ class ImageStorageService
     }
 
     /**
-     * Eliminar imagen de forma segura
+     * Eliminar imagen y sus derivados (WebP, formatos alternativos) de forma segura
      */
     public function deleteImage(string $imagePath): bool
     {
         try {
-            if ($this->imageValidationService->validateImagePath($imagePath)) {
-                $deleted = Storage::disk('public')->delete($imagePath);
-
-                if ($deleted) {
-                    Log::info('Imagen eliminada exitosamente', ['path' => $imagePath]);
-                } else {
-                    Log::warning('No se pudo eliminar la imagen', ['path' => $imagePath]);
-                }
-
-                return $deleted;
+            if (empty($imagePath)) {
+                return false;
             }
 
-            Log::warning('Intento de eliminar imagen inexistente', ['path' => $imagePath]);
-            return false;
+            // Normalizar ruta: quitar slashes iniciales, 'storage/', 'public/'
+            $normalizedPath = trim(str_replace('\\', '/', $imagePath), '/');
+            $normalizedPath = preg_replace('#^(storage|public)/#i', '', $normalizedPath) ?? $normalizedPath;
+            $normalizedPath = ltrim($normalizedPath, '/');
+
+            if (empty($normalizedPath)) {
+                return false;
+            }
+
+            $deleted = false;
+
+            if (Storage::disk('public')->exists($normalizedPath)) {
+                $deleted = Storage::disk('public')->delete($normalizedPath);
+            }
+
+            // Eliminar versión WebP complementaria si existe
+            $pathInfo = pathinfo($normalizedPath);
+            $ext = strtolower($pathInfo['extension'] ?? '');
+            $dirname = ($pathInfo['dirname'] !== '.' && !empty($pathInfo['dirname'])) ? $pathInfo['dirname'] . '/' : '';
+
+            if ($ext !== 'webp') {
+                $webpPath = $dirname . $pathInfo['filename'] . '.webp';
+                if (Storage::disk('public')->exists($webpPath)) {
+                    Storage::disk('public')->delete($webpPath);
+                    Log::info('Versión WebP eliminada exitosamente', ['path' => $webpPath]);
+                }
+            } else {
+                // Si la imagen era WebP, buscar si había un jpg o png con el mismo nombre
+                foreach (['jpg', 'jpeg', 'png'] as $altExt) {
+                    $altPath = $dirname . $pathInfo['filename'] . '.' . $altExt;
+                    if (Storage::disk('public')->exists($altPath)) {
+                        Storage::disk('public')->delete($altPath);
+                    }
+                }
+            }
+
+            if ($deleted) {
+                Log::info('Imagen eliminada exitosamente del storage', ['path' => $normalizedPath]);
+            } else {
+                Log::warning('No se encontró archivo en storage para eliminar', ['path' => $normalizedPath]);
+            }
+
+            return $deleted;
         } catch (\Exception $e) {
-            Log::error('Error al eliminar imagen', [
+            Log::error('Error al eliminar imagen del storage', [
                 'error' => $e->getMessage(),
                 'path' => $imagePath,
             ]);
             return false;
         }
+    }
+
+    /**
+     * Eliminar todas las imágenes asociadas a una noticia (imagen principal, galería, webp y contenido)
+     */
+    public function deleteAllNoticiaImages(\App\Models\Noticia $noticia): int
+    {
+        $deletedCount = 0;
+
+        try {
+            // 1. Eliminar imagen principal y su versión WebP
+            if (!empty($noticia->imagen)) {
+                if ($this->deleteImage($noticia->imagen)) {
+                    $deletedCount++;
+                }
+            }
+
+            // 2. Eliminar todas las imágenes de la galería multimedia
+            if (!empty($noticia->galeria) && is_array($noticia->galeria)) {
+                foreach ($noticia->galeria as $foto) {
+                    if (!empty($foto) && is_string($foto)) {
+                        if ($this->deleteImage($foto)) {
+                            $deletedCount++;
+                        }
+                    }
+                }
+            }
+
+            // 3. Eliminar imágenes locales insertadas dentro del contenido de la noticia
+            if (!empty($noticia->contenido)) {
+                if (preg_match_all('/<img[^>]+src=["\']([^"\']+)["\']/i', $noticia->contenido, $matches)) {
+                    foreach ($matches[1] as $src) {
+                        if (str_contains($src, '/storage/noticias/') || str_contains($src, 'storage/noticias/')) {
+                            $extractedPath = preg_replace('/^.*storage\//i', '', $src);
+                            if (!empty($extractedPath)) {
+                                if ($this->deleteImage($extractedPath)) {
+                                    $deletedCount++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Log::info('Limpieza completa de imágenes para noticia finalizada', [
+                'noticia_id' => $noticia->id,
+                'titulo' => $noticia->titulo,
+                'archivos_eliminados' => $deletedCount,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Error en deleteAllNoticiaImages: ' . $e->getMessage(), [
+                'noticia_id' => $noticia->id ?? null,
+            ]);
+        }
+
+        return $deletedCount;
     }
 
     /**

@@ -27,10 +27,8 @@ class NoticiaFactory extends Factory
             'publicada' => $this->faker->boolean(70), // 70% chance of being published
             'video_youtube' => $this->faker->optional(0.3)->url(), // 30% chance of having video
             'imagen' => $this->faker->optional(0.8)->imageUrl(800, 600, 'news'), // 80% chance of having image
-            'created_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
-            'updated_at' => function (array $attributes) {
-                return $this->faker->dateTimeBetween($attributes['created_at'], 'now');
-            },
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 

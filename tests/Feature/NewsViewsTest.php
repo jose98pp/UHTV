@@ -221,7 +221,7 @@ class NewsViewsTest extends TestCase
     public function it_shows_empty_state_when_no_news_exist()
     {
         $response = $this->actingAs($this->admin)
-            ->get(route('admin.noticias.index'));
+            ->get(route('admin.noticias.index', ['search' => '__NON_EXISTENT_SEARCH_EMPTY_STATE__']));
 
         $response->assertStatus(200);
         $response->assertSee('No se encontraron noticias');

@@ -448,12 +448,16 @@
     <div class="text-center mb-12">
       <h2 class="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">Noticias por Categorías</h2>
       <div class="w-32 h-1 bg-gradient-to-r from-[#0099ff] via-[#4f46e5] to-[#9333ea] mx-auto rounded-full"></div>
-      <p class="text-gray-600 dark:text-gray-300 mt-4 text-lg">Mantente informado con las últimas noticias de cada sección</p>
-    </div>
-
-    <!-- Secciones de Categorías como Brújula Digital -->
+      <p class="text-gray-600 dark:text-gray-300 mt-4 text-lg">Mantente informado con las últimas noti    <!-- Secciones de Categorías como Brújula Digital -->
     @foreach($categorias->take(4) as $categoria)
-      @if(isset($noticiasPorCategoria[$categoria->id]) && $noticiasPorCategoria[$categoria->id]->count() > 0)
+      @php
+        $noticiasCat = isset($noticiasPorCategoria[$categoria->id]) ? $noticiasPorCategoria[$categoria->id]->take(5) : collect();
+      @endphp
+      @if($noticiasCat->count() > 0)
+        @php
+          $principal = $noticiasCat->first();
+          $secundarias = $noticiasCat->slice(1, 4);
+        @endphp
         <div class="mb-16">
           <!-- Header de la Categoría -->
           <div class="flex items-center justify-between mb-8">
@@ -467,81 +471,147 @@
             </a>
           </div>
 
-          <!-- Grid de Noticias de la Categoría -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach($noticiasPorCategoria[$categoria->id]->take(6) as $index => $noticia)
-              <a href="{{ $noticia->url }}" class="block">
-                <article class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 @if($index === 0) md:col-span-2 md:row-span-2 @endif">
-                  
-                  <!-- Imagen de la Noticia -->
+          <!-- Composición Balanceada de 5 Noticias (Sin espacios en blanco) -->
+          @if($secundarias->count() > 0)
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+              <!-- Noticia Principal (Columna Izquierda: 5 cols en desktop) -->
+              <div class="lg:col-span-5 flex">
+                <a href="{{ $principal->url }}" class="block w-full group">
+                  <article class="h-full bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col justify-between">
+                    <div>
+                      <!-- Imagen de la Noticia Principal -->
+                      <div class="relative overflow-hidden">
+                        <img src="{{ $principal->imagenUrl ?? asset('images/default-news.svg') }}" 
+                             alt="{{ $principal->titulo }}" 
+                             class="w-full h-64 sm:h-72 lg:h-76 object-cover transition-transform duration-500 group-hover:scale-105"
+                             loading="lazy"
+                             decoding="async"
+                             onerror="handleImageError(this)">
+                        
+                        <!-- Etiqueta de categoría -->
+                        <div class="absolute top-4 left-4">
+                          <span class="bg-gradient-to-r from-[#0099ff] via-[#4f46e5] to-[#9333ea] text-white px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg border border-white/20">
+                            {{ $categoria->name }}
+                          </span>
+                        </div>
+                        
+                        <!-- Indicador de noticia principal -->
+                        <div class="absolute top-4 right-4">
+                          <span class="bg-gradient-to-r from-[#0099ff] via-[#4f46e5] to-[#9333ea] text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg border border-white/20">
+                            PRINCIPAL
+                          </span>
+                        </div>
+                        
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      </div>
+                      
+                      <!-- Contenido Principal (Sin botón Leer noticia completa) -->
+                      <div class="p-5 sm:p-6 flex flex-col justify-between flex-grow">
+                        <div class="mb-2.5">
+                          <span class="text-gray-500 dark:text-gray-400 text-sm flex items-center">
+                            <i class="fas fa-clock mr-2 text-purple-600"></i>
+                            {{ \Carbon\Carbon::parse($principal->created_at)->locale('es')->diffForHumans() }}
+                          </span>
+                        </div>
+                        
+                        <h4 class="font-bold text-gray-900 dark:text-gray-100 mb-2.5 text-xl sm:text-2xl leading-tight line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300">
+                          {{ $principal->titulo }}
+                        </h4>
+                        
+                        <p class="text-gray-600 dark:text-gray-300 text-sm sm:text-base line-clamp-3 leading-relaxed">
+                          {{ $principal->excerptLimpio ?? Str::limit(strip_tags($principal->contenido), 170) }}
+                        </p>
+                      </div>
+                    </div>
+                  </article>
+                </a>
+              </div>
+
+              <!-- 4 Noticias Secundarias (Columna Derecha: 7 cols en cuadrícula 2x2) -->
+              <div class="lg:col-span-7">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 h-full">
+                  @foreach($secundarias as $noticia)
+                    <a href="{{ $noticia->url }}" class="block h-full group">
+                      <article class="h-full bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col justify-between">
+                        <div>
+                          <!-- Imagen -->
+                          <div class="relative overflow-hidden">
+                            <img src="{{ $noticia->imagenUrl ?? asset('images/default-news.svg') }}" 
+                                 alt="{{ $noticia->titulo }}" 
+                                 class="w-full h-36 sm:h-40 object-cover transition-transform duration-500 group-hover:scale-105"
+                                 loading="lazy"
+                                 decoding="async"
+                                 onerror="handleImageError(this)">
+                            
+                            <div class="absolute top-2.5 left-2.5">
+                              <span class="bg-gradient-to-r from-[#0099ff] via-[#4f46e5] to-[#9333ea] text-white px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide shadow border border-white/20">
+                                {{ $categoria->name }}
+                              </span>
+                            </div>
+                            
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                          </div>
+                          
+                          <!-- Contenido Secundario -->
+                          <div class="p-3.5 sm:p-4">
+                            <div class="mb-2">
+                              <span class="text-gray-500 dark:text-gray-400 text-xs flex items-center">
+                                <i class="fas fa-clock mr-1.5 text-purple-600 text-[10px]"></i>
+                                {{ \Carbon\Carbon::parse($noticia->created_at)->locale('es')->diffForHumans() }}
+                              </span>
+                            </div>
+                            
+                            <h5 class="font-bold text-gray-900 dark:text-gray-100 text-sm sm:text-base leading-snug line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300">
+                              {{ $noticia->titulo }}
+                            </h5>
+                            
+                            <p class="text-gray-600 dark:text-gray-300 text-xs line-clamp-2 leading-relaxed mt-1.5">
+                              {{ $noticia->excerptLimpio ?? Str::limit(strip_tags($noticia->contenido), 90) }}
+                            </p>
+                          </div>
+                        </div>
+                      </article>
+                    </a>
+                  @endforeach
+                </div>
+              </div>
+            </div>
+          @else
+            <!-- Fallback para categorías con solo 1 noticia -->
+            <div class="max-w-xl">
+              <a href="{{ $principal->url }}" class="block group">
+                <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
                   <div class="relative overflow-hidden">
-                    <img src="{{ $noticia->imagenUrl ?? asset('images/default-news.svg') }}" 
-                         alt="{{ $noticia->titulo }}" 
-                         class="w-full @if($index === 0) h-64 md:h-80 @else h-48 @endif object-cover transition-transform duration-500 hover:scale-105"
+                    <img src="{{ $principal->imagenUrl ?? asset('images/default-news.svg') }}" 
+                         alt="{{ $principal->titulo }}" 
+                         class="w-full h-64 sm:h-72 object-cover transition-transform duration-500 group-hover:scale-105"
                          loading="lazy"
                          decoding="async"
                          onerror="handleImageError(this)">
-                    
-                    <!-- Etiqueta de categoría -->
                     <div class="absolute top-4 left-4">
                       <span class="bg-gradient-to-r from-[#0099ff] via-[#4f46e5] to-[#9333ea] text-white px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg border border-white/20">
                         {{ $categoria->name }}
                       </span>
                     </div>
-                    
-                    <!-- Indicador de noticia principal -->
-                    @if($index === 0)
-                      <div class="absolute top-4 right-4">
-                        <span class="bg-gradient-to-r from-[#0099ff] via-[#4f46e5] to-[#9333ea] text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg border border-white/20">
-                          PRINCIPAL
-                        </span>
-                      </div>
-                    @endif
-                    
-                    <!-- Overlay sutil -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
-                  
-                  <!-- Contenido -->
-                  <div class="p-4 @if($index === 0) md:p-6 @endif">
-                    <!-- Metadata -->
+                  <div class="p-5 sm:p-6">
                     <div class="mb-3">
                       <span class="text-gray-500 dark:text-gray-400 text-sm flex items-center">
                         <i class="fas fa-clock mr-2 text-purple-600"></i>
-                        {{ \Carbon\Carbon::parse($noticia->created_at)->locale('es')->diffForHumans() }}
+                        {{ \Carbon\Carbon::parse($principal->created_at)->locale('es')->diffForHumans() }}
                       </span>
                     </div>
-                    
-                    <!-- Título y contenido -->
-                    <div class="block group">
-                      <h4 class="font-bold text-gray-900 dark:text-gray-100 mb-2 @if($index === 0) text-xl md:text-2xl @else text-lg @endif leading-tight line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300">
-                        {{ $noticia->titulo }}
-                      </h4>
-                      @if($index === 0)
-                        <p class="text-gray-600 dark:text-gray-300 text-base line-clamp-3 leading-relaxed mb-4">
-                          {{ $noticia->excerptLimpio ?? Str::limit(strip_tags($noticia->contenido), 200) }}
-                        </p>
-                      @else
-                        <p class="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 leading-relaxed">
-                          {{ $noticia->excerptLimpio ?? Str::limit(strip_tags($noticia->contenido), 100) }}
-                        </p>
-                      @endif
-                    </div>
-                    
-                    <!-- Botón de acción -->
-                    @if($index === 0)
-                      <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                        <div class="inline-flex items-center text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-semibold text-sm transition-colors duration-300 group">
-                          Leer noticia completa
-                          <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform duration-300"></i>
-                        </div>
-                      </div>
-                    @endif
+                    <h4 class="font-bold text-gray-900 dark:text-gray-100 mb-2.5 text-xl sm:text-2xl leading-tight group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300">
+                      {{ $principal->titulo }}
+                    </h4>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm sm:text-base line-clamp-3 leading-relaxed">
+                      {{ $principal->excerptLimpio ?? Str::limit(strip_tags($principal->contenido), 180) }}
+                    </p>
                   </div>
                 </article>
               </a>
-            @endforeach
-          </div>
+            </div>
+          @endif
         </div>
       @endif
     @endforeach

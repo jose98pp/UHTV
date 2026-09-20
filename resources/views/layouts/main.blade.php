@@ -266,79 +266,119 @@
       
       <!-- Right Column: BCB Currency Exchange + Live Badge + Dark Mode Toggle -->
       <div class="flex items-center justify-end space-x-3 w-full md:w-1/3">
-        <!-- Widget Cotización BCB (Tipo de Cambio Bolivia) -->
+        <!-- Widget Cotización BCB (Tipo de Cambio Bolivia en Tiempo Real) -->
         <div class="relative" id="widget-tipo-cambio-bcb">
-          <div id="bcb-pill-btn" class="flex items-center gap-2 bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 hover:border-emerald-400/60 px-3 py-1.5 rounded-full text-white shadow-md transition-all duration-300 cursor-pointer select-none group" title="Ver cotizaciones oficiales del BCB">
-            <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded text-[10px] font-black bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 tracking-wider">
+          <div id="bcb-pill-btn" class="flex items-center gap-2 bg-black/40 hover:bg-black/60 backdrop-blur-md border border-purple-400/30 hover:border-purple-300 px-3 py-1.5 rounded-full text-white shadow-md transition-all duration-300 cursor-pointer select-none group" title="Ver cotización oficial del BCB en tiempo real">
+            <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded text-[10px] font-black bg-gradient-to-r from-purple-600 to-indigo-600 text-white border border-purple-400/40 tracking-wider shadow-sm">
               BCB
             </span>
             <div id="bcb-ticker-display" class="flex items-center gap-1.5 text-xs font-semibold tracking-tight transition-all duration-300">
               <span class="text-white font-bold">USD</span>
-              <span class="text-gray-300 text-[10px] font-normal">C:</span><span class="text-emerald-300 font-bold font-mono text-[11px]">6.86</span>
-              <span class="text-gray-400 font-light">/</span>
-              <span class="text-gray-300 text-[10px] font-normal">V:</span><span class="text-emerald-300 font-bold font-mono text-[11px]">6.96</span>
+              <span class="text-purple-200 text-[10px] font-normal">C:</span><span id="bcb-pill-compra" class="text-emerald-300 font-bold font-mono text-[11px]">11.00</span>
+              <span class="text-white/40 font-light">/</span>
+              <span class="text-purple-200 text-[10px] font-normal">V:</span><span id="bcb-pill-venta" class="text-emerald-300 font-bold font-mono text-[11px]">11.10</span>
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse ml-0.5" title="En tiempo real"></span>
             </div>
-            <i id="bcb-chevron-icon" class="fas fa-chevron-down text-[8px] text-gray-300 group-hover:text-white transition-transform duration-200"></i>
+            <i id="bcb-chevron-icon" class="fas fa-chevron-down text-[8px] text-purple-200 group-hover:text-white transition-transform duration-200"></i>
           </div>
 
-          <!-- Dropdown con cotizaciones oficiales BCB -->
-          <div id="bcb-dropdown-panel" class="absolute right-0 top-full mt-2 w-64 bg-gray-900/95 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl p-3.5 z-50 hidden opacity-0 transition-all duration-200 text-white">
-            <div class="flex items-center justify-between border-b border-white/10 pb-2 mb-2.5">
+          <!-- Dropdown con cotizaciones oficiales BCB en tiempo real -->
+          <div id="bcb-dropdown-panel" class="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-gray-900/95 dark:bg-gray-950/95 backdrop-blur-xl border border-purple-500/30 rounded-2xl shadow-2xl p-3.5 z-50 hidden opacity-0 transition-all duration-200 text-white">
+            <div class="flex items-center justify-between border-b border-purple-500/20 pb-2 mb-2.5">
               <div class="flex items-center gap-2">
-                <i class="fas fa-landmark text-emerald-400 text-sm"></i>
-                <span class="font-bold text-xs uppercase tracking-wide text-white">Cotización Oficial</span>
+                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-white shadow-inner">
+                  <i class="fas fa-landmark text-xs"></i>
+                </div>
+                <div>
+                  <span class="font-bold text-xs uppercase tracking-wide text-white block leading-tight">Cotización Oficial</span>
+                  <span class="text-[9px] text-purple-300 font-medium">Banco Central de Bolivia</span>
+                </div>
               </div>
-              <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30">BCB Bolivia</span>
+              <span id="bcb-regimen-badge" class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="bcb-regimen-text">Flexible</span>
+              </span>
             </div>
 
             <div class="space-y-2 text-xs">
-              <!-- Dólar Estadounidense -->
-              <div class="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/30 transition-all">
-                <div class="flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-xs font-bold">$</span>
-                  <div>
-                    <div class="font-bold text-white text-xs leading-none">Dólar (USD)</div>
-                    <div class="text-[10px] text-gray-400 leading-tight">Tipo de Cambio Oficial</div>
+              <!-- Dólar Estadounidense - Tarjeta Destacada -->
+              <div class="rounded-xl bg-gradient-to-br from-purple-950/60 via-gray-900/90 to-indigo-950/60 border border-purple-500/30 p-2.5 shadow-md">
+                <div class="flex items-center justify-between mb-2">
+                  <div class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-xs font-bold border border-emerald-500/30">$</span>
+                    <div>
+                      <div class="font-bold text-white text-xs leading-none">Dólar Estadounidense</div>
+                      <div class="text-[10px] text-purple-200/70 leading-tight">USD / BOB</div>
+                    </div>
+                  </div>
+                  <span class="text-[9px] bg-purple-600/30 text-purple-200 border border-purple-400/30 px-2 py-0.5 rounded font-mono font-bold uppercase tracking-wider">Oficial BCB</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-1.5 border-t border-white/5">
+                  <div class="bg-black/30 rounded-lg p-2 text-center border border-white/5">
+                    <div class="text-[10px] text-purple-200/80 uppercase font-semibold">Compra (TCO)</div>
+                    <div class="font-mono text-base font-extrabold text-emerald-300 tracking-tight">
+                      <span id="bcb-compra-val">11.00</span> <span class="text-xs text-gray-300 font-normal">Bs</span>
+                    </div>
+                  </div>
+                  <div class="bg-black/30 rounded-lg p-2 text-center border border-white/5">
+                    <div class="text-[10px] text-purple-200/80 uppercase font-semibold">Venta (Tope)</div>
+                    <div class="font-mono text-base font-extrabold text-emerald-300 tracking-tight">
+                      <span id="bcb-venta-val">11.10</span> <span class="text-xs text-gray-300 font-normal">Bs</span>
+                    </div>
                   </div>
                 </div>
-                <div class="text-right font-mono">
-                  <div class="text-[11px]"><span class="text-gray-400 text-[10px]">Compra:</span> <span class="text-emerald-300 font-bold">6.86 Bs</span></div>
-                  <div class="text-[11px]"><span class="text-gray-400 text-[10px]">Venta:</span> <span class="text-emerald-300 font-bold">6.96 Bs</span></div>
+
+                <div id="bcb-nota-box" class="mt-2 text-[10px] text-purple-200/90 bg-white/5 rounded-md p-1.5 leading-snug border border-white/5">
+                  <i class="fas fa-info-circle text-purple-400 mr-1"></i>
+                  <span id="bcb-nota-text">Régimen flexible según RD BCB 88/2026. Promedio ponderado diario oficial.</span>
                 </div>
               </div>
 
-              <!-- Euro -->
-              <div class="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/10 hover:border-blue-500/30 transition-all">
-                <div class="flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-300 flex items-center justify-center text-xs font-bold">€</span>
-                  <div>
-                    <div class="font-bold text-white text-xs leading-none">Euro (EUR)</div>
-                    <div class="text-[10px] text-gray-400 leading-tight">Referencial BCB</div>
+              <!-- Referenciales: Euro y UFV -->
+              <div class="grid grid-cols-2 gap-2">
+                <!-- Euro -->
+                <div class="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/10 hover:border-blue-500/30 transition-all">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-5 h-5 rounded-full bg-blue-500/20 text-blue-300 flex items-center justify-center text-[10px] font-bold">€</span>
+                    <div>
+                      <div class="font-bold text-white text-[11px] leading-none">Euro</div>
+                      <div class="text-[9px] text-gray-400">Referencial</div>
+                    </div>
+                  </div>
+                  <div class="text-right font-mono text-[11px] text-blue-300 font-bold" id="bcb-eur-val">
+                    11.85 Bs
                   </div>
                 </div>
-                <div class="text-right font-mono text-[11px]">
-                  <span class="text-blue-300 font-bold">7.45 Bs</span>
-                </div>
-              </div>
 
-              <!-- UFV -->
-              <div class="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/10 hover:border-amber-500/30 transition-all">
-                <div class="flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center text-xs font-bold">U</span>
-                  <div>
-                    <div class="font-bold text-white text-xs leading-none">UFV</div>
-                    <div class="text-[10px] text-gray-400 leading-tight">Unidad Fomento Vivienda</div>
+                <!-- UFV -->
+                <div class="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/10 hover:border-amber-500/30 transition-all">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center text-[10px] font-bold">U</span>
+                    <div>
+                      <div class="font-bold text-white text-[11px] leading-none">UFV</div>
+                      <div class="text-[9px] text-gray-400">Vivienda</div>
+                    </div>
                   </div>
-                </div>
-                <div class="text-right font-mono text-[11px]">
-                  <span class="text-amber-300 font-bold">2.54 Bs</span>
+                  <div class="text-right font-mono text-[11px] text-amber-300 font-bold" id="bcb-ufv-val">
+                    2.54 Bs
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div class="mt-2.5 pt-2 border-t border-white/10 text-[9px] text-gray-400 text-center flex items-center justify-center gap-1.5">
-              <i class="fas fa-check-circle text-emerald-400 text-[9px]"></i>
-              <span>Fuente oficial Banco Central de Bolivia</span>
+            <!-- Footer con actualización en tiempo real -->
+            <div class="mt-2.5 pt-2 border-t border-purple-500/20 text-[9px] text-gray-400 flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <button type="button" id="bcb-manual-refresh" class="text-purple-300 hover:text-white transition-colors cursor-pointer" title="Actualizar en tiempo real">
+                  <i class="fas fa-sync-alt text-[10px]"></i>
+                </button>
+                <span id="bcb-last-updated">Actualizado en tiempo real</span>
+              </div>
+              <a href="https://www.bcb.gob.bo" target="_blank" rel="noopener noreferrer" class="text-purple-300 hover:text-white transition-colors flex items-center gap-1">
+                <span>bcb.gob.bo</span>
+                <i class="fas fa-external-link-alt text-[8px]"></i>
+              </a>
             </div>
           </div>
         </div>
@@ -379,9 +419,10 @@
 
           if (bcbTicker && bcbPillBtn && bcbDropdown) {
               const rates = [
-                  '<span class="text-white font-bold">USD</span> <span class="text-gray-300 text-[10px] font-normal">C:</span><span class="text-emerald-300 font-bold font-mono text-[11px]">6.86</span> <span class="text-gray-400 font-light">/</span> <span class="text-gray-300 text-[10px] font-normal">V:</span><span class="text-emerald-300 font-bold font-mono text-[11px]">6.96</span>',
-                  '<span class="text-white font-bold">EUR</span> <span class="text-gray-300 text-[10px] font-normal">Oficial:</span><span class="text-blue-300 font-bold font-mono text-[11px]">7.45 Bs</span>',
-                  '<span class="text-white font-bold">UFV</span> <span class="text-gray-300 text-[10px] font-normal">Valor:</span><span class="text-amber-300 font-bold font-mono text-[11px]">2.54 Bs</span>'
+                  '<span class="text-white font-bold">USD</span> <span class="text-purple-200 text-[10px] font-normal">C:</span><span id="bcb-pill-compra" class="text-emerald-300 font-bold font-mono text-[11px]">11.00</span> <span class="text-white/40 font-light">/</span> <span class="text-purple-200 text-[10px] font-normal">V:</span><span id="bcb-pill-venta" class="text-emerald-300 font-bold font-mono text-[11px]">11.10</span> <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse ml-0.5" title="En tiempo real"></span>',
+                  '<span class="text-emerald-300 font-bold">BCB</span> <span class="text-purple-200 text-[10px]">Régimen:</span> <span class="text-amber-300 font-bold text-[11px] uppercase">Flexible</span>',
+                  '<span class="text-white font-bold">EUR</span> <span class="text-purple-200 text-[10px] font-normal">Ref:</span><span class="text-blue-300 font-bold font-mono text-[11px]">11.85 Bs</span>',
+                  '<span class="text-white font-bold">UFV</span> <span class="text-purple-200 text-[10px] font-normal">Hoy:</span><span class="text-amber-300 font-bold font-mono text-[11px]">2.54 Bs</span>'
               ];
               let currentRateIndex = 0;
               let isDropdownOpen = false;
@@ -431,6 +472,162 @@
                       bcbTicker.style.opacity = '1';
                   }, 250);
               }, 4500);
+
+              // 1.1 Lógica de Actualización de Datos en Tiempo Real (BCB Bolivia)
+              function updateBcbDOM(data) {
+                  const compra = (typeof data.compra === 'number') ? data.compra.toFixed(2) : data.compra;
+                  const venta = (typeof data.venta === 'number') ? data.venta.toFixed(2) : data.venta;
+                  const regimen = data.regimen ? data.regimen.toUpperCase() : 'FLEXIBLE';
+                  const fecha = data.fecha || '';
+                  const eur = data.eur ? Number(data.eur).toFixed(2) : (Number(compra) * 1.077).toFixed(2);
+                  const ufv = data.ufv || '2.54';
+
+                  // Elementos del Pill
+                  const pillCompra = document.getElementById('bcb-pill-compra');
+                  const pillVenta = document.getElementById('bcb-pill-venta');
+                  if (pillCompra) pillCompra.textContent = compra;
+                  if (pillVenta) pillVenta.textContent = venta;
+
+                  // Elementos del Dropdown
+                  const dropCompra = document.getElementById('bcb-compra-val');
+                  const dropVenta = document.getElementById('bcb-venta-val');
+                  if (dropCompra) dropCompra.textContent = compra;
+                  if (dropVenta) dropVenta.textContent = venta;
+
+                  const regText = document.getElementById('bcb-regimen-text');
+                  if (regText) regText.textContent = regimen === 'FLEXIBLE' ? 'Flexible' : regimen;
+
+                  const notaText = document.getElementById('bcb-nota-text');
+                  if (notaText && data.nota) {
+                      notaText.innerHTML = `<span class="font-semibold text-purple-300">Régimen Flexible (BCB):</span> ${data.nota.length > 130 ? data.nota.substring(0, 130) + '...' : data.nota}`;
+                  }
+
+                  const dropEur = document.getElementById('bcb-eur-val');
+                  if (dropEur) dropEur.textContent = `${eur} Bs`;
+
+                  const dropUfv = document.getElementById('bcb-ufv-val');
+                  if (dropUfv) dropUfv.textContent = `${ufv} Bs`;
+
+                  const lastUpd = document.getElementById('bcb-last-updated');
+                  if (lastUpd) {
+                      lastUpd.textContent = fecha ? `Actualizado: ${fecha}` : 'Actualizado en tiempo real';
+                  }
+
+                  // Actualizar secuencias del carrusel de tasas
+                  rates[0] = `<span class="text-white font-bold">USD</span> <span class="text-purple-200 text-[10px] font-normal">C:</span><span class="text-emerald-300 font-bold font-mono text-[11px]">${compra}</span> <span class="text-white/40 font-light">/</span> <span class="text-purple-200 text-[10px] font-normal">V:</span><span class="text-emerald-300 font-bold font-mono text-[11px]">${venta}</span> <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse ml-0.5" title="En tiempo real"></span>`;
+                  rates[1] = `<span class="text-emerald-300 font-bold">BCB</span> <span class="text-purple-200 text-[10px]">Régimen:</span> <span class="text-amber-300 font-bold text-[11px] uppercase">${regimen}</span>`;
+                  rates[2] = `<span class="text-white font-bold">EUR</span> <span class="text-purple-200 text-[10px] font-normal">Ref:</span><span class="text-blue-300 font-bold font-mono text-[11px]">${eur} Bs</span>`;
+                  rates[3] = `<span class="text-white font-bold">UFV</span> <span class="text-purple-200 text-[10px] font-normal">Hoy:</span><span class="text-amber-300 font-bold font-mono text-[11px]">${ufv} Bs</span>`;
+
+                  if (currentRateIndex === 0) {
+                      bcbTicker.innerHTML = rates[0];
+                  }
+              }
+
+              async function loadBcbRealTimeRates(forceRefresh = false) {
+                  const CACHE_KEY = 'uhtv_bcb_rates_v1';
+                  const CACHE_TIME = 10 * 60 * 1000; // 10 minutos
+                  const refreshBtn = document.getElementById('bcb-manual-refresh');
+
+                  if (!forceRefresh) {
+                      try {
+                          const cached = sessionStorage.getItem(CACHE_KEY);
+                          if (cached) {
+                              const parsed = JSON.parse(cached);
+                              if (Date.now() - parsed.time < CACHE_TIME && parsed.data) {
+                                  updateBcbDOM(parsed.data);
+                                  return;
+                              }
+                          }
+                      } catch (e) {}
+                  }
+
+                  if (refreshBtn) refreshBtn.querySelector('i')?.classList.add('fa-spin');
+
+                  let rateData = null;
+
+                  // 1. API Principal: apibcb.cucu.bo
+                  try {
+                      const controller = new AbortController();
+                      const timeout = setTimeout(() => controller.abort(), 4000);
+                      const res = await fetch('https://apibcb.cucu.bo/api/v1/tc/oficial', {
+                          signal: controller.signal,
+                          headers: { 'Accept': 'application/json' }
+                      });
+                      clearTimeout(timeout);
+                      if (res.ok) {
+                          const json = await res.json();
+                          if (json && json.tc_oficial) {
+                              rateData = {
+                                  compra: json.tc_oficial.compra || 11.0,
+                                  venta: json.tc_oficial.venta || 11.1,
+                                  regimen: json.tc_oficial.regimen || 'flexible',
+                                  nota: json.tc_oficial.nota || 'Tipo de Cambio Oficial flexible (RD BCB 88/2026).',
+                                  fecha: json.tc_oficial.fecha || '',
+                                  eur: (json.tc_oficial.compra ? (json.tc_oficial.compra * 1.077).toFixed(2) : 11.85),
+                                  ufv: '2.54'
+                              };
+                          }
+                      }
+                  } catch (err) {
+                      console.warn('API CUCU no disponible, consultando respaldo...', err);
+                  }
+
+                  // 2. API de Respaldo: bo.dolarapi.com
+                  if (!rateData) {
+                      try {
+                          const controller = new AbortController();
+                          const timeout = setTimeout(() => controller.abort(), 4000);
+                          const res = await fetch('https://bo.dolarapi.com/v1/dolares/oficial', {
+                              signal: controller.signal,
+                              headers: { 'Accept': 'application/json' }
+                          });
+                          clearTimeout(timeout);
+                          if (res.ok) {
+                              const json = await res.json();
+                              if (json && (json.compra || json.venta)) {
+                                  const c = json.compra || 11.0;
+                                  const v = json.venta || (c + 0.1);
+                                  rateData = {
+                                      compra: c,
+                                      venta: v,
+                                      regimen: 'flexible',
+                                      nota: 'Tipo de cambio oficial reportado por DolarAPI Bolivia.',
+                                      fecha: json.fechaActualizacion ? json.fechaActualizacion.slice(0, 10) : '',
+                                      eur: (c * 1.077).toFixed(2),
+                                      ufv: '2.54'
+                                  };
+                              }
+                          }
+                      } catch (err) {
+                          console.warn('API de respaldo también falló, usando datos base:', err);
+                      }
+                  }
+
+                  if (refreshBtn) refreshBtn.querySelector('i')?.classList.remove('fa-spin');
+
+                  if (rateData) {
+                      try {
+                          sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+                              time: Date.now(),
+                              data: rateData
+                          }));
+                      } catch (e) {}
+                      updateBcbDOM(rateData);
+                  }
+              }
+
+              // Evento de refresco manual
+              const refreshBtn = document.getElementById('bcb-manual-refresh');
+              if (refreshBtn) {
+                  refreshBtn.addEventListener('click', function(e) {
+                      e.stopPropagation();
+                      loadBcbRealTimeRates(true);
+                  });
+              }
+
+              // Iniciar carga en segundo plano
+              loadBcbRealTimeRates();
           }
 
           // 2. Lógica del Clima Rotativo Animado
@@ -510,15 +707,16 @@
      Posición: portada_top
 ================================================================ -->
 @if(isset($banners['portada_top']) && $banners['portada_top']->count() > 0)
-  <div class="w-full overflow-hidden bg-gray-100 dark:bg-gray-950 border-b-2 border-purple-700/30" style="max-height:130px;">
-    <a href="{{ $banners['portada_top']->first()->link ?? '#' }}" target="_blank" rel="noopener noreferrer sponsored" class="block w-full" title="Publicidad">
-      <img src="{{ asset($banners['portada_top']->first()->image_path) }}"
-           alt="{{ $banners['portada_top']->first()->title ?? 'Publicidad' }}"
-           class="w-full object-cover object-center"
-           style="max-height:130px;"
-           loading="eager"
-           decoding="async">
-    </a>
+  <div class="w-full bg-gray-100 dark:bg-gray-950 border-b-2 border-purple-700/30 flex justify-center items-center py-1">
+    <div class="container mx-auto px-2 sm:px-4 flex justify-center items-center">
+      <a href="{{ $banners['portada_top']->first()->link ?? '#' }}" target="_blank" rel="noopener noreferrer sponsored" class="block w-full text-center" title="Publicidad">
+        <img src="{{ asset($banners['portada_top']->first()->image_path) }}"
+             alt="{{ $banners['portada_top']->first()->title ?? 'Publicidad' }}"
+             class="w-full max-w-5xl h-auto max-h-[260px] md:max-h-[300px] object-contain object-center mx-auto rounded transition-all duration-300"
+             loading="eager"
+             decoding="async">
+      </a>
+    </div>
   </div>
 @else
   {{-- Placeholder cuando no hay banner: franja de color con logo/texto --}}

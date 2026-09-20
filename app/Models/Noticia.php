@@ -33,6 +33,16 @@ class Noticia extends Model
             static::clearNewsCache($noticia);
         });
 
+        static::deleting(function ($noticia) {
+            try {
+                app(\App\Services\ImageStorageService::class)->deleteAllNoticiaImages($noticia);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('Error al eliminar imágenes asociadas a la noticia: ' . $e->getMessage(), [
+                    'noticia_id' => $noticia->id ?? null
+                ]);
+            }
+        });
+
         static::deleted(function ($noticia) {
             static::clearNewsCache($noticia);
         });
@@ -116,9 +126,19 @@ class Noticia extends Model
         $urls = [];
         foreach ($this->galeria as $item) {
             if (is_string($item) && !empty($item)) {
-                $urls[] = str_starts_with($item, 'http') ? $item : asset($item);
+                $urls[] = str_starts_with($item, 'http') ? $item : \App\Helpers\ImageUrlHelper::getImageUrl($item);
             }
         }
         return $urls;
+    }
+
+    public function getWebpUrlAttribute(): ?string
+    {
+        return \App\Helpers\ImageUrlHelper::getWebpUrl($this->imagen);
+    }
+
+    public function getOptimizedImageUrlAttribute(): string
+    {
+        return $this->webp_url ?? $this->imageUrl;
     }
 }
