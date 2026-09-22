@@ -449,7 +449,7 @@
       <h2 class="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">Noticias por Categorías</h2>
       <div class="w-32 h-1 bg-gradient-to-r from-[#0099ff] via-[#4f46e5] to-[#9333ea] mx-auto rounded-full"></div>
       <p class="text-gray-600 dark:text-gray-300 mt-4 text-lg">Mantente informado con las últimas noti    <!-- Secciones de Categorías como Brújula Digital -->
-    @foreach($categorias->take(4) as $categoria)
+    @foreach($seccionesCategoria->take(4) as $categoria)
       @php
         $noticiasCat = isset($noticiasPorCategoria[$categoria->id]) ? $noticiasPorCategoria[$categoria->id]->take(5) : collect();
       @endphp

@@ -26,8 +26,8 @@ class NewsService
             // Obtener noticias principales para el carrusel
             $noticias = $this->noticiaRepository->getPublishedNews(10);
             
-            // Obtener categorías con múltiples noticias (como Brújula Digital)
-            $categorias = $this->noticiaRepository->getCategoriesWithNews(4);
+            // Obtener categorías con múltiples noticias para secciones de portada (como Brújula Digital)
+            $seccionesCategoria = $this->noticiaRepository->getCategoriesWithNews(4);
             
             // Obtener últimas noticias
             $ultimasNoticias = $this->noticiaRepository->getPublishedNews(12);
@@ -42,7 +42,7 @@ class NewsService
             });
             
             // Procesar noticias de categorías con contenido sanitizado e imágenes seguras
-            foreach ($categorias as $categoria) {
+            foreach ($seccionesCategoria as $categoria) {
                 if ($categoria->noticias) {
                     $categoria->noticias = $categoria->noticias->map(function ($noticia) {
                         return $this->processNewsItem($noticia);
@@ -52,7 +52,7 @@ class NewsService
 
             // Obtener noticias por cada categoría individual para secciones específicas (últimas 5)
             $noticiasPorCategoria = [];
-            foreach ($categorias as $categoria) {
+            foreach ($seccionesCategoria as $categoria) {
                 $noticiasCategoria = $this->noticiaRepository->getNewsByCategory($categoria->id, 5);
                 $noticiasPorCategoria[$categoria->id] = $noticiasCategoria->map(function ($noticia) {
                     return $this->processNewsItem($noticia);
@@ -67,7 +67,7 @@ class NewsService
             
             return [
                 'noticias' => $noticias,
-                'categorias' => $categorias,
+                'seccionesCategoria' => $seccionesCategoria,
                 'ultimasNoticias' => $ultimasNoticias,
                 'noticiasPorCategoria' => $noticiasPorCategoria,
                 'masLeidas' => $masLeidas,
