@@ -54,6 +54,20 @@ Route::get('/offline.html', function () {
     ]);
 })->name('pwa.offline');
 
+// Ruta de respaldo para servir archivos de storage si el enlace simbólico no está disponible (ej: cPanel / hosting compartido)
+Route::get('/storage/{path}', function (string $path) {
+    $cleanPath = trim(str_replace(['../', '..\\'], '', $path), '/');
+    $resolvedPath = \App\Helpers\ImageUrlHelper::resolveImagePath($cleanPath) ?? $cleanPath;
+
+    if (\Illuminate\Support\Facades\Storage::disk('public')->exists($resolvedPath)) {
+        return \Illuminate\Support\Facades\Storage::disk('public')->response($resolvedPath, null, [
+            'Cache-Control' => 'public, max-age=31536000, immutable',
+        ]);
+    }
+
+    abort(404);
+})->where('path', '.*')->name('storage.fallback');
+
 // Ruta de prueba para imágenes (solo en desarrollo)
 if (app()->environment('local')) {
     Route::get('/test-images', function() {

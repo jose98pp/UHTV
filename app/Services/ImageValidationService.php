@@ -15,7 +15,7 @@ class ImageValidationService
     /**
      * Extensiones de imagen permitidas
      */
-    private const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    private const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
 
     /**
      * Validar si la ruta de imagen existe y es válida
@@ -29,27 +29,20 @@ class ImageValidationService
             return false;
         }
 
-        // Verificar si el archivo existe en el storage público
-        if (!Storage::disk('public')->exists($imagePath)) {
-            Log::warning('Imagen no encontrada', [
-                'path' => $imagePath,
-                'full_path' => Storage::disk('public')->path($imagePath)
-            ]);
+        // Si es una URL externa (ej: https://...), es válida
+        if (str_starts_with($imagePath, 'http://') || str_starts_with($imagePath, 'https://')) {
+            return true;
+        }
+
+        // Intentar resolver en disco público o subcarpetas de categorías
+        $resolved = \App\Helpers\ImageUrlHelper::resolveImagePath($imagePath);
+        if (!$resolved) {
             return false;
         }
 
-        // Verificar que sea un archivo de imagen válido
-        $extension = strtolower(pathinfo($imagePath, PATHINFO_EXTENSION));
-        
-        if (!in_array($extension, self::ALLOWED_EXTENSIONS)) {
-            Log::warning('Extensión de imagen no válida', [
-                'path' => $imagePath,
-                'extension' => $extension
-            ]);
-            return false;
-        }
-
-        return true;
+        // Verificar que sea un archivo con extensión permitida
+        $extension = strtolower(pathinfo($resolved, PATHINFO_EXTENSION));
+        return in_array($extension, self::ALLOWED_EXTENSIONS);
     }
 
     /**
@@ -60,11 +53,7 @@ class ImageValidationService
      */
     public function getImageUrlOrDefault(?string $imagePath): string
     {
-        if ($this->validateImagePath($imagePath)) {
-            return $this->generateSecureImageUrl($imagePath);
-        }
-
-        return asset(self::DEFAULT_IMAGE);
+        return \App\Helpers\ImageUrlHelper::getImageUrl($imagePath);
     }
 
     /**
@@ -76,17 +65,18 @@ class ImageValidationService
             return null;
         }
 
-        $pathInfo = pathinfo($imagePath);
+        $resolved = \App\Helpers\ImageUrlHelper::resolveImagePath($imagePath) ?? $imagePath;
+        $pathInfo = pathinfo($resolved);
         $extension = strtolower($pathInfo['extension'] ?? '');
 
         if ($extension === 'webp') {
-            return $this->getImageUrlOrDefault($imagePath);
+            return $this->getImageUrlOrDefault($resolved);
         }
 
         $dirname = ($pathInfo['dirname'] !== '.' && $pathInfo['dirname'] !== '') ? $pathInfo['dirname'] . '/' : '';
         $webpPath = $dirname . $pathInfo['filename'] . '.webp';
 
-        if (Storage::disk('public')->exists($webpPath)) {
+        if (Storage::disk('public')->exists($webpPath) || file_exists(public_path('storage/' . $webpPath))) {
             return asset('storage/' . $webpPath);
         }
 
@@ -101,15 +91,7 @@ class ImageValidationService
      */
     public function generateSecureImageUrl(string $imagePath): string
     {
-        // Limpiar la ruta de caracteres peligrosos
-        $cleanPath = $this->sanitizeImagePath($imagePath);
-        
-        // Verificar que la imagen existe
-        if (!$this->validateImagePath($cleanPath)) {
-            return asset(self::DEFAULT_IMAGE);
-        }
-
-        return asset('storage/' . $cleanPath);
+        return \App\Helpers\ImageUrlHelper::getImageUrl($imagePath);
     }
 
     /**
@@ -175,15 +157,28 @@ class ImageValidationService
             ];
         }
 
-        $exists = Storage::disk('public')->exists($imagePath);
+        $resolvedPath = \App\Helpers\ImageUrlHelper::resolveImagePath($imagePath);
+        $exists = !empty($resolvedPath);
+        $diskPath = $resolvedPath ?? $imagePath;
+        $size = null;
+
+        if ($exists && Storage::disk('public')->exists($diskPath)) {
+            try {
+                $size = Storage::disk('public')->size($diskPath);
+            } catch (\Throwable $e) {}
+        } elseif ($exists && file_exists(public_path('storage/' . $diskPath))) {
+            try {
+                $size = filesize(public_path('storage/' . $diskPath));
+            } catch (\Throwable $e) {}
+        }
 
         return [
             'exists' => $exists,
-            'url' => $exists ? asset('storage/' . $imagePath) : asset(self::DEFAULT_IMAGE),
+            'url' => \App\Helpers\ImageUrlHelper::getImageUrl($imagePath),
             'is_default' => !$exists,
-            'size' => $exists ? Storage::disk('public')->size($imagePath) : null,
-            'extension' => $exists ? strtolower(pathinfo($imagePath, PATHINFO_EXTENSION)) : null,
-            'path' => $imagePath
+            'size' => $size,
+            'extension' => strtolower(pathinfo($diskPath, PATHINFO_EXTENSION)),
+            'path' => $diskPath
         ];
     }
 

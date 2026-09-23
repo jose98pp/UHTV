@@ -21,20 +21,36 @@ class ImageUrlHelper
             return self::getDefaultImageUrl();
         }
 
+        // Si es una URL externa (http:// o https://)
+        if (str_starts_with($imagePath, 'http://') || str_starts_with($imagePath, 'https://')) {
+            return $imagePath;
+        }
+
         $resolvedPath = self::resolveImagePath($imagePath);
 
-        // Si no se pudo resolver la imagen, devolver imagen por defecto
-        if (!$resolvedPath) {
-            return self::getDefaultImageUrl();
+        // Si se resolvió la ruta en disco local o subcarpeta
+        if ($resolvedPath) {
+            // Si hay CDN configurado, usarlo
+            if (Config::get('images.cdn.enabled')) {
+                return self::getCdnUrl($resolvedPath, $size);
+            }
+
+            return asset('storage/' . $resolvedPath);
         }
 
-        // Si hay CDN configurado, usarlo
-        if (Config::get('images.cdn.enabled')) {
-            return self::getCdnUrl($resolvedPath, $size);
+        // Si la imagen tiene una ruta válida pero no se encuentra en el disco local
+        // (ej: en producción las imágenes se sirven desde otro storage, CDN, o el symlink aún no se ejecuta),
+        // devolvemos la URL estándar de storage en lugar de default-news.svg para que el navegador intente
+        // cargarla y el fallback onerror del HTML actúe si realmente no existe.
+        $normalizedPath = trim(str_replace('\\', '/', $imagePath), '/');
+        $normalizedPath = preg_replace('#^(storage|public)/#', '', $normalizedPath) ?? $normalizedPath;
+        $normalizedPath = ltrim($normalizedPath, '/');
+
+        if (!empty($normalizedPath)) {
+            return asset('storage/' . $normalizedPath);
         }
 
-        // URL local estándar
-        return asset('storage/' . $resolvedPath);
+        return self::getDefaultImageUrl();
     }
 
     /**
@@ -60,6 +76,11 @@ class ImageUrlHelper
             return null;
         }
 
+        // Si es una URL externa, no hay que resolver ruta local
+        if (str_starts_with($imagePath, 'http://') || str_starts_with($imagePath, 'https://')) {
+            return $imagePath;
+        }
+
         $normalizedPath = trim(str_replace('\\', '/', $imagePath), '/');
         $normalizedPath = preg_replace('#^(storage|public)/#', '', $normalizedPath) ?? $normalizedPath;
         $normalizedPath = ltrim($normalizedPath, '/');
@@ -68,7 +89,7 @@ class ImageUrlHelper
             return null;
         }
 
-        if (Storage::disk('public')->exists($normalizedPath)) {
+        if (Storage::disk('public')->exists($normalizedPath) || file_exists(public_path('storage/' . $normalizedPath))) {
             return $normalizedPath;
         }
 
@@ -80,15 +101,35 @@ class ImageUrlHelper
             $candidates[] = 'noticias/' . $basename;
         }
 
+        // Buscar en subcarpetas de categorías conocidas de noticias
+        $categoryFolders = [
+            'noticias', 'deportes', 'cultura', 'economia', 'politica',
+            'nacional', 'sociedad', 'mundo', 'espectaculo', 'negocios'
+        ];
+        foreach ($categoryFolders as $folder) {
+            $candidates[] = "noticias/{$folder}/{$basename}";
+        }
+
+        // Comprobar candidatos directos
         foreach ($candidates as $candidate) {
-            if (Storage::disk('public')->exists($candidate)) {
+            if (Storage::disk('public')->exists($candidate) || file_exists(public_path('storage/' . $candidate))) {
                 return $candidate;
             }
         }
 
-        // Evitar escanear todo el disco (puede consumir mucha memoria en discos grandes).
-        // En su lugar solo intentamos rutas deterministas construidas arriba.
-        // Si no se encuentra, devolvemos null para que el caller pueda decidir (migrator, logs, etc.).
+        // Búsqueda dinámica en carpetas de noticias si no coincidió con las categorías fijas
+        try {
+            $directories = Storage::disk('public')->directories('noticias');
+            foreach ($directories as $dir) {
+                $dynamicCandidate = $dir . '/' . $basename;
+                if (Storage::disk('public')->exists($dynamicCandidate) || file_exists(public_path('storage/' . $dynamicCandidate))) {
+                    return $dynamicCandidate;
+                }
+            }
+        } catch (\Throwable $e) {
+            // Silenciosamente ignorar si no se pueden listar directorios
+        }
+
         return null;
     }
 
