@@ -85,9 +85,33 @@ class Transmision extends Model
         return $query->where('tipo', 'clip')->where('activo', true);
     }
 
+    public function scopeProgramas($query)
+    {
+        return $query->where('tipo', 'programa')->where('activo', true);
+    }
+
+    public function scopeGrabados($query)
+    {
+        return $query->where('en_vivo', false)->where('activo', true);
+    }
+
     public function scopeDestacados($query)
     {
         return $query->where('destacado', true);
+    }
+
+    /**
+     * Contenidos multimedia visibles en la franja debajo del navbar (clips, podcasts, programas).
+     * Las transmisiones en vivo van exclusivamente al botón "En Vivo".
+     */
+    public function scopeParaPortada($query)
+    {
+        return $query->where('activo', true)
+            ->where('en_vivo', false)
+            ->whereIn('tipo', ['podcast', 'clip', 'programa'])
+            ->orderByDesc('destacado')
+            ->orderByDesc('fecha_transmision')
+            ->orderByDesc('created_at');
     }
 
     // Accessors

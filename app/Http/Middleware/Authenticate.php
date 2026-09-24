@@ -12,7 +12,9 @@ class Authenticate extends Middleware
      */
     protected function redirectTo(Request $request): ?string
     {
-        if ($request->expectsJson()) {
+        // Las rutas API y las peticiones del editor deben recibir siempre una
+        // respuesta JSON; una redirección HTML provoca errores response.json().
+        if ($request->expectsJson() || $request->is('api/*')) {
             return null;
         }
         

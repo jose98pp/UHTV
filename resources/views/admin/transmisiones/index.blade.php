@@ -32,7 +32,7 @@
 
     <!-- Stat Cards -->
     <div class="row g-3 mb-4">
-        <div class="col-6 col-md-3">
+        <div class="col-6 col-lg">
             <div class="card border-0 shadow-sm rounded-3 border-start border-4 border-danger h-100">
                 <div class="card-body p-3">
                     <div class="d-flex align-items-center justify-content-between">
@@ -48,23 +48,7 @@
             </div>
         </div>
 
-        <div class="col-6 col-md-3">
-            <div class="card border-0 shadow-sm rounded-3 border-start border-4 border-primary h-100">
-                <div class="card-body p-3">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div>
-                            <p class="text-muted text-uppercase fw-semibold mb-1" style="font-size: 0.72rem;">Total Videos</p>
-                            <h3 class="mb-0 fw-bold text-dark">{{ $stats['total'] }}</h3>
-                        </div>
-                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 text-primary">
-                            <i class="fas fa-film fa-lg"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-6 col-md-3">
+        <div class="col-6 col-lg">
             <div class="card border-0 shadow-sm rounded-3 border-start border-4 border-purple h-100" style="border-left-color: #6f42c1 !important;">
                 <div class="card-body p-3">
                     <div class="d-flex align-items-center justify-content-between">
@@ -80,7 +64,7 @@
             </div>
         </div>
 
-        <div class="col-6 col-md-3">
+        <div class="col-6 col-lg">
             <div class="card border-0 shadow-sm rounded-3 border-start border-4 border-warning h-100">
                 <div class="card-body p-3">
                     <div class="d-flex align-items-center justify-content-between">
@@ -90,6 +74,38 @@
                         </div>
                         <div class="rounded-circle bg-warning bg-opacity-10 p-3 text-warning">
                             <i class="fas fa-bolt fa-lg"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg">
+            <div class="card border-0 shadow-sm rounded-3 border-start border-4 border-info h-100">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="text-muted text-uppercase fw-semibold mb-1" style="font-size: 0.72rem;">Programas</p>
+                            <h3 class="mb-0 fw-bold text-info">{{ $stats['programas'] }}</h3>
+                        </div>
+                        <div class="rounded-circle bg-info bg-opacity-10 p-3 text-info">
+                            <i class="fas fa-tv fa-lg"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg">
+            <div class="card border-0 shadow-sm rounded-3 border-start border-4 border-secondary h-100">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="text-muted text-uppercase fw-semibold mb-1" style="font-size: 0.72rem;">Total Registros</p>
+                            <h3 class="mb-0 fw-bold text-dark">{{ $stats['total'] }}</h3>
+                        </div>
+                        <div class="rounded-circle bg-secondary bg-opacity-10 p-3 text-secondary">
+                            <i class="fas fa-film fa-lg"></i>
                         </div>
                     </div>
                 </div>
@@ -152,6 +168,16 @@
         </div>
     </div>
 
+    <div class="alert alert-info d-flex align-items-start gap-3 mb-4" role="status">
+        <i class="fas fa-layer-group fa-lg text-info mt-1"></i>
+        <div>
+            <strong>Franja multimedia de portada</strong>
+            <div class="small mb-0">
+                Registra aquí transmisiones, podcasts y clips. Los que están <strong>Activos / Visibles</strong> aparecen en la franja horizontal debajo de las categorías; usa <strong>Priorizar</strong> para mostrarlos primero.
+            </div>
+        </div>
+    </div>
+
     <!-- Listado -->
     <div class="card shadow-sm border-0 rounded-3">
         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
@@ -192,8 +218,8 @@
                                     <div class="fw-bold text-dark d-flex align-items-center gap-1">
                                         {{ $item->titulo }}
                                         @if($item->destacado)
-                                            <span class="badge bg-warning text-dark ms-1" style="font-size: 0.65rem;" title="Destacado en portada">
-                                                <i class="fas fa-star"></i> Destacado
+                                            <span class="badge bg-warning text-dark ms-1" style="font-size: 0.65rem;" title="Se muestra primero en la franja multimedia de portada">
+                                                <i class="fas fa-star"></i> Priorizado
                                             </span>
                                         @endif
                                     </div>

@@ -19,5 +19,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Image upload endpoint for rich text editor
-Route::middleware(['auth', 'admin'])->post('/upload-image', [ImageUploadController::class, 'upload']);
+// Compatibilidad con editores que todavía usan la ruta /api/upload-image.
+// Se conserva la URL, pero se carga el stack web para usar la sesión del
+// administrador, cookies y verificación CSRF.
+Route::middleware(['web', 'auth', 'admin'])
+    ->post('/upload-image', [ImageUploadController::class, 'upload'])
+    ->name('legacy.images.upload');

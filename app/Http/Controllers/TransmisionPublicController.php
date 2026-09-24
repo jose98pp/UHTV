@@ -12,26 +12,26 @@ class TransmisionPublicController extends Controller
      */
     public function index(Request $request)
     {
-        // 1. Obtener transmisión actualmente EN VIVO
-        $activeStream = Transmision::enVivo()->first();
+        $selectedTipo = $request->get('tipo', 'todos');
+        $selectedPlataforma = $request->get('plataforma', 'todas');
 
-        // Si no hay ninguna en vivo, obtener la destacada o la más reciente
-        if (!$activeStream) {
-            $activeStream = Transmision::activos()
-                ->orderBy('destacado', 'desc')
-                ->latest('created_at')
-                ->first();
+        // 1. Obtener transmisión activa para el reproductor principal (Cinema Player)
+        if ($selectedTipo === 'en_vivo') {
+            $activeStream = Transmision::enVivo()->first();
+        } elseif (in_array($selectedTipo, ['podcast', 'clip', 'programa'])) {
+            $activeStream = Transmision::activos()->where('tipo', $selectedTipo)->orderBy('destacado', 'desc')->latest('fecha_transmision')->first();
+        } else {
+            // Todos: priorizar si hay emisión en vivo activa; sino el último destacado o reciente
+            $activeStream = Transmision::enVivo()->first() ?? Transmision::activos()->orderBy('destacado', 'desc')->latest('created_at')->first();
         }
 
         // 2. Filtros para la galería
         $query = Transmision::activos();
 
-        $selectedTipo = $request->get('tipo', 'todos');
         if ($selectedTipo !== 'todos' && in_array($selectedTipo, ['en_vivo', 'podcast', 'clip', 'programa'])) {
             $query->where('tipo', $selectedTipo);
         }
 
-        $selectedPlataforma = $request->get('plataforma', 'todas');
         if ($selectedPlataforma !== 'todas' && in_array($selectedPlataforma, ['youtube', 'facebook', 'tiktok', 'twitch'])) {
             $query->where('plataforma', $selectedPlataforma);
         }
@@ -42,15 +42,17 @@ class TransmisionPublicController extends Controller
                                ->paginate(12)
                                ->withQueryString();
 
-        // 3. Obtener podcasts recientes y clips destacados para carruseles o secciones
+        // 3. Obtener colecciones específicas por tipo para carruseles o secciones
         $podcasts = Transmision::podcasts()->latest('fecha_transmision')->take(6)->get();
         $clips = Transmision::clips()->latest('fecha_transmision')->take(6)->get();
+        $programas = Transmision::programas()->latest('fecha_transmision')->take(6)->get();
 
         return view('transmisiones.index', compact(
             'activeStream',
             'transmisiones',
             'podcasts',
             'clips',
+            'programas',
             'selectedTipo',
             'selectedPlataforma'
         ));

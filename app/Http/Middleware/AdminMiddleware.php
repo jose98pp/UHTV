@@ -17,10 +17,24 @@ class AdminMiddleware
     public function handle($request, Closure $next)
     {
         if (!Auth::check()) {
+            if ($request->expectsJson() || $request->ajax() || $request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'La sesión del administrador expiró. Vuelve a iniciar sesión.',
+                ], 401);
+            }
+
             return redirect()->route('admin.login')->with('error', 'Debes iniciar sesión para acceder al panel de administración.');
         }
 
         if (Auth::user()->role !== 'admin') {
+            if ($request->expectsJson() || $request->ajax() || $request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No tienes permisos para realizar esta acción.',
+                ], 403);
+            }
+
             return redirect()->route('portada')->with('error', 'No tienes permisos para acceder al panel de administración.');
         }
 

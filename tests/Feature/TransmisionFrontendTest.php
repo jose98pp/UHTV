@@ -58,6 +58,91 @@ class TransmisionFrontendTest extends TestCase
     }
 
     /** @test */
+    public function home_page_renders_multimedia_strip_below_category_navigation()
+    {
+        $podcast = Transmision::create([
+            'titulo' => 'Podcast para franja de portada',
+            'descripcion' => 'Resumen visible del podcast de prueba.',
+            'tipo' => 'podcast',
+            'plataforma' => 'youtube',
+            'url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            'activo' => true,
+            'destacado' => true,
+        ]);
+
+        $clip = Transmision::create([
+            'titulo' => 'Clip para franja de portada',
+            'descripcion' => 'Resumen visible del clip de prueba.',
+            'tipo' => 'clip',
+            'plataforma' => 'youtube',
+            'url' => 'https://www.youtube.com/watch?v=M7lc1UVf-VE',
+            'activo' => true,
+        ]);
+
+        $programa = Transmision::create([
+            'titulo' => 'Programa grabado para franja de portada',
+            'tipo' => 'programa',
+            'plataforma' => 'youtube',
+            'url' => 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
+            'activo' => true,
+        ]);
+
+        $enVivo = Transmision::create([
+            'titulo' => 'Transmisión En Vivo que no debe salir en franja',
+            'tipo' => 'en_vivo',
+            'plataforma' => 'youtube',
+            'url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            'en_vivo' => true,
+            'activo' => true,
+        ]);
+
+        $inactive = Transmision::create([
+            'titulo' => 'Clip oculto de la franja',
+            'tipo' => 'clip',
+            'plataforma' => 'youtube',
+            'url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            'activo' => false,
+        ]);
+
+        try {
+            $response = $this->get(route('portada'));
+            $response->assertStatus(200);
+
+            $html = $response->getContent();
+            $navigationPosition = strpos($html, 'id="category-navigation"');
+            $stripPosition = strpos($html, 'id="multimedia-strip"');
+            $mainPosition = strpos($html, '<main');
+
+            $this->assertNotFalse($navigationPosition);
+            $this->assertNotFalse($stripPosition);
+            $this->assertNotFalse($mainPosition);
+            $this->assertTrue(
+                $navigationPosition < $stripPosition && $stripPosition < $mainPosition,
+                'La franja multimedia debe quedar entre el navbar y el contenido principal.'
+            );
+
+            $stripHtml = substr($html, $stripPosition, $mainPosition - $stripPosition);
+            $this->assertStringContainsString('data-stream-title="Podcast para franja de portada"', $stripHtml);
+            $this->assertStringContainsString('data-stream-title="Clip para franja de portada"', $stripHtml);
+            $this->assertStringContainsString('data-stream-title="Programa grabado para franja de portada"', $stripHtml);
+            $this->assertStringNotContainsString('Transmisión En Vivo que no debe salir en franja', $stripHtml);
+            $this->assertStringNotContainsString('Clip oculto de la franja', $stripHtml);
+
+            $podcastPosition = strpos($stripHtml, 'Podcast para franja de portada');
+            $clipPosition = strpos($stripHtml, 'Clip para franja de portada');
+            $this->assertTrue($podcastPosition < $clipPosition, 'El contenido priorizado debe aparecer primero.');
+        } finally {
+            Transmision::whereIn('id', [
+                $podcast->id,
+                $clip->id,
+                $programa->id,
+                $enVivo->id,
+                $inactive->id,
+            ])->delete();
+        }
+    }
+
+    /** @test */
     public function public_user_can_get_transmision_json()
     {
         $transmision = Transmision::create([

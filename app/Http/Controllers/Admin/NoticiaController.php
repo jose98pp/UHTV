@@ -130,6 +130,8 @@ class NoticiaController extends Controller
 
   public function store(NoticiaRequest $request)
 {
+    $storedPaths = [];
+
     try {
         $validatedData = $request->validated();
 
@@ -161,6 +163,7 @@ class NoticiaController extends Controller
                     $request->file('imagen'),
                     $validatedData['category_id']
                 );
+                $storedPaths[] = $imagePath;
                 
                 Log::info('Imagen subida exitosamente con organización por categoría', [
                     'path' => $imagePath,
@@ -193,6 +196,7 @@ class NoticiaController extends Controller
                             $validatedData['category_id']
                         );
                         $galeriaPaths[] = $gPath;
+                        $storedPaths[] = $gPath;
                     } catch (\Exception $e) {
                         Log::warning('Error subiendo imagen de galería: ' . $e->getMessage());
                     }
@@ -221,12 +225,34 @@ class NoticiaController extends Controller
         return redirect()->route('admin.noticias.index')
             ->with('success', $successMessage);
             
-    } catch (\Exception $e) {
-        Log::error('Error al crear noticia', ['error' => $e->getMessage(), 'user_id' => auth()->id()]);
-        
+    } catch (\Throwable $e) {
+        // Si falla la persistencia, no dejar imágenes huérfanas en storage.
+        foreach (array_unique(array_filter($storedPaths)) as $storedPath) {
+            try {
+                $this->imageStorageService->deleteImage($storedPath);
+            } catch (\Throwable $cleanupError) {
+                Log::warning('No se pudo limpiar una imagen tras fallar la creación', [
+                    'path' => $storedPath,
+                    'error' => $cleanupError->getMessage(),
+                ]);
+            }
+        }
+
+        Log::error('Error al crear noticia', [
+            'exception' => get_class($e),
+            'sql_state' => $e instanceof \Illuminate\Database\QueryException ? $e->getCode() : null,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'user_id' => auth()->id(),
+        ]);
+
+        $message = str_contains($e->getMessage(), "Unknown column 'galeria'")
+            ? 'La base de datos necesita actualizarse para guardar la galería. Contacta al administrador.'
+            : 'No se pudo guardar la noticia. Revisa los archivos e inténtalo nuevamente.';
+
         return redirect()->back()
             ->withInput()
-            ->with('error', 'Error al crear la noticia. Por favor, inténtelo de nuevo.');
+            ->with('error', $message);
     }
 }
     public function edit($id)

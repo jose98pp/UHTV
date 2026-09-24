@@ -1,4 +1,4 @@
-const RichTextEditor = ({ initialContent = '', onChange, onAutoSave }) => {
+const RichTextEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChange, editorId = 'rich-text-editor' }) => {
     const [content, setContent] = React.useState(initialContent);
     const [previewMode, setPreviewMode] = React.useState(false);
     const [showColorPicker, setShowColorPicker] = React.useState(false);
@@ -11,7 +11,10 @@ const RichTextEditor = ({ initialContent = '', onChange, onAutoSave }) => {
     const [retryCount, setRetryCount] = React.useState(0);
     const [editorFailed, setEditorFailed] = React.useState(false);
     const editorRef = React.useRef(null);
+    const imageInputRef = React.useRef(null);
     const autoSaveTimerRef = React.useRef(null);
+    const imageInputId = `${editorId}-image-input`;
+    const editorElementId = `${editorId}-content`;
     const maxRetries = 3;
 
     // Colores predefinidos
@@ -41,6 +44,14 @@ const RichTextEditor = ({ initialContent = '', onChange, onAutoSave }) => {
             setEditorFailed(true);
         }
     }, [initialContent]);
+
+    React.useEffect(() => {
+        if (editorRef.current) {
+            editorRef.current.dataset.uploading = isUploading ? 'true' : 'false';
+            editorRef.current.setAttribute('aria-busy', isUploading ? 'true' : 'false');
+        }
+        if (onBusyChange) onBusyChange(isUploading);
+    }, [isUploading, onBusyChange]);
 
     // Error boundary effect
     React.useEffect(() => {
@@ -96,26 +107,42 @@ const RichTextEditor = ({ initialContent = '', onChange, onAutoSave }) => {
         const formData = new FormData();
         formData.append('image', file);
 
+        let timeoutId = null;
+
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+            timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
-            const response = await fetch('/api/upload-image', {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            const uploadUrl = document.querySelector('meta[name="image-upload-url"]')?.content
+                || '/admin/noticias/images';
+
+            if (!csrfToken) {
+                throw new Error('No se encontró el token de seguridad. Recarga la página e inicia sesión nuevamente.');
+            }
+
+            const response = await fetch(uploadUrl, {
                 method: 'POST',
                 body: formData,
+                credentials: 'same-origin',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken
                 },
                 signal: controller.signal
             });
 
-            clearTimeout(timeoutId);
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            const contentType = response.headers.get('content-type') || '';
+            if (response.redirected || !contentType.includes('application/json')) {
+                throw new Error('El servidor devolvió una respuesta inesperada. Vuelve a iniciar sesión e inténtalo nuevamente.');
             }
 
             const data = await response.json();
+
+            if (!response.ok || !data.success || typeof data.url !== 'string') {
+                throw new Error(data.message || `Error HTTP ${response.status} al subir la imagen.`);
+            }
 
             if (data.success) {
                 handleCommand('insertImage', data.url);
@@ -200,6 +227,8 @@ const RichTextEditor = ({ initialContent = '', onChange, onAutoSave }) => {
                 }, 5000);
             }
         } finally {
+            if (timeoutId) clearTimeout(timeoutId);
+
             if (attempt >= maxRetries || !networkError) {
                 setIsUploading(false);
                 // Clear the file input
@@ -229,34 +258,43 @@ const RichTextEditor = ({ initialContent = '', onChange, onAutoSave }) => {
 
     // Funciones de deshacer/rehacer
     const addToUndoStack = (newContent) => {
+        if (undoStack[undoIndex] === newContent) return;
         const newStack = undoStack.slice(0, undoIndex + 1);
         newStack.push(newContent);
         setUndoStack(newStack);
         setUndoIndex(newStack.length - 1);
     };
 
+    const updateContent = (newContent) => {
+        setContent(newContent);
+        addToUndoStack(newContent);
+        if (onChange) onChange(newContent);
+    };
+
     const undo = () => {
-        if (undoIndex > 0) {
+        if (undoIndex > 0 && editorRef.current) {
+            const previousContent = undoStack[undoIndex - 1];
             setUndoIndex(undoIndex - 1);
-            editorRef.current.innerHTML = undoStack[undoIndex - 1];
-            setContent(undoStack[undoIndex - 1]);
+            editorRef.current.innerHTML = previousContent;
+            setContent(previousContent);
+            if (onChange) onChange(previousContent);
         }
     };
 
     const redo = () => {
-        if (undoIndex < undoStack.length - 1) {
+        if (undoIndex < undoStack.length - 1 && editorRef.current) {
+            const nextContent = undoStack[undoIndex + 1];
             setUndoIndex(undoIndex + 1);
-            editorRef.current.innerHTML = undoStack[undoIndex + 1];
-            setContent(undoStack[undoIndex + 1]);
+            editorRef.current.innerHTML = nextContent;
+            setContent(nextContent);
+            if (onChange) onChange(nextContent);
         }
     };
 
     const handleCommand = (command, value = null) => {
-        document.execCommand(command, false, value);
         editorRef.current?.focus();
-        const newContent = editorRef.current.innerHTML;
-        setContent(newContent);
-        addToUndoStack(newContent);
+        document.execCommand(command, false, value);
+        if (editorRef.current) updateContent(editorRef.current.innerHTML);
     };
 
     // Función para insertar enlaces
@@ -360,8 +398,7 @@ const RichTextEditor = ({ initialContent = '', onChange, onAutoSave }) => {
                 linkElement.parentNode.replaceChild(textNode, linkElement);
                 
                 const newContent = editorRef.current.innerHTML;
-                setContent(newContent);
-                addToUndoStack(newContent);
+                updateContent(newContent);
             } else {
                 alert('No hay ningún enlace seleccionado para quitar.');
             }
@@ -449,6 +486,7 @@ const RichTextEditor = ({ initialContent = '', onChange, onAutoSave }) => {
                 ),
                 React.createElement('textarea', {
                     key: 'fallback-textarea',
+                    id: `${editorId}-fallback-textarea`,
                     className: 'w-full p-4 min-h-[300px] border-0 resize-vertical focus:outline-none focus:ring-2 focus:ring-blue-500',
                     value: content,
                     onChange: (e) => {
@@ -528,6 +566,7 @@ const RichTextEditor = ({ initialContent = '', onChange, onAutoSave }) => {
                 'div',
                 {
                     key: 'error-messages',
+                    id: `${editorId}-error-messages`,
                     className: 'p-3 bg-red-50 border-b border-red-200 text-red-700 text-sm',
                     role: 'alert',
                     'aria-live': 'polite'
@@ -564,9 +603,11 @@ const RichTextEditor = ({ initialContent = '', onChange, onAutoSave }) => {
                     // Grupo 2: Fuente
                     React.createElement('div', { className: 'toolbar-group', key: 'font' }, [
                         React.createElement('select', {
+                            id: `${editorId}-font-family`,
                             className: 'font-family-select',
                             onChange: (e) => handleCommand('fontName', e.target.value),
                             title: 'Fuente',
+                            'aria-label': 'Fuente de texto',
                             key: 'font-family',
                             defaultValue: 'Arial'
                         }, [
@@ -577,8 +618,10 @@ const RichTextEditor = ({ initialContent = '', onChange, onAutoSave }) => {
                             React.createElement('option', { value: 'Verdana', key: 'verdana' }, 'Verdana')
                         ]),
                         React.createElement('select', {
+                            id: `${editorId}-font-size`,
                             onChange: (e) => handleCommand('fontSize', e.target.value),
                             title: 'Tamaño de fuente',
+                            'aria-label': 'Tamaño de texto',
                             key: 'fontsize',
                             defaultValue: '3'
                         }, [
@@ -603,8 +646,11 @@ const RichTextEditor = ({ initialContent = '', onChange, onAutoSave }) => {
                     // Grupo 4: Color
                     React.createElement('div', { className: 'toolbar-group color-picker-container', key: 'colors' }, [
                         React.createElement('button', {
+                            type: 'button',
                             onClick: () => setShowColorPicker(!showColorPicker),
                             title: 'Color de texto',
+                            'aria-label': 'Color de texto',
+                            'aria-expanded': showColorPicker,
                             key: 'text-color',
                             style: { position: 'relative' }
                         }, [
@@ -627,7 +673,10 @@ const RichTextEditor = ({ initialContent = '', onChange, onAutoSave }) => {
                             key: 'color-grid'
                         }, colors.map(color => 
                             React.createElement('button', {
+                                type: 'button',
                                 style: { backgroundColor: color },
+                                title: `Color ${color}`,
+                                'aria-label': `Aplicar color ${color}`,
                                 onClick: () => {
                                     handleCommand('foreColor', color);
                                     setShowColorPicker(false);
@@ -667,28 +716,37 @@ const RichTextEditor = ({ initialContent = '', onChange, onAutoSave }) => {
                             key: 'remove-link',
                             type: 'button'
                         }, '🚫'),
-                        React.createElement('label', {
+                        React.createElement('button', {
                             className: `${isUploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`,
+                            type: 'button',
                             title: isUploading ? 'Subiendo imagen...' : 'Insertar imagen',
+                            'aria-label': isUploading ? 'Subiendo imagen' : 'Insertar imagen',
+                            'aria-controls': imageInputId,
+                            disabled: isUploading,
+                            onClick: () => imageInputRef.current?.click(),
                             key: 'image-upload'
-                        }, [
-                            isUploading ? '⏳' : '🖼',
-                            React.createElement('input', {
-                                type: 'file',
-                                style: { display: 'none' },
-                                accept: 'image/jpeg,image/jpg,image/png,image/gif,image/webp',
-                                onChange: handleImageUpload,
-                                disabled: isUploading,
-                                key: 'image-input'
-                            })
-                        ])
+                        }, isUploading ? '⏳' : '🖼'),
+                        React.createElement('input', {
+                            ref: imageInputRef,
+                            id: imageInputId,
+                            type: 'file',
+                            hidden: true,
+                            tabIndex: -1,
+                            accept: 'image/jpeg,image/jpg,image/png,image/gif,image/webp',
+                            'aria-label': 'Seleccionar imagen para insertar',
+                            onChange: handleImageUpload,
+                            disabled: isUploading,
+                            key: 'image-input'
+                        })
                     ]),
 
                     // Grupo 8: Vista
                     React.createElement('div', { className: 'toolbar-group', key: 'view' }, [
                         React.createElement('button', {
+                            type: 'button',
                             onClick: () => setPreviewMode(!previewMode),
                             title: 'Vista previa',
+                            'aria-label': 'Vista previa',
                             key: 'preview'
                         }, '👁')
                     ])
@@ -700,6 +758,7 @@ const RichTextEditor = ({ initialContent = '', onChange, onAutoSave }) => {
                 {
                     key: 'editor',
                     ref: editorRef,
+                    id: editorElementId,
                     className: 'p-2 sm:p-4 min-h-[200px] sm:min-h-[300px] focus:outline-none focus:ring-2 focus:ring-blue-500 prose max-w-none',
                     contentEditable: true,
                     onInput: handleChange,
@@ -707,7 +766,9 @@ const RichTextEditor = ({ initialContent = '', onChange, onAutoSave }) => {
                     role: 'textbox',
                     'aria-label': 'Editor de texto enriquecido',
                     'aria-multiline': 'true',
-                    'aria-describedby': uploadError || validationError ? 'error-messages' : undefined,
+                    'aria-required': 'true',
+                    'aria-busy': isUploading ? 'true' : 'false',
+                    'aria-describedby': uploadError || validationError ? `${editorId}-error-messages` : undefined,
                     style: {
                         direction: 'ltr',
                         unicodeBidi: 'bidi-override'

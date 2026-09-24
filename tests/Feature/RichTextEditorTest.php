@@ -234,7 +234,7 @@ class RichTextEditorTest extends TestCase
         $file = UploadedFile::fake()->create('test.jpg', 1024, 'image/jpeg'); // 1MB
 
         $response = $this->actingAs($this->user)
-            ->post('/api/upload-image', [
+            ->post(route('admin.noticias.images.store'), [
                 'image' => $file
             ]);
 
@@ -250,6 +250,17 @@ class RichTextEditorTest extends TestCase
         // Check if file was stored
         $filename = $responseData['filename'];
         Storage::disk('public')->assertExists('images/' . $filename);
+    }
+
+    /** @test */
+    public function test_image_upload_returns_json_when_session_is_missing()
+    {
+        $response = $this->postJson('/api/upload-image', []);
+
+        $response->assertUnauthorized();
+        $response->assertJson([
+            'message' => 'Unauthenticated.',
+        ]);
     }
 
     /** @test */

@@ -43,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
 
                 if (\Illuminate\Support\Facades\Schema::hasTable('transmisiones')) {
                     $liveStream = \App\Models\Transmision::enVivo()->first();
-                    $recentStreams = \App\Models\Transmision::activos()->latest('fecha_transmision')->take(8)->get();
+                    $recentStreams = \App\Models\Transmision::activos()->where('en_vivo', false)->latest('fecha_transmision')->take(8)->get();
 
                     \Illuminate\Support\Facades\View::share('transmisionEnVivo', $liveStream);
                     \Illuminate\Support\Facades\View::share('transmisionesRecientes', $recentStreams);
@@ -62,7 +62,7 @@ class AppServiceProvider extends ServiceProvider
             try {
                 if (\Illuminate\Support\Facades\Schema::hasTable('transmisiones')) {
                     $liveStream = \App\Models\Transmision::enVivo()->first();
-                    $recentStreams = \App\Models\Transmision::activos()->latest('fecha_transmision')->take(8)->get();
+                    $recentStreams = \App\Models\Transmision::activos()->where('en_vivo', false)->latest('fecha_transmision')->take(8)->get();
 
                     $view->with([
                         'transmisionEnVivo' => $liveStream,

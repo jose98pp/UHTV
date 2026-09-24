@@ -61,6 +61,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Instalación de Aplicación PWA
+    |--------------------------------------------------------------------------
+    |
+    | Define si el banner de instalación y el registro de la app PWA están
+    | activados o temporalmente bloqueados para futuras actualizaciones.
+    |
+    */
+
+    'enable_pwa_install' => (bool) env('ENABLE_PWA_INSTALL', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

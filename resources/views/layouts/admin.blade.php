@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="image-upload-url" content="{{ route('admin.noticias.images.store') }}">
     <title>@yield('title', 'Panel Admin - UHTV')</title>
     
     <!-- FontAwesome -->

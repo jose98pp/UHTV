@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\NoticiaController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Api\ImageUploadController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\PortadaController;
 use App\Http\Controllers\ProfileController;
@@ -101,6 +102,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/profile/password', [\App\Http\Controllers\Admin\ProfileController::class, 'updatePassword'])->name('profile.password.update');
 
     // Rutas para el CRUD de noticias
+    Route::post('/noticias/images', [ImageUploadController::class, 'upload'])
+        ->middleware('throttle:api')
+        ->name('noticias.images.store');
     Route::get('/noticias', [NoticiaController::class, 'index'])->name('noticias.index');
     Route::get('/noticias/filter', [NoticiaController::class, 'filter'])->name('noticias.filter');
     Route::get('/noticias/create', [NoticiaController::class, 'create'])->name('noticias.create');

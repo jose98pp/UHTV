@@ -85,7 +85,7 @@
         </div>
 
         <div class="form-group mb-3">
-            <label for="descripcion" class="form-label">Descripción (opcional)</label>
+            <label for="descripcion-hidden" class="form-label">Descripción (opcional)</label>
             
             {{-- Include help card --}}
             @include('admin.partials.rich-text-editor-help')
@@ -109,8 +109,8 @@
 <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
 
 <!-- Rich Text Editor -->
-<script src="{{ asset('js/rich-text-editor.js') }}"></script>
-<script src="{{ asset('js/rich-text-editor-init.js') }}"></script>
+<script src="{{ asset('js/rich-text-editor.js') }}?v={{ filemtime(public_path('js/rich-text-editor.js')) }}"></script>
+<script src="{{ asset('js/rich-text-editor-init.js') }}?v={{ filemtime(public_path('js/rich-text-editor-init.js')) }}"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

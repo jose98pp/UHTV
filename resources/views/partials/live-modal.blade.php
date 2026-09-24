@@ -216,7 +216,11 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const embed = trigger.getAttribute('data-stream-embed');
             const title = trigger.getAttribute('data-stream-title');
-            openLiveModal(embed, title);
+            const platform = trigger.getAttribute('data-stream-platform');
+            const platformColor = trigger.getAttribute('data-stream-platform-color');
+            const platformIcon = trigger.getAttribute('data-stream-platform-icon');
+            const type = trigger.getAttribute('data-stream-type');
+            openLiveModal(embed, title, platform, platformColor, platformIcon, type);
         }
     });
 

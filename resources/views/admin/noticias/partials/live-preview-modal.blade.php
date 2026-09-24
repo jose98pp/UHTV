@@ -1,5 +1,5 @@
 <!-- Modal de Vista Previa en Vivo de la Noticia -->
-<div class="modal fade" id="livePreviewModal" tabindex="-1" aria-labelledby="livePreviewModalLabel" aria-hidden="true">
+<div class="modal fade" id="livePreviewModal" tabindex="-1" aria-labelledby="livePreviewModalLabel" aria-hidden="true" style="z-index: 1060;">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-2xl rounded-2xl overflow-hidden">
             <!-- Modal Header -->
@@ -33,7 +33,7 @@
                         </button>
                     </div>
 
-                    <button type="button" class="btn-close btn-close-white ms-2" onclick="closeLivePreview()" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
             </div>
 
@@ -105,7 +105,7 @@
                             <div id="prev-youtube-wrapper" class="mt-4" style="display: none;">
                                 <h6 class="fw-bold text-danger mb-2"><i class="fab fa-youtube me-2"></i>Video Relacionado</h6>
                                 <div class="ratio ratio-16x9 rounded-xl overflow-hidden shadow">
-                                    <iframe id="prev-youtube-iframe" src="" allowfullscreen></iframe>
+                                    <iframe id="prev-youtube-iframe" title="Video de YouTube de la noticia" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                                 </div>
                             </div>
                         </div>
@@ -120,7 +120,7 @@
                     <i class="fas fa-info-circle text-primary me-1"></i>
                     Esta vista previa actualiza dinámicamente el contenido del formulario sin necesidad de recargar.
                 </div>
-                <button type="button" class="btn btn-secondary px-4 rounded-pill shadow-sm" onclick="closeLivePreview()" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-secondary px-4 rounded-pill shadow-sm" data-bs-dismiss="modal">
                     <i class="fas fa-times me-1"></i> Cerrar Vista Previa
                 </button>
             </div>
@@ -149,26 +149,28 @@
         }
     }
 
+    function stopYouTubePreview() {
+        const ytIframe = document.getElementById('prev-youtube-iframe');
+        if (ytIframe) {
+            ytIframe.removeAttribute('src');
+        }
+    }
+
     function closeLivePreview() {
         const modalEl = document.getElementById('livePreviewModal');
         if (!modalEl) return;
 
-        // Pausar video si estaba reproduciendo
-        const ytIframe = document.getElementById('prev-youtube-iframe');
-        if (ytIframe) ytIframe.src = '';
-
+        // Bootstrap se encarga del backdrop, del bloqueo de scroll y de la
+        // transición. No se eliminan manualmente para evitar estados intermedios.
         if (window.bootstrap && window.bootstrap.Modal) {
-            try {
-                const modal = window.bootstrap.Modal.getInstance(modalEl);
-                if (modal) {
-                    modal.hide();
-                }
-            } catch (e) {
-                console.warn('Bootstrap modal instance hide error:', e);
+            const instance = window.bootstrap.Modal.getInstance(modalEl);
+            if (instance) {
+                instance.hide();
+                return;
             }
         }
 
-        // Limpieza garantizada de estado, display y backdrops
+        // Fallback únicamente cuando Bootstrap no está disponible.
         modalEl.classList.remove('show');
         modalEl.style.display = 'none';
         modalEl.setAttribute('aria-hidden', 'true');
@@ -176,8 +178,54 @@
         document.body.classList.remove('modal-open');
         document.body.style.overflow = '';
         document.body.style.paddingRight = '';
+        stopYouTubePreview();
+    }
 
-        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+    function extractYouTubeId(value) {
+        const rawValue = String(value || '').trim();
+        if (!rawValue) return '';
+        if (/^[\w-]{11}$/.test(rawValue)) return rawValue;
+
+        try {
+            const normalizedUrl = rawValue.includes('://') ? rawValue : `https://${rawValue}`;
+            const parsedUrl = new URL(normalizedUrl);
+            const host = parsedUrl.hostname.replace(/^www\./, '');
+
+            if (host === 'youtu.be') {
+                const candidate = parsedUrl.pathname.split('/').filter(Boolean)[0] || '';
+                return /^[\w-]{11}$/.test(candidate) ? candidate : '';
+            }
+
+            if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
+                if (parsedUrl.pathname.startsWith('/embed/')) {
+                    const candidate = parsedUrl.pathname.split('/').filter(Boolean)[1] || '';
+                    return /^[\w-]{11}$/.test(candidate) ? candidate : '';
+                }
+
+                const candidate = parsedUrl.searchParams.get('v') || '';
+                return /^[\w-]{11}$/.test(candidate) ? candidate : '';
+            }
+        } catch (error) {
+            console.warn('No se pudo interpretar la URL de YouTube:', error);
+        }
+
+        return '';
+    }
+
+    function setYouTubePreview(value) {
+        const wrapper = document.getElementById('prev-youtube-wrapper');
+        const iframe = document.getElementById('prev-youtube-iframe');
+        const videoId = extractYouTubeId(value);
+
+        if (!wrapper || !iframe) return;
+
+        if (videoId) {
+            iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?rel=0`;
+            wrapper.style.display = 'block';
+        } else {
+            iframe.removeAttribute('src');
+            wrapper.style.display = 'none';
+        }
     }
 
     function openLivePreview() {
@@ -185,11 +233,29 @@
         const categorySelect = document.getElementById('category_id');
         const youtubeInput = document.getElementById('video_youtube');
         
-        // Obtener contenido HTML del editor
+        // Obtener contenido HTML sin los controles temporales de edición.
         let contentHtml = '';
         const editorContainer = document.querySelector('#editor-container [contenteditable]');
         if (editorContainer) {
-            contentHtml = editorContainer.innerHTML;
+            const cleanEditor = editorContainer.cloneNode(true);
+            cleanEditor.querySelectorAll('.editor-image-move-handle, .editor-image-resize-handle, .editor-image-delete-handle')
+                .forEach(handle => handle.remove());
+            cleanEditor.querySelectorAll('.editor-image-frame').forEach(frame => {
+                frame.removeAttribute('id');
+                frame.removeAttribute('contenteditable');
+                frame.removeAttribute('role');
+                frame.removeAttribute('tabindex');
+                frame.removeAttribute('aria-label');
+                frame.removeAttribute('aria-selected');
+                frame.removeAttribute('style');
+            });
+            cleanEditor.querySelectorAll('img').forEach(image => {
+                image.removeAttribute('loading');
+                image.removeAttribute('draggable');
+                image.removeAttribute('title');
+                image.removeAttribute('style');
+            });
+            contentHtml = cleanEditor.innerHTML;
         } else {
             const hiddenContent = document.getElementById('contenido-hidden');
             if (hiddenContent) contentHtml = hiddenContent.value;
@@ -229,39 +295,28 @@
 
         // Imagen
         const previewImg = document.getElementById('prev-featured-image');
+        const imageInput = document.getElementById('imagen');
         const filePreview = document.getElementById('image-preview');
         const existingImg = document.getElementById('current-image-preview');
 
-        if (filePreview && filePreview.src && filePreview.src.length > 5 && !filePreview.src.endsWith('#')) {
+        previewImg.onerror = function() {
+            this.onerror = null;
+            this.src = '/images/default-news.svg';
+        };
+
+        // El input de archivo es la fuente de verdad: la imagen vacía usa un
+        // data URI transparente y no debe confundirse con una selección real.
+        if (imageInput && imageInput.files && imageInput.files.length > 0 && filePreview && filePreview.src) {
             previewImg.src = filePreview.src;
-            previewImg.style.display = 'block';
         } else if (existingImg && existingImg.src) {
             previewImg.src = existingImg.src;
-            previewImg.style.display = 'block';
         } else {
             previewImg.src = '/images/default-news.svg';
-            previewImg.style.display = 'block';
         }
+        previewImg.style.display = 'block';
 
-        // YouTube
-        const ytWrapper = document.getElementById('prev-youtube-wrapper');
-        const ytIframe = document.getElementById('prev-youtube-iframe');
-        if (youtubeInput && youtubeInput.value.trim()) {
-            let ytUrl = youtubeInput.value.trim();
-            let videoId = '';
-            const match1 = ytUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-            if (match1) videoId = match1[1];
-
-            if (videoId) {
-                ytIframe.src = `https://www.youtube.com/embed/${videoId}`;
-                ytWrapper.style.display = 'block';
-            } else {
-                ytWrapper.style.display = 'none';
-            }
-        } else {
-            ytWrapper.style.display = 'none';
-            ytIframe.src = '';
-        }
+        // YouTube: acepta URL completa o el ID guardado actualmente.
+        setYouTubePreview(youtubeInput ? youtubeInput.value : '');
 
         // Mostrar Modal
         const modalEl = document.getElementById('livePreviewModal');
@@ -278,21 +333,11 @@
         }
     }
 
-    // Cerrar al presionar Escape o al hacer clic fuera del diálogo
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeLivePreview();
-        }
-    });
-
     document.addEventListener('DOMContentLoaded', function() {
         const modalEl = document.getElementById('livePreviewModal');
         if (modalEl) {
-            modalEl.addEventListener('click', function(e) {
-                if (e.target === modalEl) {
-                    closeLivePreview();
-                }
-            });
+            // Bootstrap gestiona Escape, clic exterior y eliminación del backdrop.
+            modalEl.addEventListener('hidden.bs.modal', stopYouTubePreview);
         }
     });
 </script>

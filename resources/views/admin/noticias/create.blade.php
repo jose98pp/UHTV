@@ -2,7 +2,7 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/rich-text-links.css') }}">
-<link rel="stylesheet" href="{{ asset('css/word-style-editor.css') }}">
+<link rel="stylesheet" href="{{ asset('css/word-style-editor.css') }}?v={{ filemtime(public_path('css/word-style-editor.css')) }}">
 <style>
     /* Estilos específicos para el editor en la vista de crear */
     #editor-container {
@@ -256,7 +256,7 @@
         </div>
 
         <div class="form-group mb-3">
-            <label for="contenido" class="form-label">Contenido: <span class="text-danger">*</span></label>
+            <label for="contenido-hidden" class="form-label">Contenido: <span class="text-danger">*</span></label>
             
             {{-- Include help card --}}
             @include('admin.partials.rich-text-editor-help')
@@ -516,9 +516,11 @@
             </a>
         </div>
     </form>
-
-    @include('admin.noticias.partials.live-preview-modal')
 </div>
+
+{{-- El modal debe quedar fuera de .container: optimized.css aplica containment
+     a los contenedores y puede ocultar el diálogo detrás del backdrop. --}}
+@include('admin.noticias.partials.live-preview-modal')
 
 @push('scripts')
 <!-- React libraries (carga tradicional para mayor estabilidad) -->
@@ -526,9 +528,9 @@
 <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
 
 <!-- Rich Text Editor -->
-<script src="{{ asset('js/rich-text-editor.js') }}"></script>
-<script src="{{ asset('js/word-style-editor.js') }}"></script>
-<script src="{{ asset('js/rich-text-editor-init.js') }}"></script>
+<script src="{{ asset('js/rich-text-editor.js') }}?v={{ filemtime(public_path('js/rich-text-editor.js')) }}"></script>
+<script src="{{ asset('js/word-style-editor.js') }}?v={{ filemtime(public_path('js/word-style-editor.js')) }}"></script>
+<script src="{{ asset('js/rich-text-editor-init.js') }}?v={{ filemtime(public_path('js/rich-text-editor-init.js')) }}"></script>
 
 <!-- Script de diagnóstico (solo en desarrollo) -->
 @if(config('app.debug'))

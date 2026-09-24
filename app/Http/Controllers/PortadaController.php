@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Noticia;
 use App\Models\Category;
+use App\Models\Transmision;
 use App\Services\NewsService;
 use Illuminate\Http\Request;
 
@@ -16,6 +17,15 @@ class PortadaController extends Controller
     public function index(Request $request)
     {
         $data = $this->newsService->getHomePageData();
+
+        try {
+            $data['multimediaPortada'] = Transmision::paraPortada()
+                ->take(12)
+                ->get();
+        } catch (\Throwable $e) {
+            // La portada debe seguir funcionando si la tabla multimedia no está disponible.
+            $data['multimediaPortada'] = collect();
+        }
         
         return view('portada', $data);
     }

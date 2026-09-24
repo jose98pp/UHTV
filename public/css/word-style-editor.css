@@ -300,6 +300,186 @@
     margin: 8px 0;
 }
 
+/* Arrastrar y soltar imágenes con comportamiento similar a Word */
+.word-editor-container {
+    position: relative;
+}
+
+.word-editor-container.is-dragging {
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.18);
+}
+
+.word-editor-drop-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 360px;
+    color: #174ea6;
+    background: rgba(232, 240, 254, 0.96);
+    border: 2px dashed #1a73e8;
+    border-radius: 8px;
+    pointer-events: none;
+    text-align: center;
+}
+
+.word-editor-drop-overlay i {
+    font-size: 42px;
+    font-style: normal;
+}
+
+.word-editor-drop-overlay strong {
+    font-size: 18px;
+}
+
+.word-editor-drop-overlay span {
+    font-size: 13px;
+    color: #5f6368;
+}
+
+.word-editor-content img.editor-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 12px auto;
+    border: 1px solid #dadce0;
+}
+
+/* Imagen seleccionable con comportamiento similar a Word */
+.editor-image-frame {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    margin: 12px 6px;
+    line-height: 0;
+    vertical-align: middle;
+    border: 1px solid transparent;
+    border-radius: 5px;
+}
+
+.editor-image-frame.is-selected,
+.editor-image-frame:focus {
+    border-color: #1a73e8;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.18);
+}
+
+.editor-image-frame > img.editor-image {
+    display: block;
+    max-width: 100%;
+    margin: 0;
+    border: 0;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+}
+
+.editor-image-frame > .editor-image-move-handle,
+.editor-image-frame > .editor-image-resize-handle,
+.editor-image-frame > .editor-image-delete-handle {
+    position: absolute;
+    z-index: 5;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #1a73e8;
+    background: #ffffff;
+    color: #174ea6;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.editor-image-frame.is-selected > .editor-image-move-handle,
+.editor-image-frame.is-selected > .editor-image-resize-handle,
+.editor-image-frame.is-selected > .editor-image-delete-handle {
+    display: inline-flex;
+}
+
+.editor-image-frame > .editor-image-move-handle {
+    top: -32px;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 68px;
+    height: 26px;
+    padding: 0 9px;
+    border-radius: 13px;
+    font-size: 11px;
+    cursor: grab;
+}
+
+.editor-image-frame > .editor-image-resize-handle {
+    right: -9px;
+    bottom: -9px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    font-size: 13px;
+    cursor: nwse-resize;
+}
+
+.editor-image-frame > .editor-image-delete-handle {
+    top: -12px;
+    right: -12px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #dc2626;
+    border-color: #b91c1c;
+    color: #ffffff;
+    font-size: 17px;
+}
+
+.editor-image-frame > .editor-image-move-handle:active {
+    cursor: grabbing;
+}
+
+.editor-image-frame.is-moving {
+    opacity: 0.35;
+}
+
+body.is-resizing-editor-image,
+body.is-moving-editor-image {
+    cursor: default;
+    user-select: none;
+}
+
+body.is-moving-editor-image {
+    cursor: grabbing;
+}
+
+.editor-image-move-ghost {
+    position: fixed !important;
+    z-index: 100000 !important;
+    margin: 0 !important;
+    pointer-events: none;
+    opacity: 0.82;
+    transform: rotate(1deg) scale(1.02);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25);
+}
+
+.editor-image-drop-marker {
+    position: fixed;
+    z-index: 100001;
+    display: none;
+    width: 4px;
+    min-height: 24px;
+    border-radius: 4px;
+    background: #1a73e8;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8);
+    pointer-events: none;
+}
+
 /* Estados de carga */
 .word-button.uploading {
     opacity: 0.6;

@@ -90,8 +90,9 @@ class ImageUploadController extends Controller
                 ], 500);
             }
             
-            // Generate the public URL
-            $url = Storage::url($path);
+            // Use the current request host so local previews work too; the
+            // public storage symlink or /storage fallback route serves the file.
+            $url = url('/storage/' . $path);
             
             \Log::info('Image uploaded successfully', [
                 'filename' => $filename,
@@ -130,7 +131,7 @@ class ImageUploadController extends Controller
                 'errors' => $errors
             ], 422);
             
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::error('Image upload error', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),

@@ -156,6 +156,10 @@
                    class="px-4 py-2 rounded-xl text-xs font-bold transition-all {{ ($selectedTipo == 'clip') ? 'bg-amber-500 text-black shadow-lg' : 'bg-gray-800/80 text-gray-300 hover:bg-gray-700' }}">
                     <i class="fas fa-bolt me-1.5"></i> ⚡ Clips
                 </a>
+                <a href="{{ route('transmisiones.en-vivo', array_merge(request()->query(), ['tipo' => 'programa'])) }}" 
+                   class="px-4 py-2 rounded-xl text-xs font-bold transition-all {{ ($selectedTipo == 'programa') ? 'bg-blue-600 text-white shadow-lg' : 'bg-gray-800/80 text-gray-300 hover:bg-gray-700' }}">
+                    <i class="fas fa-tv me-1.5"></i> 📺 Programas
+                </a>
             </div>
 
             <!-- Filtros por Plataforma -->

@@ -35,10 +35,12 @@
     <link rel="sitemap" type="application/xml" title="Sitemap" href="{{ route('sitemap') }}">
 
     <!-- PWA y Metadatos Móviles -->
+    @if(config('app.enable_pwa_install', false))
     <link rel="manifest" href="/manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="UHTV">
+    @endif
     <link rel="apple-touch-icon" href="{{ asset('images/icons/apple-touch-icon.png') }}">
     <link rel="icon" type="image/svg+xml" href="{{ asset('images/icons/icon.svg') }}">
 
@@ -740,7 +742,7 @@
 @endif
 
 <!-- Navbar Mejorada -->
-<nav class="bg-white dark:bg-gray-900 shadow-xl sticky top-0 left-0 w-full z-50 border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
+<nav id="category-navigation" class="bg-white dark:bg-gray-900 shadow-xl sticky top-0 left-0 w-full z-50 border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
  <div class="container mx-auto flex justify-between items-center py-4 px-4">
   <!-- Logo/Inicio -->
   <a href="/" class="flex items-center space-x-2 text-gray-900 dark:text-gray-100 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-300">
@@ -878,6 +880,13 @@
   <!-- Overlay para cerrar el menú -->
   <div id="mobileMenuOverlay" class="fixed inset-0 bg-black bg-opacity-50 opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden z-40"></div>
 </nav>
+
+@if(request()->routeIs('portada'))
+  @include('partials.multimedia-strip', [
+      'contenidos' => $multimediaPortada ?? ($transmisionesRecientes ?? collect())
+  ])
+@endif
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const hamburgerButton = document.getElementById('hamburgerButton');
@@ -1203,6 +1212,7 @@
   <!-- Modal de Streaming En Vivo y Podcasts -->
   @include('partials.live-modal')
 
+  @if(config('app.enable_pwa_install', false))
   <!-- Banner Flotante de Instalación PWA (App Móvil) -->
   <div id="pwa-install-banner" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-96 bg-gray-900/95 backdrop-blur-md text-white p-4 rounded-2xl shadow-2xl border border-purple-500/30 z-50 transform translate-y-32 opacity-0 transition-all duration-500 pointer-events-none flex items-center justify-between gap-3">
       <div class="flex items-center gap-3">
@@ -1282,6 +1292,7 @@
         }
     });
   </script>
+  @endif
 </body>
 
 </html>

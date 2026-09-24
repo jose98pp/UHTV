@@ -176,14 +176,14 @@
                     </div>
                     <div class="card-body">
                         <!-- Switch En Vivo Ahora -->
-                        <div class="p-3 bg-danger bg-opacity-10 border border-danger border-opacity-25 rounded-3 mb-3">
+                        <div id="enVivoContainer" class="p-3 bg-danger bg-opacity-10 border border-danger border-opacity-25 rounded-3 mb-3">
                             <div class="form-check form-switch d-flex align-items-center justify-content-between p-0">
                                 <div>
                                     <label class="form-check-label fw-bold text-danger d-block mb-1" for="enVivoSwitch">
                                         <i class="fas fa-broadcast-tower me-1"></i> Transmitiendo En Vivo Ahora
                                     </label>
                                     <span class="small text-muted d-block">
-                                        Al activar esta opción, el botón <strong>"En Vivo"</strong> de todo el portal comenzará a parpadear y este stream se mostrará como la señal en vivo principal.
+                                        Solo aplica a <strong>Transmisiones En Vivo</strong>. Al activarse, enciende el botón <strong>"🔴 En Vivo"</strong> en el menú superior del sitio. Los podcasts, clips y programas grabados se publican en su sección y en la franja multimedia.
                                     </span>
                                 </div>
                                 <input class="form-check-input ms-3 flex-shrink-0" type="checkbox" role="switch" name="en_vivo" value="1" id="enVivoSwitch" {{ old('en_vivo') ? 'checked' : '' }} style="width: 2.7em; height: 1.5em;">
@@ -196,8 +196,11 @@
                                 <div class="form-check form-switch p-2 border rounded-3">
                                     <input class="form-check-input ms-0 me-2" type="checkbox" role="switch" name="destacado" value="1" id="destacadoSwitch" {{ old('destacado') ? 'checked' : '' }}>
                                     <label class="form-check-label fw-semibold" for="destacadoSwitch">
-                                        <i class="fas fa-star text-warning me-1"></i> Destacar en Portada
+                                        <i class="fas fa-star text-warning me-1"></i> Priorizar en franja de portada
                                     </label>
+                                    <span class="small text-muted d-block mt-1">
+                                        Los contenidos activos se muestran bajo el navbar; los destacados aparecen primero.
+                                    </span>
                                 </div>
                             </div>
 
@@ -350,6 +353,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function syncLiveSwitchWithTipo() {
+        const enVivoContainer = document.getElementById('enVivoContainer');
+        if (tipoSelect.value === 'en_vivo') {
+            enVivoSwitch.checked = true;
+            if (enVivoContainer) enVivoContainer.classList.remove('opacity-50');
+        } else {
+            enVivoSwitch.checked = false;
+            if (enVivoContainer) enVivoContainer.classList.add('opacity-50');
+        }
+    }
+
     btnTestPreview.addEventListener('click', updatePreview);
 
     let debounceTimer;
@@ -359,13 +373,34 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     tituloInput.addEventListener('input', updateDetailsDisplay);
-    tipoSelect.addEventListener('change', updateDetailsDisplay);
+    
+    tipoSelect.addEventListener('change', function() {
+        syncLiveSwitchWithTipo();
+        updateDetailsDisplay();
+    });
+
+    enVivoSwitch.addEventListener('change', function() {
+        const enVivoContainer = document.getElementById('enVivoContainer');
+        if (enVivoSwitch.checked) {
+            tipoSelect.value = 'en_vivo';
+            if (enVivoContainer) enVivoContainer.classList.remove('opacity-50');
+        } else {
+            if (tipoSelect.value === 'en_vivo') {
+                tipoSelect.value = 'programa';
+            }
+            if (enVivoContainer) enVivoContainer.classList.add('opacity-50');
+        }
+        updateDetailsDisplay();
+    });
+
     plataformaSelect.addEventListener('change', updatePreview);
-    enVivoSwitch.addEventListener('change', updateDetailsDisplay);
 
     if (urlInput.value) {
         updatePreview();
     }
+
+    // Inicializar estado del switch según tipo seleccionado al cargar
+    syncLiveSwitchWithTipo();
 });
 </script>
 @endsection

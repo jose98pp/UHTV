@@ -206,6 +206,7 @@ class RichTextEditorManager {
         // Render React component with performance optimizations
         ReactDOM.render(
             React.createElement(EditorComponent, {
+                editorId: containerId,
                 initialContent: decodedContent,
                 onChange: (content) => {
                     hiddenInput.value = content;
@@ -229,7 +230,8 @@ class RichTextEditorManager {
      */
     setupFormValidation(config) {
         const { containerId, hiddenInputId, validationErrorId, required } = config;
-        const form = document.querySelector('form');
+        const editorContainer = document.getElementById(containerId);
+        const form = editorContainer?.closest('form');
         
         if (!form) return;
 
@@ -238,9 +240,34 @@ class RichTextEditorManager {
             const hiddenInput = document.getElementById(hiddenInputId);
             const editorContent = editorContainer?.querySelector('[contenteditable]');
 
-            // Update hidden input with current editor content
+            if (editorContent?.dataset.uploading === 'true') {
+                e.preventDefault();
+                this.showValidationError(validationErrorId, 'Espera a que terminen de subir las imágenes antes de guardar.');
+                return false;
+            }
+
+            // Sincronizar el campo oculto sin controles temporales del editor.
             if (editorContent && !this.fallbackActivated) {
-                hiddenInput.value = editorContent.innerHTML;
+                const cleanEditor = editorContent.cloneNode(true);
+                cleanEditor.querySelectorAll('.editor-image-move-handle, .editor-image-resize-handle, .editor-image-delete-handle')
+                    .forEach(handle => handle.remove());
+                cleanEditor.querySelectorAll('.editor-image-frame').forEach(frame => {
+                    frame.removeAttribute('id');
+                    frame.removeAttribute('contenteditable');
+                    frame.removeAttribute('role');
+                    frame.removeAttribute('tabindex');
+                    frame.removeAttribute('aria-label');
+                    frame.removeAttribute('aria-selected');
+                    frame.removeAttribute('style');
+                    frame.removeAttribute('data-editor-image-bound');
+                });
+                cleanEditor.querySelectorAll('img').forEach(image => {
+                    image.removeAttribute('loading');
+                    image.removeAttribute('draggable');
+                    image.removeAttribute('title');
+                    image.removeAttribute('style');
+                });
+                hiddenInput.value = cleanEditor.innerHTML;
             }
 
             // Validate required content
@@ -282,7 +309,7 @@ class RichTextEditorManager {
             // Ctrl/Cmd + S for save (prevent default browser save)
             if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                 e.preventDefault();
-                const form = document.querySelector('form');
+                const form = editorContainer.closest('form');
                 if (form) {
                     const submitBtn = form.querySelector('button[type="submit"]');
                     if (submitBtn && !submitBtn.disabled) {

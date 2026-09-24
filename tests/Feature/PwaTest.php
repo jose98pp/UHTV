@@ -51,6 +51,8 @@ class PwaTest extends TestCase
     /** @test */
     public function main_layout_renders_pwa_meta_tags_and_service_worker_registration()
     {
+        config(['app.enable_pwa_install' => true]);
+
         $response = $this->get(route('portada'));
 
         $response->assertStatus(200);
@@ -64,6 +66,18 @@ class PwaTest extends TestCase
         $response->assertSee('id="pwa-install-banner"', false);
         $response->assertSee('navigator.serviceWorker.register(\'/sw.js\')', false);
         $response->assertSee('beforeinstallprompt', false);
+    }
+
+    /** @test */
+    public function pwa_install_is_hidden_when_disabled()
+    {
+        config(['app.enable_pwa_install' => false]);
+
+        $response = $this->get(route('portada'));
+
+        $response->assertStatus(200);
+        $response->assertDontSee('id="pwa-install-banner"', false);
+        $response->assertDontSee('<link rel="manifest" href="/manifest.json">', false);
     }
 
     /** @test */

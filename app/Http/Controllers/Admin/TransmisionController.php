@@ -61,6 +61,7 @@ class TransmisionController extends Controller
             'en_vivo' => Transmision::where('en_vivo', true)->count(),
             'podcasts' => Transmision::where('tipo', 'podcast')->count(),
             'clips' => Transmision::where('tipo', 'clip')->count(),
+            'programas' => Transmision::where('tipo', 'programa')->count(),
         ];
 
         return view('admin.transmisiones.index', compact('transmisiones', 'stats'));
@@ -90,19 +91,23 @@ class TransmisionController extends Controller
             'fecha_transmision' => 'nullable|date',
         ]);
 
-        $validated['en_vivo'] = $request->boolean('en_vivo');
         $validated['activo'] = $request->boolean('activo', true);
         $validated['destacado'] = $request->boolean('destacado');
 
-        // Si se marca como "en vivo", desactivar otras transmisiones en vivo previas
-        if ($validated['en_vivo']) {
+        // La lógica de "En Vivo" solo aplica al tipo 'en_vivo'
+        if ($validated['tipo'] === 'en_vivo') {
+            $validated['en_vivo'] = true;
+            // Desactivar cualquier otra transmisión previa para que solo haya una activa
             Transmision::where('en_vivo', true)->update(['en_vivo' => false]);
+        } else {
+            // Podcasts, clips y programas grabados son contenido grabado (no en vivo)
+            $validated['en_vivo'] = false;
         }
 
         $transmision = Transmision::create($validated);
 
         return redirect()->route('admin.transmisiones.index')
-            ->with('success', 'Transmisión registrada con éxito.' . ($transmision->en_vivo ? ' ¡Actualmente EN VIVO en el portal!' : ''));
+            ->with('success', 'Contenido registrado con éxito.' . ($transmision->en_vivo ? ' ¡Actualmente EN VIVO en el botón principal!' : ' Publicado en su categoría correspondiente.'));
     }
 
     /**
@@ -132,13 +137,18 @@ class TransmisionController extends Controller
             'fecha_transmision' => 'nullable|date',
         ]);
 
-        $validated['en_vivo'] = $request->boolean('en_vivo');
         $validated['activo'] = $request->boolean('activo', true);
         $validated['destacado'] = $request->boolean('destacado');
 
-        // Si se marca como en vivo y antes no lo estaba, desmarcar otras
-        if ($validated['en_vivo'] && !$transmision->en_vivo) {
-            Transmision::where('id', '!=', $id)->where('en_vivo', true)->update(['en_vivo' => false]);
+        // La lógica de "En Vivo" solo aplica al tipo 'en_vivo'
+        if ($validated['tipo'] === 'en_vivo') {
+            $validated['en_vivo'] = true;
+            if (!$transmision->en_vivo) {
+                Transmision::where('id', '!=', $id)->where('en_vivo', true)->update(['en_vivo' => false]);
+            }
+        } else {
+            // Podcasts, clips y programas grabados nunca activan el botón de en vivo
+            $validated['en_vivo'] = false;
         }
 
         $transmision->update($validated);

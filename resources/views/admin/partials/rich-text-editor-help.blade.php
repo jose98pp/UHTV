@@ -44,8 +44,8 @@
                 <ul class="list-unstyled small">
                     <li>📷 Formatos: JPG, PNG, GIF, WebP</li>
                     <li>📏 Máximo: 5 MB</li>
-                    <li>⚡ Subida automática</li>
-                    <li>🔄 Reintentos automáticos</li>
+                    <li>🖼 Arrastra, pega o selecciona una imagen</li>
+                    <li>↘ Redimensiona y mueve desde los controles</li>
                 </ul>
             </div>
             <div class="col-md-4">
