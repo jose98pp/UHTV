@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <!-- ============================================================
-     BANNER PUBLICITARIO - Antes de la sección de Videos UHTV
+     BANNER PUBLICITARIO - Antes de la sección de Categorías
 ================================================================ -->
 @if(isset($banners['portada_middle']) && $banners['portada_middle']->count() > 0)
   <div class="w-full bg-gray-100 dark:bg-gray-900 py-4 border-b border-gray-200 dark:border-gray-800">
@@ -349,339 +349,6 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 @endif
-
-<!-- ============================================================
-     SECCIÓN VIDEOS UHTV - Cinema Showcase Interactivo y Optimizado
-================================================================ -->
-@php
-    $channelUrl = 'https://www.youtube.com/@UHTVBolivia';
-    $channelPlaylistEmbed = 'https://www.youtube-nocookie.com/embed?listType=playlist&list=UUx8c9O9qP3IjtnEKkEr-Bng';
-    
-    // Obtener videos grabados (excluyendo emisiones en vivo que van al botón superior)
-    $uhtvVideos = ($transmisionesRecientes ?? collect())
-        ->filter(fn($v) => !($v->en_vivo ?? false))
-        ->values();
-
-    $featuredVideo = $uhtvVideos->first();
-
-    $initialEmbed = $featuredVideo ? $featuredVideo->embed_url : $channelPlaylistEmbed;
-    $initialTitle = $featuredVideo ? $featuredVideo->titulo : 'Canal Oficial UHTV Bolivia en YouTube';
-    $initialThumb = $featuredVideo ? $featuredVideo->effective_thumbnail : asset('images/Logo.jpg');
-    $initialType = $featuredVideo ? $featuredVideo->tipo_nombre : 'Canal Oficial';
-    $initialDuration = $featuredVideo ? $featuredVideo->duracion : null;
-    $initialDate = $featuredVideo 
-        ? ($featuredVideo->fecha_transmision ? $featuredVideo->fecha_transmision->locale('es')->diffForHumans() : ($featuredVideo->created_at ? $featuredVideo->created_at->locale('es')->diffForHumans() : ''))
-        : 'Actualizado recientemente';
-    $initialUrl = $featuredVideo ? ($featuredVideo->url ?: $channelUrl) : $channelUrl;
-@endphp
-
-<section id="seccion-videos-uhtv" class="py-12 bg-gradient-to-b from-gray-950 via-gray-900 to-black border-y border-red-900/30 text-white transition-colors duration-300 relative overflow-hidden">
-  <!-- Glow decorativo de fondo -->
-  <div class="absolute -top-24 -left-24 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
-  <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
-
-  <div class="container mx-auto px-4 relative z-10">
-
-    <!-- Header de la sección -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-white/10">
-      <div class="flex items-center gap-3">
-        <div class="flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-tr from-red-600 to-rose-500 shadow-lg shadow-red-600/30 text-white flex-shrink-0">
-          <i class="fab fa-youtube text-xl"></i>
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h2 class="text-2xl font-black text-white leading-none tracking-tight">
-              Videos <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-rose-400">UHTV</span>
-            </h2>
-            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-red-600/20 text-red-400 border border-red-500/30">
-              YouTube Oficial
-            </span>
-          </div>
-          <p class="text-xs text-gray-400 mt-1">Reportajes, entrevistas, programas completos y resúmenes</p>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-2.5">
-        <a href="https://www.youtube.com/@UHTVBolivia?sub_confirmation=1" 
-           target="_blank" 
-           rel="noopener noreferrer"
-           class="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shadow-lg shadow-red-600/30 transition-all duration-300 transform hover:scale-105"
-           title="Suscribirse al canal oficial de YouTube">
-          <i class="fab fa-youtube text-sm"></i>
-          <span>Suscribirme</span>
-        </a>
-
-        <a href="{{ route('transmisiones.en-vivo') }}" 
-           class="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/15 text-gray-200 text-xs font-bold px-3.5 py-2.5 rounded-xl border border-white/10 transition-colors">
-          <span>UHTV Play</span>
-          <i class="fas fa-arrow-right text-[10px]"></i>
-        </a>
-      </div>
-    </div>
-
-    <!-- Contenedor Principal: Cinema Player + Playlist Lateral -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-
-      <!-- Columna Izquierda: Reproductor Cinema Principal (8 cols) -->
-      <div class="lg:col-span-8 flex flex-col gap-4">
-        <div id="uhtv-cinema-container" 
-             class="relative w-full pb-[56.25%] rounded-2xl overflow-hidden shadow-2xl bg-black border border-white/10 group">
-          
-          <!-- Facade Inicial Lácteo/Optimizado (Carga 0 KB de iframe hasta interactuar) -->
-          <div id="uhtv-cinema-facade" 
-               class="absolute inset-0 z-10 cursor-pointer flex items-center justify-center bg-black transition-opacity duration-300"
-               onclick="playCinemaFacadeVideo()">
-            
-            <img id="uhtv-cinema-thumb" 
-                 src="{{ $initialThumb }}" 
-                 alt="{{ $initialTitle }}" 
-                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                 loading="lazy"
-                 onerror="this.onerror=null;this.src='{{ asset('images/Logo.jpg') }}';">
-            
-            <!-- Gradiente de sombra cinematográfico -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/40"></div>
-            
-            <!-- Botón Central de Play Estilo YouTube -->
-            <div class="relative z-20 w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-red-600/95 hover:bg-red-600 text-white flex items-center justify-center shadow-2xl shadow-red-600/60 transform group-hover:scale-110 transition-all duration-300 border-2 border-white/40">
-              <i class="fas fa-play text-xl sm:text-2xl ml-1 text-white"></i>
-            </div>
-
-            <!-- Badge Tipo de Contenido -->
-            <span id="uhtv-cinema-type-badge" 
-                  class="absolute top-4 left-4 z-20 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-black/80 backdrop-blur-md text-white border border-white/20 shadow-md">
-              {{ $initialType }}
-            </span>
-
-            <!-- Badge Duración -->
-            <span id="uhtv-cinema-duration-badge" 
-                  class="absolute bottom-4 right-4 z-20 px-2.5 py-1 rounded-lg text-xs font-bold bg-black/80 text-white backdrop-blur-md border border-white/10 {{ empty($initialDuration) ? 'hidden' : '' }}">
-              {{ $initialDuration }}
-            </span>
-          </div>
-
-          <!-- Iframe embebido (Se activa al hacer clic o al seleccionar video de la lista) -->
-          <iframe id="uhtv-cinema-iframe"
-                  class="absolute inset-0 w-full h-full border-0 hidden z-20"
-                  src=""
-                  data-default-src="{{ $initialEmbed }}"
-                  title="{{ $initialTitle }}"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowfullscreen>
-          </iframe>
-        </div>
-
-        <!-- Barra de Metadatos y Acciones del Video Seleccionado -->
-        <div class="p-4 sm:p-5 rounded-2xl bg-gray-900/80 border border-white/10 backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div class="min-w-0 flex-1">
-            <h3 id="uhtv-cinema-title" class="text-base sm:text-lg font-bold text-white line-clamp-2 leading-snug">
-              {{ $initialTitle }}
-            </h3>
-            <div class="flex items-center gap-3 mt-1.5 text-xs text-gray-400">
-              <span id="uhtv-cinema-date" class="flex items-center gap-1.5">
-                <i class="far fa-clock text-[11px] text-red-500"></i>
-                <span>{{ $initialDate }}</span>
-              </span>
-              <span class="text-gray-600">·</span>
-              <span class="text-gray-300 flex items-center gap-1">
-                <i class="fab fa-youtube text-red-500"></i>
-                <span>Última Hora TV</span>
-              </span>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-2 flex-shrink-0">
-            <a id="uhtv-cinema-external-link" 
-               href="{{ $initialUrl }}" 
-               target="_blank" 
-               rel="noopener noreferrer" 
-               class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white text-xs font-semibold border border-white/10 transition-colors">
-              <i class="fab fa-youtube text-red-500"></i>
-              <span>Abrir en YouTube</span>
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Columna Derecha: Playlist Interactiva (4 cols) -->
-      <div class="lg:col-span-4 flex flex-col gap-3">
-        <div class="rounded-2xl bg-gray-900/80 border border-white/10 p-4 backdrop-blur-md">
-          <div class="flex items-center justify-between mb-3 pb-3 border-b border-white/10">
-            <div class="flex items-center gap-2">
-              <i class="fas fa-list-ul text-red-500 text-xs"></i>
-              <h4 class="text-xs font-extrabold uppercase tracking-wider text-gray-200">Videos Disponibles</h4>
-            </div>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-gray-300">
-              {{ $uhtvVideos->count() > 0 ? $uhtvVideos->count() : 'Canal' }}
-            </span>
-          </div>
-
-          <!-- Lista de videos interactiva -->
-          <div class="flex flex-col gap-2.5 max-h-[380px] overflow-y-auto pr-1" style="scrollbar-width: thin; scrollbar-color: #ef4444 transparent;">
-            @forelse($uhtvVideos as $index => $item)
-              @php
-                $itemDate = $item->fecha_transmision 
-                    ? $item->fecha_transmision->locale('es')->diffForHumans() 
-                    : ($item->created_at ? $item->created_at->locale('es')->diffForHumans() : '');
-                $itemBadgeColor = match($item->tipo) {
-                    'programa' => 'bg-blue-600',
-                    'podcast' => 'bg-purple-600',
-                    'clip' => 'bg-amber-500 text-black',
-                    default => 'bg-red-600',
-                };
-              @endphp
-              <button type="button" 
-                      class="uhtv-playlist-item w-full text-left p-2.5 rounded-xl border transition-all duration-200 flex gap-3 items-center group cursor-pointer {{ $index === 0 ? 'bg-white/10 border-red-500/50 shadow-md' : 'bg-black/30 border-white/5 hover:bg-white/5 hover:border-white/20' }}"
-                      data-embed-url="{{ $item->embed_url }}"
-                      data-title="{{ $item->titulo }}"
-                      data-thumb="{{ $item->effective_thumbnail }}"
-                      data-type="{{ $item->tipo_nombre }}"
-                      data-duration="{{ $item->duracion ?? '' }}"
-                      data-date="{{ $itemDate }}"
-                      data-url="{{ $item->url ?: $channelUrl }}"
-                      onclick="selectCinemaVideo(this)">
-                
-                <div class="relative w-24 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-black">
-                  <img src="{{ $item->effective_thumbnail }}" 
-                       alt="{{ $item->titulo }}" 
-                       class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                       loading="lazy"
-                       onerror="this.onerror=null;this.src='{{ asset('images/Logo.jpg') }}';">
-                  <div class="absolute inset-0 bg-black/40 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                    <i class="fas fa-play text-white/90 text-xs transform group-hover:scale-110 transition-transform"></i>
-                  </div>
-                  @if($item->duracion)
-                    <span class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-black/85 text-white">
-                      {{ $item->duracion }}
-                    </span>
-                  @endif
-                </div>
-
-                <div class="flex-1 min-w-0">
-                  <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase {{ $itemBadgeColor }} mb-1">
-                    {{ $item->tipo_nombre }}
-                  </span>
-                  <h5 class="text-xs font-bold text-gray-200 group-hover:text-white line-clamp-2 leading-snug">
-                    {{ $item->titulo }}
-                  </h5>
-                  @if($itemDate)
-                    <p class="text-[10px] text-gray-500 mt-0.5">{{ $itemDate }}</p>
-                  @endif
-                </div>
-              </button>
-            @empty
-              <!-- Estado si no hay videos registrados en BD: acceso directo al playlist del canal -->
-              <div class="p-4 rounded-xl bg-black/40 border border-white/5 text-center">
-                <i class="fab fa-youtube text-red-500 text-3xl mb-2"></i>
-                <p class="text-xs text-gray-300 font-semibold mb-1">Playlist Oficial de YouTube</p>
-                <p class="text-[11px] text-gray-500 mb-3">Reproduce las emisiones y videos más recientes directamente desde nuestro canal.</p>
-                <button type="button" 
-                        class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all shadow"
-                        onclick="playCinemaFacadeVideo()">
-                  <i class="fas fa-play me-1"></i> Reproducir Playlist
-                </button>
-              </div>
-            @endforelse
-          </div>
-
-          <!-- Banner inferior de suscripción al canal -->
-          <div class="mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2 min-w-0">
-              <i class="fab fa-youtube text-red-500 text-lg flex-shrink-0"></i>
-              <div class="min-w-0">
-                <p class="text-[11px] font-bold text-white truncate">@UHTVBolivia</p>
-                <p class="text-[10px] text-gray-400 truncate">Transmisiones y reportajes diarios</p>
-              </div>
-            </div>
-            <a href="https://www.youtube.com/@UHTVBolivia?sub_confirmation=1" 
-               target="_blank" 
-               rel="noopener noreferrer" 
-               class="px-2.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold transition-colors flex-shrink-0 flex items-center gap-1">
-              <i class="fas fa-bell text-[10px]"></i>
-              <span>Unirse</span>
-            </a>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-</section>
-
-@push('scripts')
-<script>
-function playCinemaFacadeVideo() {
-    const iframe = document.getElementById('uhtv-cinema-iframe');
-    const facade = document.getElementById('uhtv-cinema-facade');
-    if (!iframe || !facade) return;
-
-    let src = iframe.getAttribute('data-default-src') || iframe.src;
-    if (!src.includes('autoplay=')) {
-        src += (src.includes('?') ? '&' : '?') + 'autoplay=1';
-    }
-    iframe.src = autoPlayParams(src);
-    iframe.classList.remove('hidden');
-    facade.classList.add('hidden');
-}
-
-function autoPlayParams(url) {
-    if (!url) return '';
-    return url.includes('autoplay=') ? url : url + (url.includes('?') ? '&' : '?') + 'autoplay=1';
-}
-
-function selectCinemaVideo(button) {
-    const embedUrl = button.getAttribute('data-embed-url');
-    const title = button.getAttribute('data-title');
-    const thumb = button.getAttribute('data-thumb');
-    const type = button.getAttribute('data-type');
-    const duration = button.getAttribute('data-duration');
-    const date = button.getAttribute('data-date');
-    const url = button.getAttribute('data-url');
-
-    const iframe = document.getElementById('uhtv-cinema-iframe');
-    const facade = document.getElementById('uhtv-cinema-facade');
-    const titleEl = document.getElementById('uhtv-cinema-title');
-    const dateEl = document.getElementById('uhtv-cinema-date');
-    const typeBadge = document.getElementById('uhtv-cinema-type-badge');
-    const durationBadge = document.getElementById('uhtv-cinema-duration-badge');
-    const thumbImg = document.getElementById('uhtv-cinema-thumb');
-    const extLink = document.getElementById('uhtv-cinema-external-link');
-
-    // Actualizar datos del video
-    if (titleEl) titleEl.textContent = title;
-    if (dateEl) dateEl.innerHTML = `<i class="far fa-clock text-[11px] text-red-500"></i> <span>${date || 'Reciente'}</span>`;
-    if (typeBadge && type) typeBadge.textContent = type;
-    if (durationBadge) {
-        if (duration) {
-            durationBadge.textContent = duration;
-            durationBadge.classList.remove('hidden');
-        } else {
-            durationBadge.classList.add('hidden');
-        }
-    }
-    if (thumbImg && thumb) thumbImg.src = thumb;
-    if (extLink && url) extLink.href = url;
-
-    // Cargar iframe con reproducción automática
-    if (iframe) {
-        iframe.src = autoPlayParams(embedUrl);
-        iframe.classList.remove('hidden');
-    }
-    if (facade) {
-        facade.classList.add('hidden');
-    }
-
-    // Actualizar estilo activo en la lista
-    document.querySelectorAll('.uhtv-playlist-item').forEach(item => {
-        item.classList.remove('bg-white/10', 'border-red-500/50', 'shadow-md');
-        item.classList.add('bg-black/30', 'border-white/5');
-    });
-    button.classList.remove('bg-black/30', 'border-white/5');
-    button.classList.add('bg-white/10', 'border-red-500/50', 'shadow-md');
-}
-</script>
-@endpush
 
 <!-- Sección de Noticias por Categorías - Estilo Brújula Digital -->
 <section class="py-12 bg-gray-50 dark:bg-gray-800 transition-colors duration-300">
@@ -1008,9 +675,343 @@ function selectCinemaVideo(button) {
 </section>
 
 
-{{-- Widget de Elfsight habilitado --}}
+{{-- Widget de Elfsight (Free YouTube Video Gallery Widget)
 <script src="https://static.elfsight.com/platform/platform.js" async></script>
 <div class="elfsight-app-fbb50d0e-c779-44ab-bf7f-b16fd3542ccc" data-elfsight-app-lazy></div>
+--}}
+
+<!-- ============================================================
+     SECCIÓN VIDEOS UHTV - Cinema Showcase Interactivo y Optimizado
+================================================================ -->
+@php
+    $channelUrl = 'https://www.youtube.com/@UHTVBolivia';
+    $channelPlaylistEmbed = 'https://www.youtube-nocookie.com/embed?listType=playlist&list=UUx8c9O9qP3IjtnEKkEr-Bng';
+    
+    // Obtener videos grabados (excluyendo emisiones en vivo que van al botón superior)
+    $uhtvVideos = ($transmisionesRecientes ?? collect())
+        ->filter(fn($v) => !($v->en_vivo ?? false))
+        ->values();
+
+    $featuredVideo = $uhtvVideos->first();
+
+    $initialEmbed = $featuredVideo ? $featuredVideo->embed_url : $channelPlaylistEmbed;
+    $initialTitle = $featuredVideo ? $featuredVideo->titulo : 'Canal Oficial UHTV Bolivia en YouTube';
+    $initialThumb = $featuredVideo ? $featuredVideo->effective_thumbnail : asset('images/Logo.jpg');
+    $initialType = $featuredVideo ? $featuredVideo->tipo_nombre : 'Canal Oficial';
+    $initialDuration = $featuredVideo ? $featuredVideo->duracion : null;
+    $initialDate = $featuredVideo 
+        ? ($featuredVideo->fecha_transmision ? $featuredVideo->fecha_transmision->locale('es')->diffForHumans() : ($featuredVideo->created_at ? $featuredVideo->created_at->locale('es')->diffForHumans() : ''))
+        : 'Actualizado recientemente';
+    $initialUrl = $featuredVideo ? ($featuredVideo->url ?: $channelUrl) : $channelUrl;
+@endphp
+
+<section id="seccion-videos-uhtv" class="py-12 bg-gradient-to-b from-gray-950 via-gray-900 to-black border-y border-red-900/30 text-white transition-colors duration-300 relative overflow-hidden">
+  <!-- Glow decorativo de fondo -->
+  <div class="absolute -top-24 -left-24 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+  <div class="container mx-auto px-4 relative z-10">
+
+    <!-- Header de la sección -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-tr from-red-600 to-rose-500 shadow-lg shadow-red-600/30 text-white flex-shrink-0">
+          <i class="fab fa-youtube text-xl"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-2xl font-black text-white leading-none tracking-tight">
+              Videos <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-rose-400">UHTV</span>
+            </h2>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-red-600/20 text-red-400 border border-red-500/30">
+              YouTube Oficial
+            </span>
+          </div>
+          <p class="text-xs text-gray-400 mt-1">Reportajes, entrevistas, programas completos y resúmenes</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5">
+        <a href="https://www.youtube.com/@UHTVBolivia?sub_confirmation=1" 
+           target="_blank" 
+           rel="noopener noreferrer" 
+           class="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shadow-lg shadow-red-600/30 transition-all duration-300 transform hover:scale-105"
+           title="Suscribirse al canal oficial de YouTube">
+          <i class="fab fa-youtube text-sm"></i>
+          <span>Suscribirme</span>
+        </a>
+
+        <a href="{{ route('transmisiones.en-vivo') }}" 
+           class="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/15 text-gray-200 text-xs font-bold px-3.5 py-2.5 rounded-xl border border-white/10 transition-colors">
+          <span>UHTV Play</span>
+          <i class="fas fa-arrow-right text-[10px]"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Contenedor Principal: Cinema Player + Playlist Lateral -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- Columna Izquierda: Reproductor Cinema Principal (8 cols) -->
+      <div class="lg:col-span-8 flex flex-col gap-4">
+        <div id="uhtv-cinema-container" 
+             class="relative w-full pb-[56.25%] rounded-2xl overflow-hidden shadow-2xl bg-black border border-white/10 group">
+          
+          <!-- Facade Inicial Lácteo/Optimizado (Carga 0 KB de iframe hasta interactuar) -->
+          <div id="uhtv-cinema-facade" 
+               class="absolute inset-0 z-10 cursor-pointer flex items-center justify-center bg-black transition-opacity duration-300"
+               onclick="playCinemaFacadeVideo()">
+            
+            <img id="uhtv-cinema-thumb" 
+                 src="{{ $initialThumb }}" 
+                 alt="{{ $initialTitle }}" 
+                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                 loading="lazy"
+                 onerror="this.onerror=null;this.src='{{ asset('images/Logo.jpg') }}';">
+            
+            <!-- Gradiente de sombra cinematográfico -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/40"></div>
+            
+            <!-- Botón Central de Play Estilo YouTube -->
+            <div class="relative z-20 w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-red-600/95 hover:bg-red-600 text-white flex items-center justify-center shadow-2xl shadow-red-600/60 transform group-hover:scale-110 transition-all duration-300 border-2 border-white/40">
+              <i class="fas fa-play text-xl sm:text-2xl ml-1 text-white"></i>
+            </div>
+
+            <!-- Badge Tipo de Contenido -->
+            <span id="uhtv-cinema-type-badge" 
+                  class="absolute top-4 left-4 z-20 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-black/80 backdrop-blur-md text-white border border-white/20 shadow-md">
+              {{ $initialType }}
+            </span>
+
+            <!-- Badge Duración -->
+            <span id="uhtv-cinema-duration-badge" 
+                  class="absolute bottom-4 right-4 z-20 px-2.5 py-1 rounded-lg text-xs font-bold bg-black/80 text-white backdrop-blur-md border border-white/10 {{ empty($initialDuration) ? 'hidden' : '' }}">
+              {{ $initialDuration }}
+            </span>
+          </div>
+
+          <!-- Iframe embebido (Se activa al hacer clic o al seleccionar video de la lista) -->
+          <iframe id="uhtv-cinema-iframe"
+                  class="absolute inset-0 w-full h-full border-0 hidden z-20"
+                  src=""
+                  data-default-src="{{ $initialEmbed }}"
+                  title="{{ $initialTitle }}"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen>
+          </iframe>
+        </div>
+
+        <!-- Barra de Metadatos y Acciones del Video Seleccionado -->
+        <div class="p-4 sm:p-5 rounded-2xl bg-gray-900/80 border border-white/10 backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="min-w-0 flex-1">
+            <h3 id="uhtv-cinema-title" class="text-base sm:text-lg font-bold text-white line-clamp-2 leading-snug">
+              {{ $initialTitle }}
+            </h3>
+            <div class="flex items-center gap-3 mt-1.5 text-xs text-gray-400">
+              <span id="uhtv-cinema-date" class="flex items-center gap-1.5">
+                <i class="far fa-clock text-[11px] text-red-500"></i>
+                <span>{{ $initialDate }}</span>
+              </span>
+              <span class="text-gray-600">·</span>
+              <span class="text-gray-300 flex items-center gap-1">
+                <i class="fab fa-youtube text-red-500"></i>
+                <span>Última Hora TV</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <a id="uhtv-cinema-external-link" 
+               href="{{ $initialUrl }}" 
+               target="_blank" 
+               rel="noopener noreferrer" 
+               class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white text-xs font-semibold border border-white/10 transition-colors">
+              <i class="fab fa-youtube text-red-500"></i>
+              <span>Abrir en YouTube</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna Derecha: Playlist Interactiva (4 cols) -->
+      <div class="lg:col-span-4 flex flex-col gap-3">
+        <div class="rounded-2xl bg-gray-900/80 border border-white/10 p-4 backdrop-blur-md">
+          <div class="flex items-center justify-between mb-3 pb-3 border-b border-white/10">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-list-ul text-red-500 text-xs"></i>
+              <h4 class="text-xs font-extrabold uppercase tracking-wider text-gray-200">Videos Disponibles</h4>
+            </div>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-gray-300">
+              {{ $uhtvVideos->count() > 0 ? $uhtvVideos->count() : 'Canal' }}
+            </span>
+          </div>
+
+          <!-- Lista de videos interactiva -->
+          <div class="flex flex-col gap-2.5 max-h-[380px] overflow-y-auto pr-1" style="scrollbar-width: thin; scrollbar-color: #ef4444 transparent;">
+            @forelse($uhtvVideos as $index => $item)
+              @php
+                $itemDate = $item->fecha_transmision 
+                    ? $item->fecha_transmision->locale('es')->diffForHumans() 
+                    : ($item->created_at ? $item->created_at->locale('es')->diffForHumans() : '');
+                $itemBadgeColor = match($item->tipo) {
+                    'programa' => 'bg-blue-600',
+                    'podcast' => 'bg-purple-600',
+                    'clip' => 'bg-amber-500 text-black',
+                    default => 'bg-red-600',
+                };
+              @endphp
+              <button type="button" 
+                      class="uhtv-playlist-item w-full text-left p-2.5 rounded-xl border transition-all duration-200 flex gap-3 items-center group cursor-pointer {{ $index === 0 ? 'bg-white/10 border-red-500/50 shadow-md' : 'bg-black/30 border-white/5 hover:bg-white/5 hover:border-white/20' }}"
+                      data-embed-url="{{ $item->embed_url }}"
+                      data-title="{{ $item->titulo }}"
+                      data-thumb="{{ $item->effective_thumbnail }}"
+                      data-type="{{ $item->tipo_nombre }}"
+                      data-duration="{{ $item->duracion ?? '' }}"
+                      data-date="{{ $itemDate }}"
+                      data-url="{{ $item->url ?: $channelUrl }}"
+                      onclick="selectCinemaVideo(this)">
+                
+                <div class="relative w-24 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-black">
+                  <img src="{{ $item->effective_thumbnail }}" 
+                       alt="{{ $item->titulo }}" 
+                       class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                       loading="lazy"
+                       onerror="this.onerror=null;this.src='{{ asset('images/Logo.jpg') }}';">
+                  <div class="absolute inset-0 bg-black/40 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                    <i class="fas fa-play text-white/90 text-xs transform group-hover:scale-110 transition-transform"></i>
+                  </div>
+                  @if($item->duracion)
+                    <span class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-black/85 text-white">
+                      {{ $item->duracion }}
+                    </span>
+                  @endif
+                </div>
+
+                <div class="flex-1 min-w-0">
+                  <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase {{ $itemBadgeColor }} mb-1">
+                    {{ $item->tipo_nombre }}
+                  </span>
+                  <h5 class="text-xs font-bold text-gray-200 group-hover:text-white line-clamp-2 leading-snug">
+                    {{ $item->titulo }}
+                  </h5>
+                  @if($itemDate)
+                    <p class="text-[10px] text-gray-500 mt-0.5">{{ $itemDate }}</p>
+                  @endif
+                </div>
+              </button>
+            @empty
+              <!-- Estado si no hay videos registrados en BD: acceso directo al playlist del canal -->
+              <div class="p-4 rounded-xl bg-black/40 border border-white/5 text-center">
+                <i class="fab fa-youtube text-red-500 text-3xl mb-2"></i>
+                <p class="text-xs text-gray-300 font-semibold mb-1">Playlist Oficial de YouTube</p>
+                <p class="text-[11px] text-gray-500 mb-3">Reproduce las emisiones y videos más recientes directamente desde nuestro canal.</p>
+                <button type="button" 
+                        class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all shadow"
+                        onclick="playCinemaFacadeVideo()">
+                  <i class="fas fa-play me-1"></i> Reproducir Playlist
+                </button>
+              </div>
+            @endforelse
+          </div>
+
+          <!-- Banner inferior de suscripción al canal -->
+          <div class="mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <i class="fab fa-youtube text-red-500 text-lg flex-shrink-0"></i>
+              <div class="min-w-0">
+                <p class="text-[11px] font-bold text-white truncate">@UHTVBolivia</p>
+                <p class="text-[10px] text-gray-400 truncate">Transmisiones y reportajes diarios</p>
+              </div>
+            </div>
+            <a href="https://www.youtube.com/@UHTVBolivia?sub_confirmation=1" 
+               target="_blank" 
+               rel="noopener noreferrer" 
+               class="px-2.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold transition-colors flex-shrink-0 flex items-center gap-1">
+              <i class="fas fa-bell text-[10px]"></i>
+              <span>Unirse</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+@push('scripts')
+<script>
+function playCinemaFacadeVideo() {
+    const iframe = document.getElementById('uhtv-cinema-iframe');
+    const facade = document.getElementById('uhtv-cinema-facade');
+    if (!iframe || !facade) return;
+
+    let src = iframe.getAttribute('data-default-src') || iframe.src;
+    if (!src.includes('autoplay=')) {
+        src += (src.includes('?') ? '&' : '?') + 'autoplay=1';
+    }
+    iframe.src = autoPlayParams(src);
+    iframe.classList.remove('hidden');
+    facade.classList.add('hidden');
+}
+
+function autoPlayParams(url) {
+    if (!url) return '';
+    return url.includes('autoplay=') ? url : url + (url.includes('?') ? '&' : '?') + 'autoplay=1';
+}
+
+function selectCinemaVideo(button) {
+    const embedUrl = button.getAttribute('data-embed-url');
+    const title = button.getAttribute('data-title');
+    const thumb = button.getAttribute('data-thumb');
+    const type = button.getAttribute('data-type');
+    const duration = button.getAttribute('data-duration');
+    const date = button.getAttribute('data-date');
+    const url = button.getAttribute('data-url');
+
+    const iframe = document.getElementById('uhtv-cinema-iframe');
+    const facade = document.getElementById('uhtv-cinema-facade');
+    const titleEl = document.getElementById('uhtv-cinema-title');
+    const dateEl = document.getElementById('uhtv-cinema-date');
+    const typeBadge = document.getElementById('uhtv-cinema-type-badge');
+    const durationBadge = document.getElementById('uhtv-cinema-duration-badge');
+    const thumbImg = document.getElementById('uhtv-cinema-thumb');
+    const extLink = document.getElementById('uhtv-cinema-external-link');
+
+    // Actualizar datos del video
+    if (titleEl) titleEl.textContent = title;
+    if (dateEl) dateEl.innerHTML = `<i class="far fa-clock text-[11px] text-red-500"></i> <span>${date || 'Reciente'}</span>`;
+    if (typeBadge && type) typeBadge.textContent = type;
+    if (durationBadge) {
+        if (duration) {
+            durationBadge.textContent = duration;
+            durationBadge.classList.remove('hidden');
+        } else {
+            durationBadge.classList.add('hidden');
+        }
+    }
+    if (thumbImg && thumb) thumbImg.src = thumb;
+    if (extLink && url) extLink.href = url;
+
+    // Cargar iframe con reproducción automática
+    if (iframe) {
+        iframe.src = autoPlayParams(embedUrl);
+        iframe.classList.remove('hidden');
+    }
+    if (facade) {
+        facade.classList.add('hidden');
+    }
+
+    // Actualizar estilo activo en la lista
+    document.querySelectorAll('.uhtv-playlist-item').forEach(item => {
+        item.classList.remove('bg-white/10', 'border-red-500/50', 'shadow-md');
+        item.classList.add('bg-black/30', 'border-white/5');
+    });
+    button.classList.remove('bg-black/30', 'border-white/5');
+    button.classList.add('bg-white/10', 'border-red-500/50', 'shadow-md');
+}
+</script>
+@endpush
 
 
 
