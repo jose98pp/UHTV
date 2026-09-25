@@ -51,6 +51,11 @@ class NewsService
                 $noticiasPorCategoria[$categoria->id] = $noticiasCategoria;
             }
 
+            // Reutilizar la lista cacheada de categorías para la navegación.
+            $categorias = Cache::remember('all_categories', 600, function () {
+                return Category::all();
+            });
+
             // Obtener "más leídas" (noticias más vistas)
             $masLeidas = $this->noticiaRepository->getMostViewedNews(4);
             $masLeidas = $masLeidas->map(function ($noticia) {
@@ -63,7 +68,7 @@ class NewsService
                 'ultimasNoticias' => $ultimasNoticias,
                 'noticiasPorCategoria' => $noticiasPorCategoria,
                 'masLeidas' => $masLeidas,
-                'categorias' => Category::all(),
+                'categorias' => $categorias,
             ];
         });
     }
