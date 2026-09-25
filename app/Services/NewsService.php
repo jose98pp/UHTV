@@ -23,40 +23,32 @@ class NewsService
     public function getHomePageData()
     {
         return Cache::remember('homepage_data', 300, function () {
-            // Obtener noticias principales para el carrusel
-            $noticias = $this->noticiaRepository->getPublishedNews(10);
-            
-            // Obtener categorías con múltiples noticias para secciones de portada (como Brújula Digital)
-            $seccionesCategoria = $this->noticiaRepository->getCategoriesWithNews(4);
-            
-            // Obtener últimas noticias
+            // Obtener una sola colección de noticias para carrusel y ticker.
             $ultimasNoticias = $this->noticiaRepository->getPublishedNews(12);
-            
-            // Procesar noticias con contenido sanitizado e imágenes seguras
-            $noticias = $noticias->map(function ($noticia) {
-                return $this->processNewsItem($noticia);
-            });
-            
+
+            // Obtener categorías con hasta cinco noticias ya cargadas en eager loading.
+            $seccionesCategoria = $this->noticiaRepository->getCategoriesWithNews(5);
+
+            // Procesar una sola vez cada noticia y reutilizar los resultados.
             $ultimasNoticias = $ultimasNoticias->map(function ($noticia) {
                 return $this->processNewsItem($noticia);
             });
+            $noticias = $ultimasNoticias->take(10);
             
-            // Procesar noticias de categorías con contenido sanitizado e imágenes seguras
-            foreach ($seccionesCategoria as $categoria) {
-                if ($categoria->noticias) {
-                    $categoria->noticias = $categoria->noticias->map(function ($noticia) {
-                        return $this->processNewsItem($noticia);
-                    });
-                }
-            }
-
-            // Obtener noticias por cada categoría individual para secciones específicas (últimas 5)
+            // Reutilizar la relación eager-loaded para las secciones de portada.
+            // Se asigna también la categoría padre para que el acceso a la URL
+            // en Blade no genere una consulta adicional por noticia.
             $noticiasPorCategoria = [];
             foreach ($seccionesCategoria as $categoria) {
-                $noticiasCategoria = $this->noticiaRepository->getNewsByCategory($categoria->id, 5);
-                $noticiasPorCategoria[$categoria->id] = $noticiasCategoria->map(function ($noticia) {
-                    return $this->processNewsItem($noticia);
-                });
+                $noticiasCategoria = $categoria->noticias
+                    ->take(5)
+                    ->map(function ($noticia) use ($categoria) {
+                        $noticia->setRelation('category', $categoria);
+                        return $this->processNewsItem($noticia);
+                    });
+
+                $categoria->setRelation('noticias', $noticiasCategoria);
+                $noticiasPorCategoria[$categoria->id] = $noticiasCategoria;
             }
 
             // Obtener "más leídas" (noticias más vistas)
@@ -71,6 +63,7 @@ class NewsService
                 'ultimasNoticias' => $ultimasNoticias,
                 'noticiasPorCategoria' => $noticiasPorCategoria,
                 'masLeidas' => $masLeidas,
+                'categorias' => Category::all(),
             ];
         });
     }

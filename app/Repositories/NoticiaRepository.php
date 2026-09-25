@@ -95,7 +95,7 @@ class NoticiaRepository
     /**
      * Obtener categorías con sus noticias (optimizado para portada)
      */
-    public function getCategoriesWithNews($newsLimit = 1)
+    public function getCategoriesWithNews($newsLimit = 5)
     {
         return Category::with(['noticias' => function ($query) use ($newsLimit) {
             $query->select('id', 'titulo', 'imagen', 'contenido', 'category_id', 'created_at')
@@ -153,7 +153,8 @@ class NoticiaRepository
      */
     public function getMostViewedNews($limit = 5)
     {
-        return Noticia::where('publicada', true)
+        return Noticia::with('category')
+            ->where('publicada', true)
             ->orderBy('views', 'desc')
             ->take($limit)
             ->get();
