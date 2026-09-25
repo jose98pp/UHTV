@@ -28,10 +28,6 @@
 
         <title>{{ config('app.name', 'Admin') }}</title>
 
-        <!-- DNS Prefetch for better performance -->
-        <link rel="dns-prefetch" href="//fonts.googleapis.com">
-        <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
-
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">

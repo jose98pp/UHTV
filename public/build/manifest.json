@@ -1,14 +1,78 @@
 {
-  "_vendor-upsvKRUO.js": {
-    "file": "js/chunks/vendor-upsvKRUO.js",
+  "_vendor-CA6tP7uT.js": {
+    "file": "js/chunks/vendor-CA6tP7uT.js",
     "name": "vendor"
+  },
+  "node_modules/@fontsource/figtree/files/figtree-latin-400-normal.woff": {
+    "file": "assets/figtree-latin-400-normal-Cmu7UqQt.woff",
+    "src": "node_modules/@fontsource/figtree/files/figtree-latin-400-normal.woff"
+  },
+  "node_modules/@fontsource/figtree/files/figtree-latin-400-normal.woff2": {
+    "file": "assets/figtree-latin-400-normal-DCh3z3eG.woff2",
+    "src": "node_modules/@fontsource/figtree/files/figtree-latin-400-normal.woff2"
+  },
+  "node_modules/@fontsource/figtree/files/figtree-latin-500-normal.woff": {
+    "file": "assets/figtree-latin-500-normal-CJjfTJPN.woff",
+    "src": "node_modules/@fontsource/figtree/files/figtree-latin-500-normal.woff"
+  },
+  "node_modules/@fontsource/figtree/files/figtree-latin-500-normal.woff2": {
+    "file": "assets/figtree-latin-500-normal-BbP9ghK1.woff2",
+    "src": "node_modules/@fontsource/figtree/files/figtree-latin-500-normal.woff2"
+  },
+  "node_modules/@fontsource/figtree/files/figtree-latin-600-normal.woff": {
+    "file": "assets/figtree-latin-600-normal-BQwd_lqE.woff",
+    "src": "node_modules/@fontsource/figtree/files/figtree-latin-600-normal.woff"
+  },
+  "node_modules/@fontsource/figtree/files/figtree-latin-600-normal.woff2": {
+    "file": "assets/figtree-latin-600-normal-BD_wgCWh.woff2",
+    "src": "node_modules/@fontsource/figtree/files/figtree-latin-600-normal.woff2"
+  },
+  "node_modules/@fontsource/figtree/files/figtree-latin-700-normal.woff": {
+    "file": "assets/figtree-latin-700-normal-CNKWZGej.woff",
+    "src": "node_modules/@fontsource/figtree/files/figtree-latin-700-normal.woff"
+  },
+  "node_modules/@fontsource/figtree/files/figtree-latin-700-normal.woff2": {
+    "file": "assets/figtree-latin-700-normal-BbJ2Poxx.woff2",
+    "src": "node_modules/@fontsource/figtree/files/figtree-latin-700-normal.woff2"
+  },
+  "node_modules/@fontsource/roboto/files/roboto-latin-400-normal.woff": {
+    "file": "assets/roboto-latin-400-normal-551zQQ7R.woff",
+    "src": "node_modules/@fontsource/roboto/files/roboto-latin-400-normal.woff"
+  },
+  "node_modules/@fontsource/roboto/files/roboto-latin-400-normal.woff2": {
+    "file": "assets/roboto-latin-400-normal-CNwBRw8h.woff2",
+    "src": "node_modules/@fontsource/roboto/files/roboto-latin-400-normal.woff2"
+  },
+  "node_modules/@fontsource/roboto/files/roboto-latin-700-normal.woff": {
+    "file": "assets/roboto-latin-700-normal-CTLkNcF_.woff",
+    "src": "node_modules/@fontsource/roboto/files/roboto-latin-700-normal.woff"
+  },
+  "node_modules/@fontsource/roboto/files/roboto-latin-700-normal.woff2": {
+    "file": "assets/roboto-latin-700-normal-DZr4b_KL.woff2",
+    "src": "node_modules/@fontsource/roboto/files/roboto-latin-700-normal.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2": {
+    "file": "assets/fa-brands-400-Bs6tcqqs.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2": {
+    "file": "assets/fa-regular-400-DRN8N0d1.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2": {
+    "file": "assets/fa-solid-900-IAB4Droh.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2": {
+    "file": "assets/fa-v4compatibility-CErXDOsT.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2"
   },
   "public/images/banner.png": {
     "file": "images/banner-BpWHoSL3.png",
     "src": "public/images/banner.png"
   },
   "resources/css/app.css": {
-    "file": "css/core/app-DYaU1-XU.css",
+    "file": "css/core/app-BKRM6-Tu.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -28,12 +92,12 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "js/app-BL2BFwCx.js",
+    "file": "js/app-cwQqz7mr.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "imports": [
-      "_vendor-upsvKRUO.js"
+      "_vendor-CA6tP7uT.js"
     ]
   }
 }

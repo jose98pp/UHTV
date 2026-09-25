@@ -78,6 +78,8 @@ class NewsService
      */
     public function getCategoryPageData($categoryId, $perPage = 10)
     {
+        $perPage = min(max((int) $perPage, 6), 30);
+
         // Obtener la categoría
         $categoria = Category::findOrFail($categoryId);
         
@@ -85,7 +87,8 @@ class NewsService
         $noticiasCategoria = Noticia::where('category_id', $categoryId)
             ->where('publicada', true)
             ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+            ->paginate($perPage)
+            ->withQueryString();
         
         // Procesar noticias de la categoría con contenido sanitizado e imágenes seguras
         $noticiasCategoria->getCollection()->transform(function ($noticia) {

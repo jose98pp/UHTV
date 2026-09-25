@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión - UHTV Admin</title>
     @vite(['resources/css/app.css'])
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 min-h-screen flex items-center justify-center">
     <div class="max-w-md w-full mx-4">

@@ -138,7 +138,10 @@ class PortadaController extends Controller
         }
 
         try {
-            $perPage = $request->get('per_page', 10);
+            $perPage = min(
+                max((int) $request->get('per_page', 10), 6),
+                30
+            );
             $data = $this->newsService->getCategoryPageData($categoria->id, $perPage);
             
             // Verificar que tenemos los datos necesarios
@@ -173,7 +176,10 @@ class PortadaController extends Controller
     public function search(Request $request)
     {
         $query = $request->get('q', '');
-        $perPage = $request->get('per_page', 12);
+        $perPage = min(
+            max((int) $request->get('per_page', 12), 6),
+            30
+        );
         
         if (empty($query)) {
             return redirect()->route('portada')->with('error', 'Por favor ingresa un término de búsqueda.');
@@ -186,7 +192,8 @@ class PortadaController extends Controller
                   ->orWhere('contenido', 'LIKE', "%{$query}%");
             })
             ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+            ->paginate($perPage)
+            ->withQueryString();
 
         // Procesar noticias con el servicio
         $noticias->getCollection()->transform(function ($noticia) {

@@ -8,12 +8,8 @@
     <meta name="image-upload-url" content="{{ route('admin.noticias.images.store') }}">
     <title>@yield('title', 'Panel Admin - UHTV')</title>
     
-    <!-- FontAwesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+    <!-- Bootstrap, Tailwind, FontAwesome y fuentes se cargan mediante Vite. -->
+
     <!-- CSS personalizado -->
     <link href="{{ asset('css/optimized.css') }}" rel="stylesheet">
     
@@ -544,11 +540,11 @@
     <!-- Mobile Sidebar Overlay -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden"></div>
     
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+    <!-- Bootstrap JS se carga desde el bundle Vite de app.js. -->
+
     <!-- Scripts -->
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
         // Sidebar Toggle for mobile
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebar = document.getElementById('sidebar');
@@ -607,6 +603,7 @@
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
         });
     </script>
     

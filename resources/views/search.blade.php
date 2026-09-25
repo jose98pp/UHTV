@@ -128,7 +128,7 @@
 
                 <!-- Paginación -->
                 <div class="flex justify-center">
-                    {{ $noticias->appends(['q' => $query])->links() }}
+                    {{ $noticias->appends(request()->query())->links() }}
                 </div>
             @else
                 <!-- Sin Resultados -->

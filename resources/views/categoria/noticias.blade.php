@@ -174,9 +174,9 @@
                         <div class="flex items-center space-x-3">
                             <span class="text-sm text-gray-600 dark:text-gray-400">Ver por página:</span>
                             <select onchange="changePerPage(this.value)" class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-shadow">
-                                <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
-                                <option value="20" {{ request('per_page') == 20 ? 'selected' : '' }}>20</option>
-                                <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                                <option value="10" {{ $noticiasCategoria->perPage() == 10 ? 'selected' : '' }}>10</option>
+                                <option value="20" {{ $noticiasCategoria->perPage() == 20 ? 'selected' : '' }}>20</option>
+                                <option value="30" {{ $noticiasCategoria->perPage() == 30 ? 'selected' : '' }}>30</option>
                             </select>
                         </div>
                     </div>
