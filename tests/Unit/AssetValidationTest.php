@@ -54,15 +54,23 @@ class AssetValidationTest extends TestCase
     }
 
     /**
-     * Test that main layout references all required CSS files
+     * Test that the layout assets partial references all required CSS files
      */
     public function test_main_layout_references_required_css(): void
     {
         $layoutPath = resource_path('views/layouts/main.blade.php');
+        $assetsPath = resource_path('views/partials/head/assets.blade.php');
         $this->assertFileExists($layoutPath, 'Main layout file does not exist');
+        $this->assertFileExists($assetsPath, 'Head assets partial does not exist');
 
-        $content = File::get($layoutPath);
-        
+        $layoutContent = File::get($layoutPath);
+        $this->assertStringContainsString(
+            "@include('partials.head.assets')",
+            $layoutContent,
+            'Main layout does not include the head assets partial'
+        );
+
+        $assetsContent = File::get($assetsPath);
         $requiredCssFiles = [
             'resources/css/app.css',
             'resources/css/browser-compatibility.css',
@@ -73,8 +81,8 @@ class AssetValidationTest extends TestCase
         foreach ($requiredCssFiles as $cssFile) {
             $this->assertStringContainsString(
                 $cssFile,
-                $content,
-                "Main layout does not reference CSS file: {$cssFile}"
+                $assetsContent,
+                "Head assets partial does not reference CSS file: {$cssFile}"
             );
         }
     }

@@ -93,22 +93,52 @@ class NoticiaRepository
     }
 
     /**
-     * Obtener categorías con sus noticias (optimizado para portada)
+     * Obtener categorías con hasta cinco noticias por categoría.
+     *
+     * Laravel 10 aplica un take() dentro de with() a toda la consulta
+     * eager-load, no a cada categoría. Por eso se construye un UNION ALL
+     * con una rama limitada por categoría y se asigna la relación manualmente.
      */
     public function getCategoriesWithNews($newsLimit = 5)
     {
-        return Category::with(['noticias' => function ($query) use ($newsLimit) {
-            $query->select('id', 'titulo', 'imagen', 'contenido', 'category_id', 'created_at')
-                  ->where('publicada', true)
-                  ->orderBy('created_at', 'desc')
-                  ->take($newsLimit);
-        }])
-        ->whereHas('noticias', function ($query) {
+        $newsLimit = max(1, (int) $newsLimit);
+
+        $categorias = Category::whereHas('noticias', function ($query) {
             $query->where('publicada', true);
         })
-        ->orderBy('name', 'asc')
-        ->take(8) // Mostrar más categorías como Brújula Digital
-        ->get();
+            ->orderBy('name', 'asc')
+            ->orderBy('id', 'asc')
+            ->take(8) // Mostrar más categorías como Brújula Digital
+            ->get();
+
+        if ($categorias->isEmpty()) {
+            return $categorias;
+        }
+
+        $noticiasQuery = null;
+
+        foreach ($categorias as $categoria) {
+            $query = Noticia::select('id', 'titulo', 'imagen', 'contenido', 'category_id', 'created_at')
+                ->where('publicada', true)
+                ->where('category_id', $categoria->id)
+                ->orderByDesc('created_at')
+                ->orderByDesc('id')
+                ->limit($newsLimit);
+
+            $noticiasQuery = $noticiasQuery
+                ? $noticiasQuery->unionAll($query)
+                : $query;
+        }
+
+        $noticiasPorCategoria = $noticiasQuery->get()->groupBy('category_id');
+
+        foreach ($categorias as $categoria) {
+            $noticias = $noticiasPorCategoria->get($categoria->id, collect());
+
+            $categoria->setRelation('noticias', new Collection($noticias->all()));
+        }
+
+        return $categorias;
     }
 
     /**

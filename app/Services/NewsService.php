@@ -26,7 +26,7 @@ class NewsService
             // Obtener una sola colección de noticias para carrusel y ticker.
             $ultimasNoticias = $this->noticiaRepository->getPublishedNews(12);
 
-            // Obtener categorías con hasta cinco noticias ya cargadas en eager loading.
+            // Obtener categorías con hasta cinco noticias por categoría mediante una consulta agrupada.
             $seccionesCategoria = $this->noticiaRepository->getCategoriesWithNews(5);
 
             // Procesar una sola vez cada noticia y reutilizar los resultados.
@@ -35,7 +35,7 @@ class NewsService
             });
             $noticias = $ultimasNoticias->take(10);
             
-            // Reutilizar la relación eager-loaded para las secciones de portada.
+            // Reutilizar la relación ya cargada para las secciones de portada.
             // Se asigna también la categoría padre para que el acceso a la URL
             // en Blade no genere una consulta adicional por noticia.
             $noticiasPorCategoria = [];
