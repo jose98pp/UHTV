@@ -1,8 +1,8 @@
-      <!-- Right Column: BCB Currency Exchange + Live Badge + Dark Mode Toggle -->
-      <div class="flex items-center justify-end space-x-3 w-full md:w-1/3">
+      <!-- Right Column Elements: BCB Currency Exchange + Live Badge + Dark Mode Toggle -->
+      <div class="flex items-center space-x-2">
         <!-- Widget Cotización BCB (Tipo de Cambio Bolivia en Tiempo Real) -->
         <div class="relative" id="widget-tipo-cambio-bcb">
-          <div id="bcb-pill-btn" class="flex items-center gap-2 bg-black/40 hover:bg-black/60 backdrop-blur-md border border-purple-400/30 hover:border-purple-300 px-3 py-1.5 rounded-full text-white shadow-md transition-all duration-300 cursor-pointer select-none group" title="Ver cotización oficial del BCB en tiempo real">
+          <div id="bcb-pill-btn" class="flex items-center gap-2 bg-black/50 hover:bg-black/70 backdrop-blur-md border border-white/25 hover:border-purple-300 px-3 py-1.5 rounded-full text-white shadow-md transition-all duration-300 cursor-pointer select-none group" title="Ver cotización oficial del BCB en tiempo real">
             <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded text-[10px] font-black bg-gradient-to-r from-purple-600 to-indigo-600 text-white border border-purple-400/40 tracking-wider shadow-sm">
               BCB
             </span>

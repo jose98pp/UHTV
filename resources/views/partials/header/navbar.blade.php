@@ -2,21 +2,35 @@
      BANNER PUBLICITARIO - A todo el ancho, entre header y nav
      Posición: portada_top
 ================================================================ -->
+<style>
+  .uhtv-banner-matched-height {
+    height: 140px;
+    min-height: 140px;
+  }
+  .uhtv-banner-img-matched {
+    height: 100%;
+    max-height: 132px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+  }
+</style>
+
 @if(isset($banners['portada_top']) && $banners['portada_top']->count() > 0)
-  <div class="w-full bg-gray-100 dark:bg-gray-950 border-b-2 border-purple-700/30 flex justify-center items-center py-1">
-    <div class="container mx-auto px-2 sm:px-4 flex justify-center items-center">
-      <a href="{{ $banners['portada_top']->first()->link ?? '#' }}" target="_blank" rel="noopener noreferrer sponsored" class="block w-full text-center" title="Publicidad">
+  <div class="uhtv-banner-matched-height w-full bg-gray-100 dark:bg-gray-950 border-b-2 border-purple-700/30 flex justify-center items-center py-1">
+    <div class="container mx-auto px-2 sm:px-4 flex justify-center items-center h-full">
+      <a href="{{ $banners['portada_top']->first()->link ?? '#' }}" target="_blank" rel="noopener noreferrer sponsored" class="flex justify-center items-center w-full h-full text-center" title="Publicidad">
         <img src="{{ asset($banners['portada_top']->first()->image_path) }}"
              alt="{{ $banners['portada_top']->first()->title ?? 'Publicidad' }}"
-             class="w-full max-w-5xl h-auto max-h-[260px] md:max-h-[300px] object-contain object-center mx-auto rounded transition-all duration-300"
+             class="uhtv-banner-img-matched mx-auto rounded transition-all duration-300"
              loading="eager"
              decoding="async">
       </a>
     </div>
   </div>
 @else
-  {{-- Placeholder cuando no hay banner: franja de color con logo/texto --}}
-  <div class="w-full bg-gradient-to-r from-purple-900 via-indigo-800 to-purple-900 dark:from-gray-900 dark:via-indigo-950 dark:to-gray-900 border-b-2 border-purple-600/40 flex items-center justify-center" style="height:80px;">
+  {{-- Placeholder cuando no hay banner: franja de color con logo/texto con misma altura del header --}}
+  <div class="uhtv-banner-matched-height w-full bg-gradient-to-r from-purple-900 via-indigo-800 to-purple-900 dark:from-gray-900 dark:via-indigo-950 dark:to-gray-900 border-b-2 border-purple-600/40 flex items-center justify-center">
     <div class="flex items-center gap-4 opacity-60">
       <span class="text-white/50 text-xs uppercase tracking-widest font-semibold">Espacio Publicitario</span>
       <div class="h-px w-24 bg-white/20"></div>
@@ -165,6 +179,42 @@
   <div id="mobileMenuOverlay" class="fixed inset-0 bg-black bg-opacity-50 opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden z-40"></div>
 </nav>
 
+  @if(isset($transmisionEnVivo) && $transmisionEnVivo)
+    <!-- Alerta En Vivo Principal -->
+    <aside id="liveStreamAlert" class="bg-gradient-to-r from-red-700 via-red-600 to-red-800 text-white shadow-xl border-y border-red-500/40 relative z-30 transition-all duration-300" aria-label="Alerta de Transmisión en Vivo">
+      <div class="container mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center space-x-3 overflow-hidden min-w-0">
+          <span class="relative flex h-3 w-3 flex-shrink-0">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-90"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+          </span>
+          <span class="bg-black/40 text-white text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full border border-white/20 flex-shrink-0">
+            🔴 EN VIVO AHORA
+          </span>
+          <span class="text-xs sm:text-sm font-bold truncate text-white">
+            {{ $transmisionEnVivo->titulo }}
+          </span>
+        </div>
+        <div class="flex items-center space-x-2 flex-shrink-0 ml-auto">
+          <button type="button" 
+                  data-open-live-modal 
+                  data-stream-embed="{{ $transmisionEnVivo->embed_url }}"
+                  data-stream-title="{{ $transmisionEnVivo->titulo }}"
+                  class="bg-white text-red-600 hover:bg-gray-100 font-extrabold text-xs px-3.5 py-1.5 rounded-full shadow transition-all duration-200 flex items-center gap-1.5 transform hover:scale-105 cursor-pointer">
+            <i class="fas fa-play text-[9px]"></i>
+            <span>Ver Transmisión</span>
+          </button>
+          <button type="button" 
+                  onclick="document.getElementById('liveStreamAlert').style.display='none'" 
+                  class="text-white/80 hover:text-white p-1 focus:outline-none transition-colors" 
+                  title="Cerrar aviso">
+            <i class="fas fa-times text-xs"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+  @endif
+
 @if(request()->routeIs('portada'))
   @include('partials.multimedia-strip', [
       'contenidos' => $multimediaPortada ?? ($transmisionesRecientes ?? collect())
@@ -229,39 +279,3 @@
     });
   });
 </script>
-
-  @if(isset($transmisionEnVivo) && $transmisionEnVivo)
-    <!-- Alerta En Vivo Principal -->
-    <aside id="liveStreamAlert" class="bg-gradient-to-r from-red-700 via-red-600 to-red-800 text-white shadow-xl border-y border-red-500/40 relative z-30 transition-all duration-300" aria-label="Alerta de Transmisión en Vivo">
-      <div class="container mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
-        <div class="flex items-center space-x-3 overflow-hidden min-w-0">
-          <span class="relative flex h-3 w-3 flex-shrink-0">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-90"></span>
-            <span class="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
-          </span>
-          <span class="bg-black/40 text-white text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full border border-white/20 flex-shrink-0">
-            🔴 EN VIVO AHORA
-          </span>
-          <span class="text-xs sm:text-sm font-bold truncate text-white">
-            {{ $transmisionEnVivo->titulo }}
-          </span>
-        </div>
-        <div class="flex items-center space-x-2 flex-shrink-0 ml-auto">
-          <button type="button" 
-                  data-open-live-modal 
-                  data-stream-embed="{{ $transmisionEnVivo->embed_url }}"
-                  data-stream-title="{{ $transmisionEnVivo->titulo }}"
-                  class="bg-white text-red-600 hover:bg-gray-100 font-extrabold text-xs px-3.5 py-1.5 rounded-full shadow transition-all duration-200 flex items-center gap-1.5 transform hover:scale-105 cursor-pointer">
-            <i class="fas fa-play text-[9px]"></i>
-            <span>Ver Transmisión</span>
-          </button>
-          <button type="button" 
-                  onclick="document.getElementById('liveStreamAlert').style.display='none'" 
-                  class="text-white/80 hover:text-white p-1 focus:outline-none transition-colors" 
-                  title="Cerrar aviso">
-            <i class="fas fa-times text-xs"></i>
-          </button>
-        </div>
-      </div>
-    </aside>
-  @endif

@@ -1,19 +1,46 @@
-  <!-- Header Principal -->
-  <header class="relative bg-gradient-to-r from-purple-900 via-purple-700 to-red-700 dark:from-gray-950 dark:via-purple-900 dark:to-red-900 min-h-[110px] flex items-center justify-center text-white overflow-hidden py-4 px-4 transition-colors duration-300">
+  <!-- Estilos dedicados para sincronizar exactamente la altura del Header con el Banner Publicitario -->
+  <style>
+    .uhtv-header-matched-height {
+      height: 140px;
+      min-height: 140px;
+    }
+  </style>
+
+  <!-- Header Principal con Imagen de Fondo Herencia Invisible + UHTV en Ultra HD -->
+  <header class="uhtv-header-matched-height relative flex items-center justify-center text-white overflow-hidden py-1 px-4 shadow-lg border-b border-purple-800/40 select-none"
+          style="background: linear-gradient(90deg, #5b5be3 0%, #4033b0 45%, #010102 100%);">
     
-    <!-- Overlay de oscurecimiento para legibilidad premium -->
-    <div class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/55 to-black/75 dark:from-black/85 dark:via-black/65 dark:to-black/85"></div>
-    
-    <!-- Elementos decorativos de fondo -->
-    <div class="absolute inset-0 opacity-10">
-      <div class="absolute top-4 left-4 w-32 h-32 bg-white rounded-full blur-3xl"></div>
-      <div class="absolute bottom-4 right-4 w-24 h-24 bg-purple-300 rounded-full blur-2xl"></div>
+    <!-- Imagen de cabecera en Ultra HD 4K (3840px) estirada en todo el contenido sin pixelarse -->
+    <div class="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none overflow-hidden">
+      <img src="{{ asset('images/header-herencia-uhtv-hd.png') }}"
+           alt="Herencia Invisible - Última Hora TV"
+           class="w-full h-full object-cover object-center select-none"
+           style="image-rendering: -webkit-optimize-contrast; image-rendering: high-quality;"
+           loading="eager"
+           decoding="async">
     </div>
 
-    <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4 relative z-10">
-    @include('partials.header.weather')
-    @include('partials.header.logo')
-    @include('partials.header.currency')
+    <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-1 md:gap-2 relative z-10 h-full py-1">
+      <!-- Enlaces a logos: en mobile distribuidos en fila superior, en desktop ocupan 2/3 -->
+      <div class="flex items-center justify-between md:justify-start w-full md:w-2/3 h-1/2 md:h-full">
+        <!-- Columna Izquierda: Herencia Invisible -->
+        <div class="flex items-center justify-start md:w-1/2">
+          <a href="/" class="block w-28 sm:w-44 md:w-52 h-10 sm:h-14 md:h-16 rounded-xl hover:bg-white/5 transition-all" title="Herencia Invisible">
+            <span class="sr-only">Herencia Invisible</span>
+          </a>
+        </div>
+
+        <!-- Columna Central: Última Hora TV -->
+        <div class="flex items-center justify-center md:w-1/2">
+          @include('partials.header.logo')
+        </div>
+      </div>
+
+      <!-- Columna Derecha: Clima + Cotizaciones BCB + En Vivo + Modo Oscuro -->
+      <div class="flex items-center justify-center md:justify-end flex-wrap gap-1.5 md:gap-2 w-full md:w-1/3 h-1/2 md:h-full">
+        @include('partials.header.weather')
+        @include('partials.header.currency')
+      </div>
     </div>
   </header>
 

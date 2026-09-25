@@ -22,6 +22,7 @@ class ImageOptimizationAttributesTest extends TestCase
     /** @test */
     public function main_layout_renders_optimized_logo_and_pwa_image_tags()
     {
+        config(['app.enable_pwa_install' => true]);
         $response = $this->get('/');
         $response->assertStatus(200);
 

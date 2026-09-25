@@ -126,7 +126,9 @@ class AssetIntegrityTest extends TestCase
      */
     private function findReferencedCssFiles(): array
     {
-        $bladeFiles = File::glob(resource_path('views/**/*.blade.php'));
+        $bladeFiles = collect(File::allFiles(resource_path('views')))
+            ->filter(fn($file) => str_ends_with($file->getFilename(), '.blade.php'))
+            ->map(fn($file) => $file->getPathname());
         $cssFiles = [];
 
         foreach ($bladeFiles as $file) {
