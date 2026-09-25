@@ -7,6 +7,7 @@ export default {
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
+        './resources/js/**/*.js',
         './public/js/**/*.js',
     ],
 
@@ -19,6 +20,18 @@ export default {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
             colors: {
+                primary: {
+                    50: '#f5f3ff',
+                    100: '#ede9fe',
+                    200: '#ddd6fe',
+                    300: '#c4b5fd',
+                    400: '#a78bfa',
+                    500: '#8b5cf6',
+                    600: '#7c3aed',
+                    700: '#6d28d9',
+                    800: '#5b21b6',
+                    900: '#4c1d95',
+                },
                 // Colores personalizados para UHTV
                 'uhtv-purple': {
                     50: '#f3f1ff',

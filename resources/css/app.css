@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* resources/js/components/Footer.css */
 
 .social-icons a {
