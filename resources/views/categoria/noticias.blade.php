@@ -120,11 +120,18 @@
                         
                         <div class="flex items-center justify-between mt-auto pt-6 border-t border-gray-100 dark:border-gray-700">
                             <div class="flex items-center space-x-4">
-                                <button class="text-gray-400 hover:text-red-500 transition-colors duration-300">
-                                    <i class="far fa-heart"></i>
+                                <button type="button" 
+                                        class="btn-favorite text-gray-400 hover:text-red-500 transition-all duration-300 transform active:scale-125 focus:outline-none cursor-pointer"
+                                        data-noticia-id="{{ $noticia->id }}"
+                                        title="Guardar en favoritos">
+                                    <i class="far fa-heart text-lg"></i>
                                 </button>
-                                <button class="text-gray-400 hover:text-blue-500 transition-colors duration-300">
-                                    <i class="far fa-share-square"></i>
+                                <button type="button" 
+                                        class="btn-share text-gray-400 hover:text-blue-500 transition-all duration-300 transform active:scale-125 focus:outline-none cursor-pointer"
+                                        data-url="{{ $noticia->url }}"
+                                        data-title="{{ addslashes($noticia->titulo) }}"
+                                        title="Compartir noticia">
+                                    <i class="far fa-share-square text-lg"></i>
                                 </button>
                             </div>
                             <a href="{{ $noticia->url }}" 
@@ -229,6 +236,109 @@ function changePerPage(perPage) {
     url.searchParams.delete('page'); // Reset to first page
     window.location.href = url.toString();
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const STORAGE_KEY = 'uhtv_favoritos_noticias';
+
+    function getFavorites() {
+        try {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveFavorites(favorites) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
+        } catch (e) {}
+    }
+
+    function showToast(message, iconHtml = '<i class="fas fa-check text-emerald-400"></i>') {
+        const existing = document.getElementById('uhtv-category-toast');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.id = 'uhtv-category-toast';
+        toast.className = 'fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-gray-950/95 text-white px-5 py-3.5 rounded-2xl shadow-2xl border border-white/10 backdrop-blur-md transform translate-y-8 opacity-0 transition-all duration-300 font-medium text-sm select-none';
+        toast.innerHTML = `${iconHtml}<span>${message}</span>`;
+        document.body.appendChild(toast);
+
+        requestAnimationFrame(() => {
+            toast.classList.remove('translate-y-8', 'opacity-0');
+        });
+
+        setTimeout(() => {
+            toast.classList.add('translate-y-8', 'opacity-0');
+            setTimeout(() => toast.remove(), 300);
+        }, 2800);
+    }
+
+    // Inicializar estado de botones de favoritos
+    const favorites = getFavorites();
+    document.querySelectorAll('.btn-favorite').forEach(btn => {
+        const id = parseInt(btn.dataset.noticiaId, 10);
+        const icon = btn.querySelector('i');
+        if (favorites.includes(id)) {
+            icon.classList.remove('far', 'text-gray-400');
+            icon.classList.add('fas', 'text-red-500');
+            btn.classList.add('text-red-500');
+            btn.classList.remove('text-gray-400');
+        }
+
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            let currentFavorites = getFavorites();
+            const isFav = currentFavorites.includes(id);
+
+            if (isFav) {
+                currentFavorites = currentFavorites.filter(item => item !== id);
+                icon.classList.remove('fas', 'text-red-500');
+                icon.classList.add('far', 'text-gray-400');
+                btn.classList.remove('text-red-500');
+                btn.classList.add('text-gray-400');
+                showToast('Eliminada de tus favoritos', '<i class="far fa-heart text-gray-300"></i>');
+            } else {
+                currentFavorites.push(id);
+                icon.classList.remove('far', 'text-gray-400');
+                icon.classList.add('fas', 'text-red-500');
+                btn.classList.remove('text-gray-400');
+                btn.classList.add('text-red-500');
+                // Micro-animación de rebote
+                icon.classList.add('scale-125');
+                setTimeout(() => icon.classList.remove('scale-125'), 200);
+                showToast('Añadida a tus favoritos', '<i class="fas fa-heart text-red-500"></i>');
+            }
+            saveFavorites(currentFavorites);
+        });
+    });
+
+    // Manejar botón de compartir
+    document.querySelectorAll('.btn-share').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const url = btn.dataset.url || window.location.href;
+            const title = btn.dataset.title || document.title;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: title,
+                    url: url
+                }).catch(() => {});
+            } else if (navigator.clipboard) {
+                navigator.clipboard.writeText(url).then(() => {
+                    showToast('Enlace copiado al portapapeles', '<i class="fas fa-link text-blue-400"></i>');
+                }).catch(() => {
+                    showToast('No se pudo copiar el enlace', '<i class="fas fa-exclamation-circle text-amber-400"></i>');
+                });
+            } else {
+                window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(title + ' ' + url), '_blank');
+            }
+        });
+    });
+});
 </script>
 
 <!-- Banner Publicitario -->

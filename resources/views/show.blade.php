@@ -168,7 +168,7 @@
                         </span>
                         <span class="flex items-center">
                             <i class="fas fa-eye mr-2 text-purple-600 dark:text-purple-400"></i>
-                            <span id="view-count">{{ rand(100, 1000) }} lecturas</span>
+                            <span id="view-count">{{ number_format($noticia->views ?? 0, 0, ',', '.') }} {{ ($noticia->views ?? 0) == 1 ? 'lectura' : 'lecturas' }}</span>
                         </span>
                     </div>
                     <div class="flex items-center space-x-4 mt-2 md:mt-0">

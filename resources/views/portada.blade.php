@@ -197,10 +197,10 @@
 <!-- Cintillo de Últimas Noticias (News Ticker) -->
 @if($ultimasNoticias->isNotEmpty())
   <section id="latest-news-ticker"
-           class="latest-news-ticker bg-uhtv-purple-700 dark:bg-uhtv-purple-900 text-white py-2 overflow-hidden border-y border-uhtv-purple-500 dark:border-uhtv-purple-800 relative shadow-md z-10"
+           class="latest-news-ticker text-gray-900 dark:text-white py-2 overflow-hidden border-y relative shadow-md z-10"
            aria-label="Últimas noticias">
     <div class="container mx-auto px-4 flex items-center gap-3">
-      <div class="bg-gradient-to-r from-[#0099ff] via-[#4f46e5] to-[#9333ea] text-white text-xs font-bold uppercase px-3.5 py-1.5 rounded-full flex-shrink-0 shadow-sm z-20 relative border border-white/20">
+      <div class="latest-news-ticker__label bg-gradient-to-r from-[#0099ff] via-[#4f46e5] to-[#9333ea] text-white text-xs font-bold uppercase px-3.5 py-1.5 rounded-full flex-shrink-0 shadow-sm z-20 relative border border-white/20">
         <span class="inline-flex items-center gap-2">
           <i class="fas fa-circle text-[8px]" aria-hidden="true"></i>
           Último Momento
@@ -214,11 +214,10 @@
           <div class="latest-news-ticker__group">
             @foreach($ultimasNoticias->take(10) as $noticia)
               <span class="latest-news-ticker__item inline-flex items-center text-sm font-medium">
-                <a href="{{ $noticia->url }}" class="flex items-center hover:text-uhtv-purple-200 transition-colors focus:outline-none focus:underline">
-                  <span class="text-uhtv-purple-300 mr-2">[{{ $noticia->created_at->format('H:i') }}]</span>
+                <a href="{{ $noticia->url }}" class="flex items-center text-gray-900 dark:text-white hover:text-purple-700 dark:hover:text-purple-300 transition-colors focus:outline-none focus:underline">
                   <span>{{ $noticia->titulo }}</span>
                 </a>
-                <span class="text-uhtv-purple-400 mx-3" aria-hidden="true">•</span>
+                <span class="text-purple-600 dark:text-purple-300 mx-3" aria-hidden="true">•</span>
               </span>
             @endforeach
           </div>
@@ -229,6 +228,23 @@
 @endif
 
 <style>
+  .latest-news-ticker {
+    background-color: #ffffff !important;
+    border-color: #e5e7eb !important;
+    color: #111827 !important;
+  }
+
+  .dark .latest-news-ticker {
+    background-color: #111827 !important;
+    border-color: #4b5563 !important;
+    color: #f9fafb !important;
+  }
+
+  .latest-news-ticker__label {
+    background: linear-gradient(90deg, #0099ff, #4f46e5, #9333ea) !important;
+    color: #ffffff !important;
+  }
+
   .latest-news-ticker__viewport {
     min-width: 0;
     white-space: nowrap;
@@ -685,7 +701,7 @@ document.addEventListener('DOMContentLoaded', function() {
 ================================================================ -->
 @php
     $channelUrl = 'https://www.youtube.com/@UHTVBolivia';
-    $channelPlaylistEmbed = 'https://www.youtube-nocookie.com/embed?listType=playlist&list=UUx8c9O9qP3IjtnEKkEr-Bng';
+    $channelPlaylistEmbed = 'https://www.youtube-nocookie.com/embed?listType=playlist&list=UUx8c9O9qP3IjtnEKkEr-Bng&mute=1&playsinline=1';
     
     // Obtener videos grabados (excluyendo emisiones en vivo que van al botón superior)
     $uhtvVideos = ($transmisionesRecientes ?? collect())
@@ -939,25 +955,38 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </section>
 
-@push('scripts')
 <script>
 function playCinemaFacadeVideo() {
     const iframe = document.getElementById('uhtv-cinema-iframe');
     const facade = document.getElementById('uhtv-cinema-facade');
     if (!iframe || !facade) return;
 
-    let src = iframe.getAttribute('data-default-src') || iframe.src;
-    if (!src.includes('autoplay=')) {
-        src += (src.includes('?') ? '&' : '?') + 'autoplay=1';
-    }
-    iframe.src = autoPlayParams(src);
+    const src = iframe.getAttribute('data-default-src') || iframe.src;
+    iframe.src = mutedPlaybackUrl(src);
     iframe.classList.remove('hidden');
     facade.classList.add('hidden');
 }
 
-function autoPlayParams(url) {
+function mutedPlaybackUrl(url) {
     if (!url) return '';
-    return url.includes('autoplay=') ? url : url + (url.includes('?') ? '&' : '?') + 'autoplay=1';
+
+    try {
+        const parsedUrl = new URL(url, window.location.origin);
+        const host = parsedUrl.hostname.replace(/^www\./, '');
+        const isYouTube = host === 'youtube.com'
+            || host === 'youtube-nocookie.com'
+            || host === 'youtu.be';
+
+        parsedUrl.searchParams.set('autoplay', '1');
+        if (isYouTube) {
+            parsedUrl.searchParams.set('mute', '1');
+            parsedUrl.searchParams.set('playsinline', '1');
+        }
+
+        return parsedUrl.toString();
+    } catch (error) {
+        return url + (url.includes('?') ? '&' : '?') + 'autoplay=1&mute=1';
+    }
 }
 
 function selectCinemaVideo(button) {
@@ -995,7 +1024,7 @@ function selectCinemaVideo(button) {
 
     // Cargar iframe con reproducción automática
     if (iframe) {
-        iframe.src = autoPlayParams(embedUrl);
+        iframe.src = mutedPlaybackUrl(embedUrl);
         iframe.classList.remove('hidden');
     }
     if (facade) {
@@ -1011,8 +1040,5 @@ function selectCinemaVideo(button) {
     button.classList.add('bg-white/10', 'border-red-500/50', 'shadow-md');
 }
 </script>
-@endpush
-
-
 
 @endsection
