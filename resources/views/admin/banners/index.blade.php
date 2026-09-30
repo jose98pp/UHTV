@@ -24,210 +24,35 @@
 
     <!-- Banner Location Guide -->
     <div class="card shadow mb-4">
-        <div class="card-header bg-gradient-primary text-white py-3">
+        <div class="card-header bg-gradient-primary text-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
             <h6 class="m-0 font-weight-bold">
-                <i class="fas fa-map-marked-alt me-2"></i>Ubicaciones de Banners en el Sitio
+                <i class="fas fa-map-marked-alt me-2"></i>Dónde aparece cada banner en el sitio
             </h6>
+            <span class="badge bg-white text-primary">
+                {{ count($bannerLocations) }} espacios publicitarios
+            </span>
         </div>
         <div class="card-body">
+            <p class="text-muted small mb-4">
+                Cada dibujo representa la maquetación real de la página. El recuadro morado
+                señala el hueco exacto donde se mostrará el banner, con las mismas proporciones
+                que tendrá en producción.
+            </p>
+
             <div class="row g-4">
-                <!-- Header Banner -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-primary">
-                        <div class="card-header bg-primary text-white">
-                            <h6 class="mb-0"><i class="fas fa-image me-2"></i>Banner Principal (Header)</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="position-relative mb-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 120px; border-radius: 8px; overflow: hidden;">
-                                <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center text-white">
-                                    <div class="text-center">
-                                        <i class="fas fa-image fa-3x mb-2 opacity-50"></i>
-                                        <p class="mb-0 small">Fondo del Header</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="small mb-2"><strong>Ubicación:</strong> <code>portada_top</code></p>
-                            <p class="small mb-2"><strong>Descripción:</strong> Imagen de fondo del encabezado principal del sitio</p>
-                            <p class="small mb-0"><strong>Dimensiones recomendadas:</strong> 1920x400px</p>
-                        </div>
-                    </div>
-                </div>
+                @foreach($bannerLocations as $uhtvKey)
+                    <div class="col-md-6 col-xl-4">
+                        @include('admin.banners.partials.location-card', ['locationKey' => $uhtvKey])
 
-                <!-- Portada Middle Banner -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-warning">
-                        <div class="card-header bg-warning text-dark">
-                            <h6 class="mb-0"><i class="fas fa-image me-2"></i>Banner Medio (Portada)</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="position-relative mb-3" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); height: 120px; border-radius: 8px; overflow: hidden;">
-                                <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center text-dark">
-                                    <div class="text-center">
-                                        <i class="fas fa-image fa-3x mb-2 opacity-50"></i>
-                                        <p class="mb-0 small">Centro de Portada</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="small mb-2"><strong>Ubicación:</strong> <code>portada_middle</code></p>
-                            <p class="small mb-2"><strong>Descripción:</strong> Banner en el centro de la página principal</p>
-                            <p class="small mb-0"><strong>Dimensiones recomendadas:</strong> 1200x300px</p>
-                        </div>
+                        @if(\App\Services\BannerLocationService::publicUrl($uhtvKey))
+                            <a href="{{ \App\Services\BannerLocationService::publicUrl($uhtvKey) }}"
+                               target="_blank" rel="noopener"
+                               class="btn btn-sm btn-outline-secondary w-100 mt-2">
+                                <i class="fas fa-external-link-alt me-1"></i>Ver la portada real
+                            </a>
+                        @endif
                     </div>
-                </div>
-
-                <!-- Sidebar Banner -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-info">
-                        <div class="card-header bg-info text-white">
-                            <h6 class="mb-0"><i class="fas fa-image me-2"></i>Banner Lateral (Sidebar)</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="position-relative mb-3" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); height: 120px; border-radius: 8px; overflow: hidden;">
-                                <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center text-white">
-                                    <div class="text-center">
-                                        <i class="fas fa-image fa-3x mb-2 opacity-50"></i>
-                                        <p class="mb-0 small">Sidebar Derecho</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="small mb-2"><strong>Ubicación:</strong> <code>sidebar</code></p>
-                            <p class="small mb-2"><strong>Descripción:</strong> Banner publicitario en la barra lateral derecha de la portada</p>
-                            <p class="small mb-0"><strong>Dimensiones recomendadas:</strong> 300x600px</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Footer Banner -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-success">
-                        <div class="card-header bg-success text-white">
-                            <h6 class="mb-0"><i class="fas fa-image me-2"></i>Banner Inferior (Footer)</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="position-relative mb-3" style="background: linear-gradient(135deg, #28a745 0%, #218838 100%); height: 120px; border-radius: 8px; overflow: hidden;">
-                                <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center text-white">
-                                    <div class="text-center">
-                                        <i class="fas fa-image fa-3x mb-2 opacity-50"></i>
-                                        <p class="mb-0 small">Banner Horizontal</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="small mb-2"><strong>Ubicación:</strong> <code>footer</code></p>
-                            <p class="small mb-2"><strong>Descripción:</strong> Banner horizontal debajo del menú de navegación</p>
-                            <p class="small mb-0"><strong>Dimensiones recomendadas:</strong> 1200x200px</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Category Top Banner -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-danger">
-                        <div class="card-header bg-danger text-white">
-                            <h6 class="mb-0"><i class="fas fa-image me-2"></i>Banner Categoría (Arriba)</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="position-relative mb-3" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); height: 120px; border-radius: 8px; overflow: hidden;">
-                                <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center text-white">
-                                    <div class="text-center">
-                                        <i class="fas fa-image fa-3x mb-2 opacity-50"></i>
-                                        <p class="mb-0 small">Top Categoría</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="small mb-2"><strong>Ubicación:</strong> <code>category_top</code></p>
-                            <p class="small mb-2"><strong>Descripción:</strong> Banner superior en páginas de categorías</p>
-                            <p class="small mb-0"><strong>Dimensiones recomendadas:</strong> 1200x250px</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Category Bottom Banner -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-secondary">
-                        <div class="card-header bg-secondary text-white">
-                            <h6 class="mb-0"><i class="fas fa-image me-2"></i>Banner Categoría (Abajo)</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="position-relative mb-3" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); height: 120px; border-radius: 8px; overflow: hidden;">
-                                <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center text-white">
-                                    <div class="text-center">
-                                        <i class="fas fa-image fa-3x mb-2 opacity-50"></i>
-                                        <p class="mb-0 small">Bottom Categoría</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="small mb-2"><strong>Ubicación:</strong> <code>category_bottom</code></p>
-                            <p class="small mb-2"><strong>Descripción:</strong> Banner inferior en páginas de categorías</p>
-                            <p class="small mb-0"><strong>Dimensiones recomendadas:</strong> 1200x250px</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Show Top Banner -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-dark">
-                        <div class="card-header bg-dark text-white">
-                            <h6 class="mb-0"><i class="fas fa-image me-2"></i>Banner Noticia (Arriba)</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="position-relative mb-3" style="background: linear-gradient(135deg, #343a40 0%, #23272b 100%); height: 120px; border-radius: 8px; overflow: hidden;">
-                                <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center text-white">
-                                    <div class="text-center">
-                                        <i class="fas fa-image fa-3x mb-2 opacity-50"></i>
-                                        <p class="mb-0 small">Top Noticia</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="small mb-2"><strong>Ubicación:</strong> <code>show_top</code></p>
-                            <p class="small mb-2"><strong>Descripción:</strong> Banner superior en páginas de detalle de noticias</p>
-                            <p class="small mb-0"><strong>Dimensiones recomendadas:</strong> 1200x250px</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Show Bottom Banner -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-light">
-                        <div class="card-header bg-light text-dark">
-                            <h6 class="mb-0"><i class="fas fa-image me-2"></i>Banner Noticia (Abajo)</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="position-relative mb-3" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); height: 120px; border-radius: 8px; overflow: hidden;">
-                                <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center text-dark">
-                                    <div class="text-center">
-                                        <i class="fas fa-image fa-3x mb-2 opacity-50"></i>
-                                        <p class="mb-0 small">Bottom Noticia</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="small mb-2"><strong>Ubicación:</strong> <code>show_bottom</code></p>
-                            <p class="small mb-2"><strong>Descripción:</strong> Banner inferior en páginas de detalle de noticias</p>
-                            <p class="small mb-0"><strong>Dimensiones recomendadas:</strong> 1200x250px</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Popup Banner -->
-                <div class="col-md-4">
-                    <div class="card h-100 border-primary" style="border-color: #6f42c1 !important;">
-                        <div class="card-header text-white" style="background-color: #6f42c1 !important;">
-                            <h6 class="mb-0"><i class="fas fa-window-restore me-2"></i>Publicidad Emergente (Popup)</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="position-relative mb-3" style="background: linear-gradient(135deg, #6f42c1 0%, #8c68cd 100%); height: 120px; border-radius: 8px; overflow: hidden;">
-                                <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center text-white">
-                                    <div class="text-center">
-                                        <i class="fas fa-window-restore fa-3x mb-2 opacity-50"></i>
-                                        <p class="mb-0 small">Popup Portada</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="small mb-2"><strong>Ubicación:</strong> <code>popup</code></p>
-                            <p class="small mb-2"><strong>Descripción:</strong> Ventana emergente publicitaria al cargar la portada (cerrable con la tecla 'Z')</p>
-                            <p class="small mb-0"><strong>Dimensiones recomendadas:</strong> 800x800px o formato vertical/cuadrado</p>
-                        </div>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </div>
@@ -272,22 +97,14 @@
                                 </td>
                                 <td>
                                     @php
-                                        $locationInfo = [
-                                            'portada_top' => ['label' => 'Header Principal', 'color' => 'primary', 'icon' => 'fa-image'],
-                                            'portada_middle' => ['label' => 'Portada Medio', 'color' => 'warning', 'icon' => 'fa-image'],
-                                            'sidebar' => ['label' => 'Sidebar Derecho', 'color' => 'info', 'icon' => 'fa-sidebar'],
-                                            'footer' => ['label' => 'Footer Horizontal', 'color' => 'success', 'icon' => 'fa-rectangle-ad'],
-                                            'category_top' => ['label' => 'Categoría Arriba', 'color' => 'danger', 'icon' => 'fa-image'],
-                                            'category_bottom' => ['label' => 'Categoría Abajo', 'color' => 'secondary', 'icon' => 'fa-image'],
-                                            'show_top' => ['label' => 'Noticia Arriba', 'color' => 'dark', 'icon' => 'fa-image'],
-                                            'show_bottom' => ['label' => 'Noticia Abajo', 'color' => 'light', 'icon' => 'fa-image']
-                                        ];
-                                        $info = $locationInfo[$banner->location] ?? ['label' => $banner->location, 'color' => 'secondary', 'icon' => 'fa-question'];
+                                        $info = \App\Services\BannerLocationService::get($banner->location)
+                                            ?? ['label' => $banner->location, 'color' => 'secondary', 'icon' => 'fa-question'];
                                     @endphp
                                     <span class="badge bg-{{ $info['color'] }}">
                                         <i class="fas {{ $info['icon'] }} me-1"></i>{{ $info['label'] }}
                                     </span>
                                     <br><small class="text-muted"><code>{{ $banner->location }}</code></small>
+                                    <br><small class="text-muted"><i class="fas fa-ruler-combined me-1"></i>{{ $info['dimensions'] ?? '' }}</small>
                                 </td>
                                 <td class="text-center">
                                     <span class="badge bg-secondary">{{ $banner->position }}</span>

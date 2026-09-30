@@ -8,6 +8,11 @@
     <meta name="image-upload-url" content="{{ route('admin.noticias.images.store') }}">
     <title>@yield('title', 'Panel Admin - UHTV')</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/icons/apple-touch-icon.png') }}">
+
     <!-- Bootstrap, Tailwind, FontAwesome y fuentes se cargan mediante Vite. -->
 
     <!-- CSS personalizado -->

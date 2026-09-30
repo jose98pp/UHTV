@@ -31,6 +31,14 @@
 
     <link rel="sitemap" type="application/xml" title="Sitemap" href="{{ route('sitemap') }}">
 
+    <!-- Favicon e Iconos de la Aplicación -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/icons/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/icons/icon.svg') }}">
+
     <!-- PWA y Metadatos Móviles -->
     @if(config('app.enable_pwa_install', false))
     <link rel="manifest" href="/manifest.json">
@@ -38,5 +46,3 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="UHTV">
     @endif
-    <link rel="apple-touch-icon" href="{{ asset('images/icons/apple-touch-icon.png') }}">
-    <link rel="icon" type="image/svg+xml" href="{{ asset('images/icons/icon.svg') }}">

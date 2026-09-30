@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
+use App\Services\BannerLocationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -13,12 +14,16 @@ class BannerController extends Controller
     public function index()
     {
         $banners = Banner::orderBy('location')->orderBy('position')->get();
-        return view('admin.banners.index', compact('banners'));
+        $bannerLocations = BannerLocationService::keys();
+
+        return view('admin.banners.index', compact('banners', 'bannerLocations'));
     }
 
     public function create()
     {
-        return view('admin.banners.create');
+        $bannerLocations = BannerLocationService::keys();
+
+        return view('admin.banners.create', compact('bannerLocations'));
     }
 
     public function store(Request $request)
@@ -27,12 +32,13 @@ class BannerController extends Controller
             'title' => 'required|string|max:255',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'link' => 'nullable|url',
-            'location' => 'required|string',
+            'location' => ['required', 'string', BannerLocationService::validationRule()],
             'position' => 'integer',
             'active' => 'boolean'
         ]);
 
         $data = $request->except('image');
+        $data['position'] = $request->integer('position', 0);
         
         if ($request->hasFile('image')) {
             $file = $request->file('image');
@@ -51,7 +57,9 @@ class BannerController extends Controller
     public function edit($id)
     {
         $banner = Banner::findOrFail($id);
-        return view('admin.banners.edit', compact('banner'));
+        $bannerLocations = BannerLocationService::keys();
+
+        return view('admin.banners.edit', compact('banner', 'bannerLocations'));
     }
 
     public function update(Request $request, $id)
@@ -62,12 +70,13 @@ class BannerController extends Controller
             'title' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'link' => 'nullable|url',
-            'location' => 'required|string',
+            'location' => ['required', 'string', BannerLocationService::validationRule()],
             'position' => 'integer',
             'active' => 'boolean'
         ]);
 
         $data = $request->except('image');
+        $data['position'] = $request->integer('position', 0);
 
         if ($request->hasFile('image')) {
             // Delete old image if exists

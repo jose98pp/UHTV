@@ -13,84 +13,27 @@
     </div>
 
     <!-- Banner Location Guide -->
-    <div class="card shadow mb-4">
-        <div class="card-header bg-gradient-primary text-white py-3">
-            <h6 class="m-0 font-weight-bold">
-                <i class="fas fa-map-marked-alt me-2"></i>Guía de Ubicaciones de Banners
-            </h6>
-        </div>
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <div class="card border-primary">
-                        <div class="card-body p-2 text-center">
-                            <div class="mb-2" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 60px; border-radius: 4px;"></div>
-                            <small class="fw-bold">Header Principal</small>
-                            <br><small class="text-muted"><code>portada_top</code></small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card border-warning">
-                        <div class="card-body p-2 text-center">
-                            <div class="mb-2" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); height: 60px; border-radius: 4px;"></div>
-                            <small class="fw-bold">Portada Medio</small>
-                            <br><small class="text-muted"><code>portada_middle</code></small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card border-info">
-                        <div class="card-body p-2 text-center">
-                            <div class="mb-2" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); height: 60px; border-radius: 4px;"></div>
-                            <small class="fw-bold">Sidebar Derecho</small>
-                            <br><small class="text-muted"><code>sidebar</code></small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card border-success">
-                        <div class="card-body p-2 text-center">
-                            <div class="mb-2" style="background: linear-gradient(135deg, #28a745 0%, #218838 100%); height: 60px; border-radius: 4px;"></div>
-                            <small class="fw-bold">Footer Horizontal</small>
-                            <br><small class="text-muted"><code>footer</code></small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card border-danger">
-                        <div class="card-body p-2 text-center">
-                            <div class="mb-2" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); height: 60px; border-radius: 4px;"></div>
-                            <small class="fw-bold">Categoría Arriba</small>
-                            <br><small class="text-muted"><code>category_top</code></small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card border-secondary">
-                        <div class="card-body p-2 text-center">
-                            <div class="mb-2" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); height: 60px; border-radius: 4px;"></div>
-                            <small class="fw-bold">Categoría Abajo</small>
-                            <br><small class="text-muted"><code>category_bottom</code></small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card border-dark">
-                        <div class="card-body p-2 text-center">
-                            <div class="mb-2" style="background: linear-gradient(135deg, #343a40 0%, #23272b 100%); height: 60px; border-radius: 4px;"></div>
-                            <small class="fw-bold">Noticia Arriba</small>
-                            <br><small class="text-muted"><code>show_top</code></small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card border-light">
-                        <div class="card-body p-2 text-center">
-                            <div class="mb-2" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); height: 60px; border-radius: 4px;"></div>
-                            <small class="fw-bold">Noticia Abajo</small>
-                            <br><small class="text-muted"><code>show_bottom</code></small>
-                        </div>
+    <div class="accordion shadow mb-4" id="bannerGuideAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bannerGuide">
+                    <i class="fas fa-map-marked-alt me-2 text-primary"></i>
+                    <span class="fw-bold">Guía de ubicaciones: dónde sale cada banner</span>
+                    <span class="badge bg-primary ms-2">{{ count($bannerLocations) }}</span>
+                </button>
+            </h2>
+            <div id="bannerGuide" class="accordion-collapse collapse" data-bs-parent="#bannerGuideAccordion">
+                <div class="accordion-body">
+                    <p class="text-muted small mb-4">
+                        Cada dibujo muestra la maquetación real de la página. El recuadro morado
+                        marca el hueco exacto donde se verá el banner.
+                    </p>
+                    <div class="row g-4">
+                        @foreach($bannerLocations as $uhtvKey)
+                            <div class="col-md-6 col-xl-4">
+                                @include('admin.banners.partials.location-card', ['locationKey' => $uhtvKey])
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -129,17 +72,12 @@
                             <div class="col-md-6 mb-3">
                                 <label for="location" class="form-label">Ubicación</label>
                                 <select class="form-select @error('location') is-invalid @enderror" id="location" name="location" required>
-                                    <option value="">Seleccionar ubicación...</option>
-                                    <option value="portada_top" {{ old('location', $banner->location) == 'portada_top' ? 'selected' : '' }}>Portada - Entre el Header y el Nav (100% ancho)</option>
-                                    <option value="portada_middle" {{ old('location', $banner->location) == 'portada_middle' ? 'selected' : '' }}>Portada - Arriba del Widget YouTube</option>
-                                    <option value="sidebar" {{ old('location', $banner->location) == 'sidebar' ? 'selected' : '' }}>Portada - Debajo de "Más Leídas" (Sidebar)</option>
-                                    <option value="footer" {{ old('location', $banner->location) == 'footer' ? 'selected' : '' }}>Pie de Página (Footer)</option>
-                                    <option value="category_top" {{ old('location', $banner->location) == 'category_top' ? 'selected' : '' }}>Categoría - Arriba</option>
-                                    <option value="category_bottom" {{ old('location', $banner->location) == 'category_bottom' ? 'selected' : '' }}>Categoría - Abajo</option>
-                                    <option value="show_top" {{ old('location', $banner->location) == 'show_top' ? 'selected' : '' }}>Noticia - Arriba del artículo</option>
-                                    <option value="show_bottom" {{ old('location', $banner->location) == 'show_bottom' ? 'selected' : '' }}>Noticia - Al final, antes del footer</option>
-                                    <option value="popup" {{ old('location', $banner->location) == 'popup' ? 'selected' : '' }}>Publicidad Emergente (Popup - Portada)</option>
+                                    @include('admin.banners.partials.location-options', ['selected' => $banner->location])
                                 </select>
+                                <small class="text-muted d-block mt-1">
+                                    Al elegir la ubicación verás a la derecha un dibujo de la página
+                                    con el hueco donde se mostrará este banner.
+                                </small>
                                 @error('location')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -173,6 +111,13 @@
                             </div>
                             <small class="text-muted d-block mt-2">Deja vacío para mantener la imagen actual.</small>
                         </div>
+
+                        <div class="mt-3">
+                            @include('admin.banners.partials.live-preview', [
+                                'selected' => $banner->location,
+                                'imageUrl' => asset($banner->image_path),
+                            ])
+                        </div>
                     </div>
                 </div>
 
@@ -191,16 +136,21 @@
     function previewImage(input) {
         const preview = document.getElementById('imagePreview');
         const noImageText = document.getElementById('noImageText');
-        
+
         if (input.files && input.files[0]) {
             const reader = new FileReader();
-            
+
             reader.onload = function(e) {
                 preview.src = e.target.result;
                 preview.style.display = 'block';
                 noImageText.style.display = 'none';
+
+                // Refleja la imagen en el hueco del mockup de la ubicación elegida.
+                if (typeof window.setBannerPreviewImage === 'function') {
+                    window.setBannerPreviewImage(e.target.result);
+                }
             }
-            
+
             reader.readAsDataURL(input.files[0]);
         }
     }
