@@ -39,3 +39,4 @@ php.ini
 error_log
 **/error_log
 *.sql
+!docker/database/init.sql
