@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('banners', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->string('image_path');
-            $table->string('link')->nullable();
-            $table->string('location'); // portada_top, portada_middle, sidebar, footer, etc.
-            $table->boolean('active')->default(true);
-            $table->integer('position')->default(0);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('banners')) {
+            Schema::create('banners', function (Blueprint $table) {
+                $table->id();
+                $table->string('title');
+                $table->string('image_path');
+                $table->string('link')->nullable();
+                $table->string('location'); // portada_top, portada_middle, sidebar, footer, etc.
+                $table->boolean('active')->default(true);
+                $table->integer('position')->default(0);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

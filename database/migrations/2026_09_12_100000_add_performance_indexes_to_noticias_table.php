@@ -11,15 +11,31 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('noticias', function (Blueprint $table) {
-            // Índices simples
-            $table->index('publicada', 'noticias_publicada_index');
-            $table->index('created_at', 'noticias_created_at_index');
+        try {
+            $existingIndexes = collect(\Illuminate\Support\Facades\DB::select("SHOW INDEX FROM noticias"))
+                ->pluck('Key_name')
+                ->unique()
+                ->all();
+        } catch (\Throwable $e) {
+            $existingIndexes = [];
+        }
 
-            // Índices compuestos para consultas recurrentes en portada y categorías
-            $table->index(['category_id', 'publicada'], 'noticias_category_id_publicada_index');
-            $table->index(['publicada', 'created_at'], 'noticias_publicada_created_at_index');
-            $table->index(['publicada', 'views'], 'noticias_publicada_views_index');
+        Schema::table('noticias', function (Blueprint $table) use ($existingIndexes) {
+            if (!in_array('noticias_publicada_index', $existingIndexes)) {
+                $table->index('publicada', 'noticias_publicada_index');
+            }
+            if (!in_array('noticias_created_at_index', $existingIndexes)) {
+                $table->index('created_at', 'noticias_created_at_index');
+            }
+            if (!in_array('noticias_category_id_publicada_index', $existingIndexes)) {
+                $table->index(['category_id', 'publicada'], 'noticias_category_id_publicada_index');
+            }
+            if (!in_array('noticias_publicada_created_at_index', $existingIndexes)) {
+                $table->index(['publicada', 'created_at'], 'noticias_publicada_created_at_index');
+            }
+            if (!in_array('noticias_publicada_views_index', $existingIndexes)) {
+                $table->index(['publicada', 'views'], 'noticias_publicada_views_index');
+            }
         });
     }
 

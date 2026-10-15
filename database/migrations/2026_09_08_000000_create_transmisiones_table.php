@@ -11,23 +11,25 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transmisiones', function (Blueprint $table) {
-            $table->id();
-            $table->string('titulo');
-            $table->text('descripcion')->nullable();
-            $table->enum('tipo', ['en_vivo', 'podcast', 'clip', 'programa'])->default('en_vivo');
-            $table->enum('plataforma', ['youtube', 'facebook', 'tiktok', 'twitch', 'otro'])->default('youtube');
-            $table->text('url');
-            $table->text('embed_url')->nullable();
-            $table->string('thumbnail_url')->nullable();
-            $table->boolean('en_vivo')->default(false)->index();
-            $table->boolean('activo')->default(true)->index();
-            $table->boolean('destacado')->default(false)->index();
-            $table->unsignedBigInteger('views')->default(0);
-            $table->string('duracion', 50)->nullable();
-            $table->timestamp('fecha_transmision')->nullable()->index();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('transmisiones')) {
+            Schema::create('transmisiones', function (Blueprint $table) {
+                $table->id();
+                $table->string('titulo');
+                $table->text('descripcion')->nullable();
+                $table->enum('tipo', ['en_vivo', 'podcast', 'clip', 'programa'])->default('en_vivo');
+                $table->enum('plataforma', ['youtube', 'facebook', 'tiktok', 'twitch', 'otro'])->default('youtube');
+                $table->text('url');
+                $table->text('embed_url')->nullable();
+                $table->string('thumbnail_url')->nullable();
+                $table->boolean('en_vivo')->default(false)->index();
+                $table->boolean('activo')->default(true)->index();
+                $table->boolean('destacado')->default(false)->index();
+                $table->unsignedBigInteger('views')->default(0);
+                $table->string('duracion', 50)->nullable();
+                $table->timestamp('fecha_transmision')->nullable()->index();
+                $table->timestamps();
+            });
+        }
     }
 
     /**
