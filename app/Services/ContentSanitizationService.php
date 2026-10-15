@@ -7,7 +7,7 @@ use HTMLPurifier_Config;
 
 class ContentSanitizationService
 {
-    private HTMLPurifier $purifier;
+    private ?HTMLPurifier $purifier = null;
     
     public function __construct()
     {
@@ -26,8 +26,12 @@ class ContentSanitizationService
         // First remove unwanted characters
         $content = $this->removeUnwantedCharacters($content);
         
-        // Then sanitize HTML
-        return $this->purifier->purify($content);
+        // Then sanitize HTML using Purifier if available, or fallback
+        if ($this->purifier) {
+            return $this->purifier->purify($content);
+        }
+
+        return $this->fallbackSanitize($content);
     }
     
     /**
@@ -49,7 +53,11 @@ class ContentSanitizationService
         $content = $this->normalizeWhitespace($content);
         
         // Sanitize HTML while preserving rich text formatting
-        $content = $this->purifier->purify($content);
+        if ($this->purifier) {
+            $content = $this->purifier->purify($content);
+        } else {
+            $content = $this->fallbackSanitize($content);
+        }
         
         return $content;
     }
@@ -147,61 +155,86 @@ class ContentSanitizationService
     /**
      * Create and configure HTML Purifier instance
      */
-    private function createPurifier(): HTMLPurifier
+    private function createPurifier(): ?HTMLPurifier
     {
-        $config = HTMLPurifier_Config::createDefault();
-        
-        // Set cache directory
-        $config->set('Cache.SerializerPath', storage_path('app/htmlpurifier'));
-        
-        // Allow specific HTML elements and attributes
-        $config->set('HTML.Allowed', implode(',', [
-            // Text formatting
-            'p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'sub', 'sup',
+        if (!class_exists('HTMLPurifier') || !class_exists('HTMLPurifier_Config')) {
+            return null;
+        }
+
+        try {
+            $config = HTMLPurifier_Config::createDefault();
             
-            // Headings
-            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+            // Set cache directory
+            $cachePath = storage_path('app/htmlpurifier');
+            if (!file_exists($cachePath)) {
+                @mkdir($cachePath, 0775, true);
+            }
+            $config->set('Cache.SerializerPath', $cachePath);
             
-            // Lists
-            'ul', 'ol', 'li',
+            // Allow specific HTML elements and attributes
+            $config->set('HTML.Allowed', implode(',', [
+                // Text formatting
+                'p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'sub', 'sup',
+                
+                // Headings
+                'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                
+                // Lists
+                'ul', 'ol', 'li',
+                
+                // Links
+                'a[href|title|target]',
+                
+                // Images
+                'img[src|alt|title|width|height|class]',
+                
+                // Tables
+                'table[class]', 'thead', 'tbody', 'tr', 'th[colspan|rowspan]', 'td[colspan|rowspan]',
+                
+                // Divs and spans for styling
+                'div[class|style]', 'span[class|style]',
+                
+                // Block quotes
+                'blockquote', 'cite'
+            ]));
             
-            // Links
-            'a[href|title|target]',
+            // Allow specific CSS properties for styling
+            $config->set('CSS.AllowedProperties', [
+                'color', 'background-color', 'font-size', 'font-weight', 'font-style',
+                'text-align', 'text-decoration', 'margin', 'padding',
+                'border', 'border-color', 'border-style', 'border-width'
+            ]);
             
-            // Images
-            'img[src|alt|title|width|height|class]',
+            // Configure links
+            $config->set('HTML.TargetBlank', true); // Add target="_blank" to external links
+            $config->set('Attr.AllowedFrameTargets', ['_blank', '_self']);
             
-            // Tables
-            'table[class]', 'thead', 'tbody', 'tr', 'th[colspan|rowspan]', 'td[colspan|rowspan]',
+            // Image configuration
+            $config->set('HTML.MaxImgLength', 1200);
+            $config->set('CSS.MaxImgLength', '1200px');
             
-            // Divs and spans for styling
-            'div[class|style]', 'span[class|style]',
+            // Security settings
+            $config->set('HTML.Nofollow', true); // Add rel="nofollow" to external links
+            $config->set('HTML.SafeIframe', true);
+            $config->set('URI.SafeIframeRegexp', '%^(https?:)?//(www\.youtube(?:-nocookie)?\.com/embed/|player\.vimeo\.com/video/)%');
             
-            // Block quotes
-            'blockquote', 'cite'
-        ]));
-        
-        // Allow specific CSS properties for styling
-        $config->set('CSS.AllowedProperties', [
-            'color', 'background-color', 'font-size', 'font-weight', 'font-style',
-            'text-align', 'text-decoration', 'margin', 'padding',
-            'border', 'border-color', 'border-style', 'border-width'
-        ]);
-        
-        // Configure links
-        $config->set('HTML.TargetBlank', true); // Add target="_blank" to external links
-        $config->set('Attr.AllowedFrameTargets', ['_blank', '_self']);
-        
-        // Image configuration
-        $config->set('HTML.MaxImgLength', 1200);
-        $config->set('CSS.MaxImgLength', '1200px');
-        
-        // Security settings
-        $config->set('HTML.Nofollow', true); // Add rel="nofollow" to external links
-        $config->set('HTML.SafeIframe', true);
-        $config->set('URI.SafeIframeRegexp', '%^(https?:)?//(www\.youtube(?:-nocookie)?\.com/embed/|player\.vimeo\.com/video/)%');
-        
-        return new HTMLPurifier($config);
+            return new HTMLPurifier($config);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('No se pudo inicializar HTMLPurifier: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Fallback de sanitización cuando HTMLPurifier no está instalado en el servidor
+     */
+    private function fallbackSanitize(string $content): string
+    {
+        // Eliminar scripts maliciosos y eventos inline (onclick, onerror, etc.)
+        $clean = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $content);
+        $clean = preg_replace('#\bon\w+\s*=\s*(["\']).*?\1#is', '', $clean);
+        $clean = preg_replace('#javascript\s*:#is', '', $clean);
+        return $clean;
     }
     
     /**
