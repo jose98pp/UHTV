@@ -1,12 +1,12 @@
       <!-- Right Column Elements: BCB Currency Exchange + Live Badge + Dark Mode Toggle -->
-      <div class="flex items-center space-x-2">
+      <div class="flex items-center space-x-1 sm:space-x-2">
         <!-- Widget Cotización BCB (Tipo de Cambio Bolivia en Tiempo Real) -->
         <div class="relative" id="widget-tipo-cambio-bcb">
-          <div id="bcb-pill-btn" class="flex items-center gap-2 bg-black/50 hover:bg-black/70 backdrop-blur-md border border-white/25 hover:border-purple-300 px-3 py-1.5 rounded-full text-white shadow-md transition-all duration-300 cursor-pointer select-none group" title="Ver cotización oficial del BCB en tiempo real">
+          <div id="bcb-pill-btn" class="flex items-center gap-1 sm:gap-2 bg-black/50 hover:bg-black/70 backdrop-blur-md border border-white/25 hover:border-purple-300 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-white shadow-md transition-all duration-300 cursor-pointer select-none group" title="Ver cotización oficial del BCB en tiempo real">
             <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded text-[10px] font-black bg-gradient-to-r from-purple-600 to-indigo-600 text-white border border-purple-400/40 tracking-wider shadow-sm">
               BCB
             </span>
-            <div id="bcb-ticker-display" class="flex items-center gap-1.5 text-xs font-semibold tracking-tight transition-all duration-300">
+            <div id="bcb-ticker-display" class="flex items-center gap-1 sm:gap-1.5 text-xs font-semibold tracking-tight transition-all duration-300">
               <span class="text-white font-bold">USD</span>
               <span class="text-purple-200 text-[10px] font-normal">C:</span><span id="bcb-pill-compra" class="text-emerald-300 font-bold font-mono text-[11px]">11.00</span>
               <span class="text-white/40 font-light">/</span>
@@ -17,7 +17,7 @@
           </div>
 
           <!-- Dropdown con cotizaciones oficiales BCB en tiempo real -->
-          <div id="bcb-dropdown-panel" class="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-gray-900/95 dark:bg-gray-950/95 backdrop-blur-xl border border-purple-500/30 rounded-2xl shadow-2xl p-3.5 z-50 hidden opacity-0 transition-all duration-200 text-white">
+          <div id="bcb-dropdown-panel" class="absolute right-0 top-full mt-2 w-[calc(100vw-1.5rem)] max-w-sm sm:w-80 bg-gray-900/95 dark:bg-gray-950/95 backdrop-blur-xl border border-purple-500/30 rounded-2xl shadow-2xl p-3 sm:p-3.5 z-50 hidden opacity-0 transition-all duration-200 text-white">
             <div class="flex items-center justify-between border-b border-purple-500/20 pb-2 mb-2.5">
               <div class="flex items-center gap-2">
                 <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-white shadow-inner">
@@ -133,7 +133,7 @@
           </button>
         @endif
         <!-- Selector de tema oscuro -->
-        <button data-dark-mode-toggle class="p-2 rounded-full hover:bg-white/10 text-white transition-colors" aria-label="Cambiar tema" style="background: none; border: none; cursor: pointer;">
+        <button data-dark-mode-toggle class="p-1 sm:p-2 rounded-full hover:bg-white/10 text-white transition-colors" aria-label="Cambiar tema" style="background: none; border: none; cursor: pointer;">
           <i class="fas fa-sun text-yellow-400 sun-icon hidden"></i>
           <i class="fas fa-moon moon-icon text-gray-100"></i>
         </button>

@@ -82,8 +82,7 @@ class BannerLocationGuideTest extends TestCase
             $response->assertSee($key);
         }
 
-        // Cada maqueta resalta su propio hueco. portada_middle aparece dos veces
-        // porque en la portada ese bloque se dibuja dos veces.
+        // Cada maqueta resalta su propio hueco según la estructura definida.
         $countActiveSlots = function (array $rows) use (&$countActiveSlots) {
             $total = 0;
             foreach ($rows as $row) {

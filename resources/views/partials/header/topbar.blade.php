@@ -7,10 +7,11 @@
   </style>
 
   <!-- Header Principal con Imagen de Fondo Herencia Invisible + UHTV en Ultra HD -->
-  <header class="uhtv-header-matched-height relative flex items-center justify-center text-white overflow-hidden py-1 px-4 shadow-lg border-b border-purple-800/40 select-none"
+  <header id="uhtv-main-header"
+          class="relative flex flex-col md:flex-row items-center justify-between text-white select-none border-b border-purple-800/40"
           style="background: linear-gradient(90deg, #5b5be3 0%, #4033b0 45%, #010102 100%);">
     
-    <!-- Imagen de cabecera en Ultra HD 4K (3840px) estirada en todo el contenido sin pixelarse -->
+    <!-- Imagen de cabecera en Ultra HD 4K (SOLO esta capa tiene overflow-hidden para no recortar el menú del dólar) -->
     <div class="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none overflow-hidden">
       <img src="{{ asset('images/header-herencia-uhtv-hd.png') }}"
            alt="Herencia Invisible - Última Hora TV"
@@ -20,26 +21,30 @@
            decoding="async">
     </div>
 
-    <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-1 md:gap-2 relative z-10 h-full py-1">
-      <!-- Enlaces a logos: en mobile distribuidos en fila superior, en desktop ocupan 2/3 -->
-      <div class="flex items-center justify-between md:justify-start w-full md:w-2/3 h-1/2 md:h-full">
-        <!-- Columna Izquierda: Herencia Invisible -->
-        <div class="flex items-center justify-start md:w-1/2">
-          <a href="/" class="block w-28 sm:w-44 md:w-52 h-10 sm:h-14 md:h-16 rounded-xl hover:bg-white/5 transition-all" title="Herencia Invisible">
-            <span class="sr-only">Herencia Invisible</span>
-          </a>
-        </div>
+    <!-- Barra de Widgets (Clima + Dólar BCB + En Vivo + Modo Oscuro):
+         - En móvil (<md): Barra superior compacta (order-1) con glassmorphism, dejando el logo totalmente despejado.
+         - En desktop (md+): Flotante a la derecha del header dentro de los 140px (order-2), verticalmente centrada.
+    -->
+    <div class="w-full md:w-auto md:absolute md:right-4 md:top-1/2 md:-translate-y-1/2 flex items-center justify-between md:justify-end gap-1.5 sm:gap-2 px-3 py-1.5 md:p-0 bg-black/45 md:bg-transparent backdrop-blur-md md:backdrop-blur-none border-b md:border-none border-white/10 relative z-30 order-1 md:order-2">
+      @include('partials.header.weather')
+      @include('partials.header.currency')
+    </div>
 
-        <!-- Columna Central: Última Hora TV -->
-        <div class="flex items-center justify-center md:w-1/2">
-          @include('partials.header.logo')
-        </div>
+    <!-- Área del Logo (140px de alto perfectamente sincronizado con el banner publicitario):
+         - En móvil: 140px completamente limpios y libres para lucir el logo sin superposición de texto ni widgets.
+         - En desktop: Distribuye los accesos clickeables a los logos.
+    -->
+    <div class="container mx-auto flex items-center justify-between md:justify-start w-full md:w-2/3 uhtv-header-matched-height relative z-10 px-2 sm:px-4 py-1 order-2 md:order-1">
+      <!-- Columna Izquierda: Herencia Invisible -->
+      <div class="flex items-center justify-start md:w-1/2">
+        <a href="/" class="block w-28 sm:w-44 md:w-52 h-10 sm:h-14 md:h-16 rounded-xl hover:bg-white/5 transition-all" title="Herencia Invisible">
+          <span class="sr-only">Herencia Invisible</span>
+        </a>
       </div>
 
-      <!-- Columna Derecha: Clima + Cotizaciones BCB + En Vivo + Modo Oscuro -->
-      <div class="flex items-center justify-center md:justify-end flex-wrap gap-1.5 md:gap-2 w-full md:w-1/3 h-1/2 md:h-full">
-        @include('partials.header.weather')
-        @include('partials.header.currency')
+      <!-- Columna Central: Última Hora TV -->
+      <div class="flex items-center justify-center md:w-1/2">
+        @include('partials.header.logo')
       </div>
     </div>
   </header>
@@ -67,7 +72,9 @@
 
               function toggleBcbDropdown(show) {
                   isDropdownOpen = (show !== undefined) ? show : bcbDropdown.classList.contains('hidden');
+                  const headerEl = document.getElementById('uhtv-main-header');
                   if (isDropdownOpen) {
+                      if (headerEl) headerEl.style.zIndex = '60';
                       bcbDropdown.classList.remove('hidden');
                       requestAnimationFrame(() => {
                           bcbDropdown.classList.remove('opacity-0');
@@ -77,7 +84,10 @@
                       bcbDropdown.classList.add('opacity-0');
                       if (bcbChevron) bcbChevron.classList.remove('rotate-180');
                       setTimeout(() => {
-                          if (!isDropdownOpen) bcbDropdown.classList.add('hidden');
+                          if (!isDropdownOpen) {
+                              bcbDropdown.classList.add('hidden');
+                              if (headerEl) headerEl.style.zIndex = '';
+                          }
                       }, 200);
                   }
               }
@@ -100,6 +110,12 @@
                       toggleBcbDropdown(false);
                   }
               });
+
+              window.addEventListener('scroll', function() {
+                  if (isDropdownOpen) {
+                      toggleBcbDropdown(false);
+                  }
+              }, { passive: true });
 
               setInterval(function() {
                   if (isDropdownOpen) return;
@@ -270,7 +286,7 @@
 
           // 2. Lógica del Clima Rotativo Animado
           const weatherData = [
-              { id: 'sc', name: 'Santa Cruz de la Sierra', temp: 28, code: 0, lat: -17.7863, lon: -63.1812 },
+              { id: 'sc', name: 'Santa Cruz', temp: 28, code: 0, lat: -17.7863, lon: -63.1812 },
               { id: 'lp', name: 'La Paz', temp: 15, code: 3, lat: -16.5001, lon: -68.1193 },
               { id: 'cb', name: 'Cochabamba', temp: 22, code: 2, lat: -17.3895, lon: -66.1568 }
           ];
@@ -314,9 +330,9 @@
               
               ticker.innerHTML = `
                   <span class="flex items-center gap-1.5 transition-all duration-300">
-                      <i class="fas ${iconClass} text-lg"></i>
-                      <span class="font-bold text-white text-sm">${city.temp}°</span>
-                      <span class="text-xs text-gray-200">- ${city.name}</span>
+                      <i class="fas ${iconClass} text-xs sm:text-sm"></i>
+                      <span class="font-bold text-white text-xs">${city.temp}°</span>
+                      <span class="text-[11px] text-gray-200 font-medium truncate max-w-[85px] sm:max-w-none">- ${city.name}</span>
                   </span>
               `;
           }

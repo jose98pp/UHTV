@@ -116,19 +116,6 @@
             </div>
         </div>
 
-        <!-- Línea divisoria -->
-        <div class="border-t border-gray-700 mt-8 pt-6">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-400 text-sm mb-4 md:mb-0">
-                    Desarrollado con <i class="fas fa-heart text-red-500 mx-1"></i> por el equipo de Última Hora TV.
-                </p>
-                <div class="flex items-center space-x-4 text-gray-400 text-sm">
-                    <span>Bolivia</span>
-                    <span>•</span>
-                    <span>{{ date('Y') }}</span>
-                </div>
-            </div>
-        </div>
     </div>
 </footer>
     <!-- Dark Mode Script (debe cargarse antes que otros scripts) -->

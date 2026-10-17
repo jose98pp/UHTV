@@ -229,6 +229,12 @@
     const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
 
     function openMobileMenu() {
+      const headerEl = document.getElementById('uhtv-main-header');
+      if (headerEl) headerEl.style.zIndex = '';
+      const bcbDropdown = document.getElementById('bcb-dropdown-panel');
+      if (bcbDropdown && !bcbDropdown.classList.contains('hidden')) {
+        bcbDropdown.classList.add('hidden', 'opacity-0');
+      }
       mobileMenu.classList.remove('-translate-x-full');
       mobileMenuOverlay.classList.remove('opacity-0', 'pointer-events-none');
       document.body.style.overflow = 'hidden';

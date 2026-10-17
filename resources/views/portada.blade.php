@@ -344,27 +344,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<!-- ============================================================
-     BANNER PUBLICITARIO - Antes de la sección de Categorías
-================================================================ -->
-@if(isset($banners['portada_middle']) && $banners['portada_middle']->count() > 0)
-  <div class="w-full bg-gray-100 dark:bg-gray-900 py-4 border-b border-gray-200 dark:border-gray-800">
-    <div class="container mx-auto px-4">
-      <p class="text-center text-gray-400 dark:text-gray-500 text-[10px] uppercase tracking-widest font-semibold mb-2">Publicidad</p>
-      @foreach($banners['portada_middle'] as $banner)
-        <div class="flex justify-center mb-3 last:mb-0">
-          <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer sponsored" class="block max-w-5xl w-full group">
-            <img src="{{ asset($banner->image_path) }}"
-                 alt="{{ $banner->title }}"
-                 class="w-full h-auto rounded-xl shadow-md hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700"
-                 loading="lazy"
-                 decoding="async">
-          </a>
-        </div>
-      @endforeach
-    </div>
-  </div>
-@endif
+
 
 <!-- Sección de Noticias por Categorías - Estilo Brújula Digital -->
 <section class="py-12 bg-gray-50 dark:bg-gray-800 transition-colors duration-300">
@@ -567,7 +547,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Script de carrusel optimizado -->
 <script src="{{ asset('js/carousel.js') }}"></script>
 
-<!-- Banner Publicitario Portada Medio -->
+<!-- Banner Publicitario Portada Medio - Entre Explora Todas las Secciones y Últimas Noticias -->
 @if(isset($banners['portada_middle']) && $banners['portada_middle']->count() > 0)
     <section class="py-6 bg-gray-50 dark:bg-gray-850 transition-colors duration-300">
         <div class="container mx-auto px-4">
@@ -575,8 +555,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span class="text-gray-400 dark:text-gray-500 text-xs font-semibold uppercase tracking-wider">Publicidad</span>
             </div>
             @foreach($banners['portada_middle'] as $banner)
-                <div class="flex justify-center mb-4">
-                    <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="block max-w-5xl w-full group">
+                <div class="flex justify-center mb-4 last:mb-0">
+                    <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer sponsored" class="block max-w-5xl w-full group">
                         <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
                              class="w-full h-auto rounded-2xl shadow-lg hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700" 
                              loading="lazy"
@@ -585,6 +565,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             @endforeach
         </div>
+    </section>
+@else
+    {{-- Publicidad por defecto (Radio Betania) reubicada entre Explora Secciones y Últimas Noticias --}}
+    <section class="py-6 bg-white dark:bg-gray-900 transition-colors duration-300">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-2">
+          <span class="text-gray-500 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">PUBLICIDAD</span>
+        </div>
+        <div class="flex justify-center">
+          <a href="https://radiobetania.com/" target="_blank" rel="noopener noreferrer sponsored" class="block max-w-5xl w-full group"> 
+            <img src="{{ asset('images/betania.jpg') }}" alt="Publicidad Radio Betania" 
+                 class="w-full h-auto rounded-2xl shadow-lg hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700"
+                 loading="lazy"
+                 decoding="async">
+          </a>
+        </div>
+      </div>
     </section>
 @endif
 
@@ -676,22 +673,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </section>
 
-<!-- Banner Publicitario Horizontal -->
-<section class="py-6 bg-white dark:bg-gray-900 transition-colors duration-300">
-  <div class="container mx-auto px-4">
-    <div class="text-center mb-4">
-      <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">PUBLICIDAD</span>
-    </div>
-    <div class="flex justify-center">
-      <a href="https://radiobetania.com/" target="_blank" rel="noopener noreferrer" class="block max-w-4xl"> 
-        <img src="{{ asset('images/betania.jpg') }}" alt="Publicidad Radio Betania" 
-             class="w-full h-auto rounded-lg shadow-lg hover:opacity-90 transition"
-             loading="lazy"
-             decoding="async">
-      </a>
-    </div>
-  </div>
-</section>
+
 
 
 {{-- Widget de Elfsight (Free YouTube Video Gallery Widget)
