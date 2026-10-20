@@ -7,11 +7,13 @@
             @foreach($banners['footer'] as $banner)
                 <div class="w-full flex justify-center mb-4">
                     <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="block w-full max-w-5xl transition-transform hover:scale-[1.01] duration-300 group"> 
-                        <img src="{{ asset($banner->image_path) }}" 
-                             alt="{{ $banner->title }}" 
-                             class="w-full h-auto rounded-2xl shadow-lg object-cover border border-gray-200 dark:border-gray-700" 
-                             loading="lazy"
-                             decoding="async">
+                        <div class="uhtv-banner-slot w-full">
+                            <img src="{{ asset($banner->image_path) }}" 
+                                 alt="{{ $banner->title }}" 
+                                 class="uhtv-banner-img rounded-2xl shadow-lg" 
+                                 loading="lazy"
+                                 decoding="async">
+                        </div>
                     </a>
                 </div>
             @endforeach
@@ -149,7 +151,7 @@
 
         <a href="{{ $popupBanner->link ?? '#' }}" {{ $popupBanner->link ? 'target="_blank" rel="noopener noreferrer"' : '' }} class="block overflow-hidden group">
           <img src="{{ asset($popupBanner->image_path) }}" alt="{{ $popupBanner->title }}" 
-               class="w-full h-auto object-cover max-h-[70vh] transition-transform duration-500 group-hover:scale-[1.01]"
+               class="uhtv-banner-popup-img"
                loading="lazy"
                decoding="async">
         </a>

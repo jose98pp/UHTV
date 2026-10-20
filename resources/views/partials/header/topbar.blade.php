@@ -1,8 +1,44 @@
   <!-- Estilos dedicados para sincronizar exactamente la altura del Header con el Banner Publicitario -->
   <style>
     .uhtv-header-matched-height {
-      height: 140px;
-      min-height: 140px;
+            height: auto;
+            min-height: 0;
+            aspect-ratio: 3840 / 397;
+        }
+        .uhtv-header-art {
+            top: 41px;
+            height: calc(100% - 41px);
+        }
+        .uhtv-header-heritage-link,
+        .uhtv-header-brand-link {
+            height: 32px;
+        }
+        @media (min-width: 640px) {
+            .uhtv-header-heritage-link,
+            .uhtv-header-brand-link {
+                height: 40px;
+            }
+            .uhtv-header-art {
+                top: 47px;
+                height: calc(100% - 47px);
+            }
+        }
+        @media (min-width: 768px) {
+            .uhtv-header-matched-height {
+                height: 140px;
+                min-height: 140px;
+                aspect-ratio: auto;
+            }
+            .uhtv-header-art {
+                top: 0;
+                height: 100%;
+            }
+            .uhtv-header-heritage-link {
+                height: 64px;
+            }
+            .uhtv-header-brand-link {
+                height: 56px;
+            }
     }
   </style>
 
@@ -12,11 +48,11 @@
           style="background: linear-gradient(90deg, #5b5be3 0%, #4033b0 45%, #010102 100%);">
     
     <!-- Imagen de cabecera en Ultra HD 4K (SOLO esta capa tiene overflow-hidden para no recortar el menú del dólar) -->
-    <div class="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none overflow-hidden">
+    <div class="uhtv-header-art absolute inset-x-0 w-full flex items-center justify-center pointer-events-none overflow-hidden md:inset-y-0">
       <img src="{{ asset('images/header-herencia-uhtv-hd.png') }}"
            alt="Herencia Invisible - Última Hora TV"
-           class="w-full h-full object-cover object-center select-none"
-           style="image-rendering: -webkit-optimize-contrast; image-rendering: high-quality;"
+           class="w-full h-full select-none"
+           style="object-fit: contain; object-position: center;"
            loading="eager"
            decoding="async">
     </div>
@@ -37,7 +73,7 @@
     <div class="container mx-auto flex items-center justify-between md:justify-start w-full md:w-2/3 uhtv-header-matched-height relative z-10 px-2 sm:px-4 py-1 order-2 md:order-1">
       <!-- Columna Izquierda: Herencia Invisible -->
       <div class="flex items-center justify-start md:w-1/2">
-        <a href="/" class="block w-28 sm:w-44 md:w-52 h-10 sm:h-14 md:h-16 rounded-xl hover:bg-white/5 transition-all" title="Herencia Invisible">
+        <a href="/" class="uhtv-header-heritage-link block w-28 sm:w-44 md:w-52 rounded-xl hover:bg-white/5 transition-all" title="Herencia Invisible">
           <span class="sr-only">Herencia Invisible</span>
         </a>
       </div>

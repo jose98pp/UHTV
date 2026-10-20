@@ -90,10 +90,12 @@
             @foreach($banners['show_top'] as $banner)
                 <div class="flex justify-center mb-4">
                     <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="block max-w-5xl w-full group">
-                        <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
-                             class="w-full h-auto rounded-2xl shadow-lg hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700" 
-                             loading="lazy"
-                             decoding="async">
+                        <div class="uhtv-banner-slot w-full">
+                            <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
+                                 class="uhtv-banner-img rounded-2xl shadow-lg hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700" 
+                                 loading="lazy"
+                                 decoding="async">
+                        </div>
                     </a>
                 </div>
             @endforeach
@@ -123,26 +125,55 @@
                     <!-- Botones de Compartir Mejorados -->
                     <div class="flex items-center space-x-3">
                         <span class="text-gray-500 text-sm font-medium">Compartir:</span>
-                        <div class="flex space-x-2">
+                        <div class="flex flex-wrap gap-2" aria-label="Compartir noticia">
                             <a href="https://twitter.com/intent/tweet?text={{ urlencode($noticia->titulo) }}&url={{ urlencode(Request::url()) }}" 
                                target="_blank" 
-                               class="bg-blue-400 hover:bg-blue-500 text-white p-3 rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg">
-                                <i class="fab fa-twitter"></i>
+                               rel="noopener noreferrer"
+                               aria-label="Compartir en X"
+                               title="Compartir en X"
+                               class="bg-gray-900 hover:bg-black text-white w-10 h-10 inline-flex items-center justify-center rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg">
+                                <i class="fab fa-x-twitter" aria-hidden="true"></i>
                             </a>
                             <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(Request::url()) }}" 
                                target="_blank" 
-                               class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg">
-                                <i class="fab fa-facebook"></i>
+                               rel="noopener noreferrer"
+                               aria-label="Compartir en Facebook"
+                               title="Compartir en Facebook"
+                               class="bg-blue-600 hover:bg-blue-700 text-white w-10 h-10 inline-flex items-center justify-center rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg">
+                                <i class="fab fa-facebook-f" aria-hidden="true"></i>
                             </a>
                             <a href="https://api.whatsapp.com/send?text={{ urlencode($noticia->titulo . ' ' . Request::url()) }}" 
                                target="_blank" 
-                               class="bg-green-500 hover:bg-green-600 text-white p-3 rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg">
-                                <i class="fab fa-whatsapp"></i>
+                               rel="noopener noreferrer"
+                               aria-label="Compartir en WhatsApp"
+                               title="Compartir en WhatsApp"
+                               class="bg-green-600 hover:bg-green-700 text-white w-10 h-10 inline-flex items-center justify-center rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg">
+                                <i class="fab fa-whatsapp" aria-hidden="true"></i>
                             </a>
-                            <button onclick="copyToClipboard('{{ Request::url() }}')" 
-                                    class="bg-gray-600 hover:bg-gray-700 text-white p-3 rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg">
-                                <i class="fas fa-link"></i>
+                            <button type="button" data-share-native data-share-title="{{ $noticia->titulo }}"
+                                    aria-label="Compartir noticia desde el teléfono"
+                                    title="Más opciones para compartir"
+                                    class="bg-purple-600 hover:bg-purple-700 text-white w-10 h-10 inline-flex items-center justify-center rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg">
+                                <i class="fas fa-share-nodes" aria-hidden="true"></i>
                             </button>
+                            <button type="button" data-copy-link
+                                    aria-label="Copiar enlace de la noticia"
+                                    title="Copiar enlace"
+                                    class="bg-gray-600 hover:bg-gray-700 text-white w-10 h-10 inline-flex items-center justify-center rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg">
+                                <i class="fas fa-link" aria-hidden="true"></i>
+                            </button>
+                                        <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer"
+                                            aria-label="Abrir Instagram para compartir la noticia"
+                                            title="Abrir Instagram"
+                                    class="bg-pink-600 hover:bg-pink-700 text-white w-10 h-10 inline-flex items-center justify-center rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg">
+                                <i class="fab fa-instagram" aria-hidden="true"></i>
+                                        </a>
+                                        <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer"
+                                            aria-label="Abrir YouTube para compartir la noticia"
+                                            title="Abrir YouTube"
+                                    class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 inline-flex items-center justify-center rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg">
+                                <i class="fab fa-youtube" aria-hidden="true"></i>
+                                        </a>
                         </div>
                     </div>
                 </div>
@@ -270,55 +301,77 @@
             <div class="bg-gradient-to-r from-purple-50 to-red-50 dark:from-purple-900/20 dark:to-red-900/20 rounded-2xl p-8 mb-12 border border-purple-100 dark:border-purple-800 transition-colors duration-300">
                 <div class="text-center">
                     <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 transition-colors duration-300">¿Te gustó esta noticia?</h3>
-                    <p class="text-gray-600 dark:text-gray-300 mb-6 text-lg transition-colors duration-300">Compártela con tus amigos y familiares en redes sociales</p>
-                    <div class="flex flex-wrap justify-center gap-4">
+                    <p class="text-gray-600 dark:text-gray-300 mb-6 text-lg transition-colors duration-300">Compártela con tus amigos o visita nuestras cuentas oficiales</p>
+                    <div class="flex flex-wrap justify-center gap-3">
                         <a href="https://twitter.com/intent/tweet?text={{ urlencode($noticia->titulo) }}&url={{ urlencode(Request::url()) }}" 
-                           target="_blank" 
-                           class="bg-blue-400 hover:bg-blue-500 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center font-semibold transform hover:-translate-y-1 shadow-lg">
-                            <i class="fab fa-twitter mr-3 text-lg"></i>Compartir en Twitter
+                           target="_blank" rel="noopener noreferrer"
+                           class="bg-gray-900 hover:bg-black text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center font-semibold transform hover:-translate-y-1 shadow-lg">
+                            <i class="fab fa-x-twitter mr-3 text-lg" aria-hidden="true"></i>Compartir en X
                         </a>
                         <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(Request::url()) }}" 
-                           target="_blank" 
+                           target="_blank" rel="noopener noreferrer"
                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center font-semibold transform hover:-translate-y-1 shadow-lg">
-                            <i class="fab fa-facebook mr-3 text-lg"></i>Compartir en Facebook
+                            <i class="fab fa-facebook-f mr-3 text-lg" aria-hidden="true"></i>Compartir en Facebook
                         </a>
                         <a href="https://api.whatsapp.com/send?text={{ urlencode($noticia->titulo . ' ' . Request::url()) }}" 
-                           target="_blank" 
+                           target="_blank" rel="noopener noreferrer"
                            class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center font-semibold transform hover:-translate-y-1 shadow-lg">
-                            <i class="fab fa-whatsapp mr-3 text-lg"></i>Enviar por WhatsApp
+                            <i class="fab fa-whatsapp mr-3 text-lg" aria-hidden="true"></i>Enviar por WhatsApp
                         </a>
-                        <button onclick="copyToClipboard('{{ Request::url() }}')" 
-                                class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center font-semibold transform hover:-translate-y-1 shadow-lg">
-                            <i class="fas fa-link mr-3 text-lg"></i>Copiar enlace
+                        <button type="button" data-share-native data-share-title="{{ $noticia->titulo }}"
+                                class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center font-semibold transform hover:-translate-y-1 shadow-lg">
+                            <i class="fas fa-share-nodes mr-3 text-lg" aria-hidden="true"></i>Más opciones
                         </button>
+                        <button type="button" data-copy-link
+                                class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center font-semibold transform hover:-translate-y-1 shadow-lg">
+                            <i class="fas fa-link mr-3 text-lg" aria-hidden="true"></i>Copiar enlace
+                        </button>
+                        <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer"
+                                class="bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center font-semibold transform hover:-translate-y-1 shadow-lg">
+                            <i class="fab fa-instagram mr-3 text-lg" aria-hidden="true"></i>Abrir Instagram
+                        </a>
+                        <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer"
+                                class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center font-semibold transform hover:-translate-y-1 shadow-lg">
+                            <i class="fab fa-youtube mr-3 text-lg" aria-hidden="true"></i>Abrir YouTube
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Script para copiar al portapapeles -->
+            <!-- Acciones para compartir y copiar enlaces -->
             <script>
-                function copyToClipboard(text) {
-                    navigator.clipboard.writeText(text).then(function() {
-                        // Mostrar notificación de éxito
+                async function copyToClipboard(text) {
+                    try {
+                        await navigator.clipboard.writeText(text);
                         const notification = document.createElement('div');
-                        notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
-                        notification.innerHTML = '<i class="fas fa-check mr-2"></i>Enlace copiado al portapapeles';
+                        notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg z-50';
+                        notification.setAttribute('role', 'status');
+                        notification.textContent = 'Enlace copiado';
                         document.body.appendChild(notification);
-                        
-                        setTimeout(() => {
-                            notification.classList.remove('translate-x-full');
-                        }, 100);
-                        
-                        setTimeout(() => {
-                            notification.classList.add('translate-x-full');
-                            setTimeout(() => {
-                                document.body.removeChild(notification);
-                            }, 300);
-                        }, 3000);
-                    }).catch(function(err) {
-                        console.error('Error al copiar: ', err);
-                    });
+                        setTimeout(() => notification.remove(), 2500);
+                    } catch (error) {
+                        window.prompt('Copia el enlace de la noticia:', text);
+                    }
                 }
+
+                document.querySelectorAll('[data-copy-link], [data-share-copy]').forEach((button) => {
+                    button.addEventListener('click', () => copyToClipboard(window.location.href));
+                });
+
+                document.querySelectorAll('[data-share-native]').forEach((button) => {
+                    button.addEventListener('click', async () => {
+                        const shareData = { title: button.dataset.shareTitle, url: window.location.href };
+                        if (navigator.share) {
+                            try {
+                                await navigator.share(shareData);
+                                return;
+                            } catch (error) {
+                                if (error.name === 'AbortError') return;
+                            }
+                        }
+                        await copyToClipboard(shareData.url);
+                    });
+                });
             </script>
         </div>
     </div>
@@ -414,11 +467,13 @@
       @foreach($banners['show_bottom'] as $banner)
         <div class="flex justify-center mb-4 last:mb-0">
           <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer sponsored" class="block max-w-5xl w-full group">
-            <img src="{{ asset($banner->image_path) }}"
-                 alt="{{ $banner->title }}"
-                 class="w-full h-auto rounded-xl shadow-lg hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700"
-                 loading="lazy"
-                 decoding="async">
+            <div class="uhtv-banner-slot w-full">
+                <img src="{{ asset($banner->image_path) }}"
+                     alt="{{ $banner->title }}"
+                     class="uhtv-banner-img rounded-xl shadow-lg hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700"
+                     loading="lazy"
+                     decoding="async">
+            </div>
           </a>
         </div>
       @endforeach

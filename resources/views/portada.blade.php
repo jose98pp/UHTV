@@ -176,15 +176,17 @@
         <!-- Banner Publicitario -->
         @if(isset($banners['sidebar']) && $banners['sidebar']->count() > 0)
             @foreach($banners['sidebar'] as $banner)
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mb-6 border border-gray-100 dark:border-gray-700">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mb-6 border border-gray-100 dark:border-gray-700 uhtv-banner-sidebar">
                     <div class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 p-3 text-center">
                         <span class="text-xs font-medium uppercase tracking-wide">Publicidad</span>
                     </div>
-                    <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="block">
-                        <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
-                             class="w-full h-auto hover:opacity-90 transition-opacity duration-300"
-                             loading="lazy"
-                             decoding="async">
+                    <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="block w-full">
+                        <div class="uhtv-banner-slot w-full">
+                            <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
+                                 class="uhtv-banner-img"
+                                 loading="lazy"
+                                 decoding="async">
+                        </div>
                     </a>
                 </div>
             @endforeach
@@ -557,10 +559,12 @@ document.addEventListener('DOMContentLoaded', function() {
             @foreach($banners['portada_middle'] as $banner)
                 <div class="flex justify-center mb-4 last:mb-0">
                     <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer sponsored" class="block max-w-5xl w-full group">
-                        <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
-                             class="w-full h-auto rounded-2xl shadow-lg hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700" 
-                             loading="lazy"
-                             decoding="async">
+                        <div class="uhtv-banner-slot w-full">
+                            <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
+                                 class="uhtv-banner-img rounded-2xl shadow-lg hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700" 
+                                 loading="lazy"
+                                 decoding="async">
+                        </div>
                     </a>
                 </div>
             @endforeach
@@ -575,10 +579,12 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         <div class="flex justify-center">
           <a href="https://radiobetania.com/" target="_blank" rel="noopener noreferrer sponsored" class="block max-w-5xl w-full group"> 
-            <img src="{{ asset('images/betania.jpg') }}" alt="Publicidad Radio Betania" 
-                 class="w-full h-auto rounded-2xl shadow-lg hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700"
-                 loading="lazy"
-                 decoding="async">
+            <div class="uhtv-banner-slot w-full">
+                <img src="{{ asset('images/betania.jpg') }}" alt="Publicidad Radio Betania" 
+                     class="uhtv-banner-img rounded-2xl shadow-lg hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700"
+                     loading="lazy"
+                     decoding="async">
+            </div>
           </a>
         </div>
       </div>

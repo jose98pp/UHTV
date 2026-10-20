@@ -308,10 +308,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, observerOptions);
     
-    // Observe all news cards
+    // Observe all news cards and ensure they are running and visible
     document.querySelectorAll('.news-card').forEach(card => {
+        card.style.opacity = '1';
+        card.style.visibility = 'visible';
+        card.style.animationPlayState = 'running';
         window.cardObserver.observe(card);
-        card.style.animationPlayState = 'paused';
     });
     
     // Enhanced keyboard navigation

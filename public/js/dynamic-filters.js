@@ -21,7 +21,6 @@ class DynamicFilters {
     
     init() {
         this.bindEvents();
-        this.updateURL();
         this.updateActiveFilters();
     }
     
@@ -142,34 +141,67 @@ class DynamicFilters {
     }
     
     updateContent(data) {
-        // Update news cards with fade effect
-        this.newsContainer.style.opacity = '0.5';
+        if (!this.newsContainer) return;
+
+        // Target news cards grid or empty state container
+        const currentGrid = this.newsContainer.querySelector('.news-cards-grid');
+        const currentEmpty = this.newsContainer.querySelector('.text-center');
+        const targetContainer = currentGrid || currentEmpty;
         
-        setTimeout(() => {
-            // Update news cards
-            const newsCardsContainer = this.newsContainer.querySelector('.news-cards-grid') || 
-                                     this.newsContainer.querySelector('.text-center');
-            
-            if (newsCardsContainer) {
-                newsCardsContainer.outerHTML = data.html;
-            } else {
-                this.newsContainer.innerHTML = data.html + 
-                    '<div id="pagination-container">' + data.pagination + '</div>';
+        if (targetContainer) {
+            targetContainer.outerHTML = data.html;
+        } else {
+            // If neither exists, rebuild inside newsContainer while preserving results count
+            const existingCount = this.newsContainer.querySelector('.results-count');
+            const countHtml = existingCount ? existingCount.outerHTML : '';
+            this.newsContainer.innerHTML = countHtml + data.html + 
+                '<div id="pagination-container">' + (data.pagination || '') + '</div>';
+        }
+        
+        // Update pagination safely
+        const paginationContainer = document.getElementById('pagination-container');
+        if (paginationContainer) {
+            paginationContainer.innerHTML = data.pagination || '';
+        }
+        
+        // Ensure all news cards are explicitly visible and running
+        const cards = this.newsContainer.querySelectorAll('.news-card');
+        cards.forEach(card => {
+            card.style.opacity = '1';
+            card.style.visibility = 'visible';
+            card.style.animationPlayState = 'running';
+            if (window.cardObserver) {
+                window.cardObserver.observe(card);
             }
-            
-            // Update pagination
-            this.paginationContainer.innerHTML = data.pagination;
-            
-            // Restore opacity with animation
-            this.newsContainer.style.opacity = '1';
-            
-            // Re-initialize card animations
-            this.initializeCardAnimations();
-            
-            // Update active filters display
-            this.updateActiveFilters();
-            
-        }, 150);
+        });
+        
+        // Re-initialize card animations
+        this.initializeCardAnimations();
+        
+        // Re-initialize view manager interactions (grid/list) if present
+        if (window.newsViewManager && typeof window.newsViewManager.reinitializeCardInteractions === 'function') {
+            window.newsViewManager.reinitializeCardInteractions();
+        }
+        
+        // Refresh performance optimizer lazy loading if present
+        if (window.performanceOptimizer) {
+            if (typeof window.performanceOptimizer.optimizeNewContent === 'function') {
+                window.performanceOptimizer.optimizeNewContent(this.newsContainer);
+            } else if (typeof window.performanceOptimizer.refreshLazyLoading === 'function') {
+                window.performanceOptimizer.refreshLazyLoading();
+            }
+        }
+        
+        // Reset selection in bulk actions toolbar if present
+        if (typeof clearSelection === 'function') {
+            clearSelection();
+        }
+        
+        // Update active filters display
+        this.updateActiveFilters();
+        
+        // Restore opacity immediately
+        this.newsContainer.style.opacity = '1';
     }
     
     updateStatistics(stats) {
@@ -213,15 +245,17 @@ class DynamicFilters {
             existingCount.remove();
         }
         
-        // Add new results count
+        // Add new results count with dark mode support
         const countElement = document.createElement('div');
-        countElement.className = 'results-count text-sm text-gray-600 mb-4';
+        countElement.className = 'results-count text-sm text-slate-700 dark:text-slate-200 mb-4 flex items-center gap-2 font-medium bg-slate-100 dark:bg-slate-800/80 px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm';
         countElement.innerHTML = `
-            <i class="fas fa-info-circle mr-1"></i>
-            Se encontraron <strong>${count}</strong> resultado${count !== 1 ? 's' : ''}
+            <i class="fas fa-info-circle text-indigo-500"></i>
+            <span>Se encontraron <strong>${count}</strong> resultado${count !== 1 ? 's' : ''}</span>
         `;
         
-        this.newsContainer.insertBefore(countElement, this.newsContainer.firstChild);
+        if (this.newsContainer) {
+            this.newsContainer.insertBefore(countElement, this.newsContainer.firstChild);
+        }
     }
     
     updateURL(params) {
@@ -286,27 +320,37 @@ class DynamicFilters {
     }
     
     scrollToResults() {
-        const offset = this.newsContainer.getBoundingClientRect().top + window.pageYOffset - 100;
-        window.scrollTo({
-            top: offset,
-            behavior: 'smooth'
-        });
+        if (document.activeElement === this.searchInput) {
+            return;
+        }
+        if (!this.newsContainer) return;
+        const rect = this.newsContainer.getBoundingClientRect();
+        if (rect.top < 0 || rect.top > window.innerHeight) {
+            const offset = rect.top + window.pageYOffset - 100;
+            window.scrollTo({
+                top: offset,
+                behavior: 'smooth'
+            });
+        }
     }
     
     initializeCardAnimations() {
-        // Re-initialize entrance animations for new cards
         const cards = document.querySelectorAll('.news-card');
         cards.forEach((card, index) => {
-            card.style.animationDelay = `${(index % 8) * 0.1}s`;
+            card.style.opacity = '1';
+            card.style.visibility = 'visible';
+            card.style.animationPlayState = 'running';
+            card.style.animationDelay = `${(index % 8) * 0.05}s`;
             card.classList.add('animate-entrance');
         });
         
-        // Remove animation class after animation completes
         setTimeout(() => {
             cards.forEach(card => {
                 card.classList.remove('animate-entrance');
+                card.style.opacity = '1';
+                card.style.visibility = 'visible';
             });
-        }, 1000);
+        }, 500);
     }
     
     updateActiveFilters() {
@@ -489,13 +533,13 @@ function removeFilter(filterName) {
 const style = document.createElement('style');
 style.textContent = `
     .animate-entrance {
-        animation: slideInUp 0.6s ease-out both;
+        animation: dynamicSlideIn 0.35s ease-out forwards;
     }
     
-    @keyframes slideInUp {
+    @keyframes dynamicSlideIn {
         from {
-            opacity: 0;
-            transform: translateY(30px);
+            opacity: 0.4;
+            transform: translateY(15px);
         }
         to {
             opacity: 1;

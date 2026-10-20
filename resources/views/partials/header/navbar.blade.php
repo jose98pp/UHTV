@@ -17,14 +17,16 @@
 </style>
 
 @if(isset($banners['portada_top']) && $banners['portada_top']->count() > 0)
-  <div class="uhtv-banner-matched-height w-full bg-gray-100 dark:bg-gray-950 border-b-2 border-purple-700/30 flex justify-center items-center py-1">
-    <div class="container mx-auto px-2 sm:px-4 flex justify-center items-center h-full">
-      <a href="{{ $banners['portada_top']->first()->link ?? '#' }}" target="_blank" rel="noopener noreferrer sponsored" class="flex justify-center items-center w-full h-full text-center" title="Publicidad">
-        <img src="{{ asset($banners['portada_top']->first()->image_path) }}"
-             alt="{{ $banners['portada_top']->first()->title ?? 'Publicidad' }}"
-             class="uhtv-banner-img-matched mx-auto rounded transition-all duration-300"
-             loading="eager"
-             decoding="async">
+  <div class="w-full bg-gray-100 dark:bg-gray-950 border-b-2 border-purple-700/30 py-1">
+    <div class="container mx-auto px-2 sm:px-4 flex justify-center items-center">
+      <a href="{{ $banners['portada_top']->first()->link ?? '#' }}" target="_blank" rel="noopener noreferrer sponsored" class="flex justify-center items-center w-full" title="Publicidad">
+        <div class="uhtv-banner-slot w-full max-w-[728px]">
+          <img src="{{ asset($banners['portada_top']->first()->image_path) }}"
+               alt="{{ $banners['portada_top']->first()->title ?? 'Publicidad' }}"
+               class="uhtv-banner-img mx-auto"
+               loading="eager"
+               decoding="async">
+        </div>
       </a>
     </div>
   </div>

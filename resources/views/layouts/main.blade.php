@@ -4,6 +4,7 @@
     @include('partials.head.seo')
     @include('partials.head.schema')
     @include('partials.head.assets')
+    @include('partials.banners.shared-styles')
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
     @include('partials.header.topbar')

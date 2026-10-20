@@ -321,4 +321,51 @@ class EnhancedFiltersTest extends TestCase
         $response->assertSee('Publicadas');
         $response->assertSee('Borradores');
     }
+
+    /** @test */
+    public function it_returns_json_and_cards_when_filtering_via_ajax()
+    {
+        $category = Category::factory()->create();
+        $matching = Noticia::factory()->create([
+            'category_id' => $category->id,
+            'titulo' => 'Noticia Eutanasia Legal',
+            'contenido' => 'Debate sobre la eutanasia en el congreso'
+        ]);
+        $other = Noticia::factory()->create([
+            'category_id' => $category->id,
+            'titulo' => 'Economia Nacional',
+            'contenido' => 'Crecimiento del PIB'
+        ]);
+
+        $response = $this->actingAs($this->admin)
+            ->getJson(route('admin.noticias.filter', ['search' => 'Eutanasia']));
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'total_results' => 1
+        ]);
+
+        $data = $response->json();
+        $this->assertStringContainsString('Noticia Eutanasia Legal', $data['html']);
+        $this->assertStringNotContainsString('Economia Nacional', $data['html']);
+        $this->assertStringContainsString('news-card', $data['html']);
+        $this->assertStringContainsString('news-cards-grid', $data['html']);
+    }
+
+    /** @test */
+    public function it_returns_empty_state_html_when_no_results_found()
+    {
+        $response = $this->actingAs($this->admin)
+            ->getJson(route('admin.noticias.filter', ['search' => 'palabraquenoexistenunca12345']));
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'total_results' => 0
+        ]);
+
+        $data = $response->json();
+        $this->assertStringContainsString('No se encontraron noticias', $data['html']);
+    }
 }

@@ -59,10 +59,12 @@
             @foreach($banners['category_top'] as $banner)
                 <div class="flex justify-center mb-4">
                     <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="block max-w-5xl w-full group">
-                        <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
-                             class="w-full h-auto rounded-2xl shadow-lg hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700" 
-                             loading="lazy"
-                             decoding="async">
+                        <div class="uhtv-banner-slot w-full">
+                            <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
+                                 class="uhtv-banner-img rounded-2xl shadow-lg hover:opacity-95 transition-opacity duration-300 border border-gray-100 dark:border-gray-700" 
+                                 loading="lazy"
+                                 decoding="async">
+                        </div>
                     </a>
                 </div>
             @endforeach
@@ -350,10 +352,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="relative group max-w-4xl w-full">
                         <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
                         <a href="{{ $banner->link ?? '#' }}" target="_blank" rel="noopener noreferrer" class="relative block bg-white dark:bg-gray-900 rounded-xl p-1">     
-                            <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
-                                 class="w-full h-auto rounded-lg shadow-sm"
-                                 loading="lazy"
-                                 decoding="async">
+                            <div class="uhtv-banner-slot w-full">
+                                <img src="{{ asset($banner->image_path) }}" alt="{{ $banner->title }}" 
+                                     class="uhtv-banner-img rounded-lg shadow-sm"
+                                     loading="lazy"
+                                     decoding="async">
+                            </div>
                             <div class="absolute top-2 right-2 bg-black/50 text-white text-[10px] px-2 py-0.5 rounded uppercase tracking-wider">Publicidad</div>
                         </a>
                     </div>

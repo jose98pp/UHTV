@@ -331,25 +331,30 @@
     align-items: center !important;
 }
 
-/* Card entrance animations */
+/* Card entrance animations - cards are always visible by default */
 .news-card {
-    animation: slideInUp 0.6s ease-out;
-    animation-fill-mode: both;
+    opacity: 1;
+    transform: none;
+    visibility: visible;
 }
 
-.news-card:nth-child(1) { animation-delay: 0.1s; }
-.news-card:nth-child(2) { animation-delay: 0.2s; }
-.news-card:nth-child(3) { animation-delay: 0.3s; }
-.news-card:nth-child(4) { animation-delay: 0.4s; }
-.news-card:nth-child(5) { animation-delay: 0.5s; }
-.news-card:nth-child(6) { animation-delay: 0.6s; }
-.news-card:nth-child(7) { animation-delay: 0.7s; }
-.news-card:nth-child(8) { animation-delay: 0.8s; }
+.news-card.animate-entrance {
+    animation: slideInUp 0.4s ease-out forwards;
+}
+
+.news-card.animate-entrance:nth-child(1) { animation-delay: 0.05s; }
+.news-card.animate-entrance:nth-child(2) { animation-delay: 0.1s; }
+.news-card.animate-entrance:nth-child(3) { animation-delay: 0.15s; }
+.news-card.animate-entrance:nth-child(4) { animation-delay: 0.2s; }
+.news-card.animate-entrance:nth-child(5) { animation-delay: 0.25s; }
+.news-card.animate-entrance:nth-child(6) { animation-delay: 0.3s; }
+.news-card.animate-entrance:nth-child(7) { animation-delay: 0.35s; }
+.news-card.animate-entrance:nth-child(8) { animation-delay: 0.4s; }
 
 @keyframes slideInUp {
     from {
-        opacity: 0;
-        transform: translateY(30px);
+        opacity: 0.4;
+        transform: translateY(15px);
     }
     to {
         opacity: 1;
@@ -438,17 +443,25 @@ function initializeEnhancedFilters() {
 
 // Clear search function
 function clearSearch() {
+    if (window.dynamicFilters) {
+        window.dynamicFilters.clearSearch();
+        return;
+    }
     const searchInput = document.getElementById('search-input');
-    const searchWrapper = searchInput.parentElement;
-    
-    searchInput.value = '';
-    searchWrapper.classList.remove('has-value');
-    searchInput.focus();
+    const searchWrapper = searchInput?.parentElement;
+    if (searchInput) searchInput.value = '';
+    if (searchWrapper) searchWrapper.classList.remove('has-value');
+    if (searchInput) searchInput.focus();
 }
 
 // Clear all filters function
 function clearAllFilters() {
+    if (window.dynamicFilters) {
+        window.dynamicFilters.clearAllFilters();
+        return;
+    }
     const form = document.getElementById('filters-form');
+    if (!form) return;
     const inputs = form.querySelectorAll('input, select');
     
     inputs.forEach(input => {
@@ -459,17 +472,19 @@ function clearAllFilters() {
         }
     });
     
-    // Remove has-value class from search wrapper
     const searchWrapper = document.querySelector('.search-input-wrapper');
-    searchWrapper.classList.remove('has-value');
-    
-    // Submit form to clear filters
+    if (searchWrapper) searchWrapper.classList.remove('has-value');
     form.submit();
 }
 
 // Remove individual filter function
 function removeFilter(filterName) {
+    if (window.dynamicFilters) {
+        window.dynamicFilters.removeFilter(filterName);
+        return;
+    }
     const form = document.getElementById('filters-form');
+    if (!form) return;
     const input = form.querySelector(`[name="${filterName}"]`);
     
     if (input) {
@@ -479,13 +494,10 @@ function removeFilter(filterName) {
             input.selectedIndex = 0;
         }
         
-        // Update search wrapper class if needed
         if (filterName === 'search') {
             const searchWrapper = document.querySelector('.search-input-wrapper');
-            searchWrapper.classList.remove('has-value');
+            if (searchWrapper) searchWrapper.classList.remove('has-value');
         }
-        
-        // Submit form
         form.submit();
     }
 }
@@ -546,24 +558,11 @@ function createRipple(element) {
 
 // Enhanced card interactions
 document.addEventListener('DOMContentLoaded', function() {
-    // Add intersection observer for entrance animations
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.animationPlayState = 'running';
-            }
-        });
-    }, observerOptions);
-    
-    // Observe all news cards
+    // Ensure all news cards are visible immediately
     document.querySelectorAll('.news-card').forEach(card => {
-        observer.observe(card);
-        card.style.animationPlayState = 'paused';
+        card.style.opacity = '1';
+        card.style.visibility = 'visible';
+        card.style.animationPlayState = 'running';
     });
     
     // Add hover sound effect (optional)
