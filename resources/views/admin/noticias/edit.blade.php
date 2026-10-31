@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @push('styles')
+<link rel="stylesheet" href="{{ asset('css/rich-text-links.css') }}?v={{ filemtime(public_path('css/rich-text-links.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/word-style-editor.css') }}?v={{ filemtime(public_path('css/word-style-editor.css')) }}">
 <style>
     /* Estilos específicos para el editor en la vista de editar */
