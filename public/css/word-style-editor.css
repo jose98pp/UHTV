@@ -407,24 +407,24 @@
 }
 
 .editor-image-frame > .editor-image-move-handle {
-    top: -32px;
+    top: -38px;
     left: 50%;
     transform: translateX(-50%);
-    min-width: 68px;
-    height: 26px;
-    padding: 0 9px;
-    border-radius: 13px;
-    font-size: 11px;
+    min-width: 76px;
+    min-height: 34px;
+    padding: 0 10px;
+    border-radius: 17px;
+    font-size: 12px;
     cursor: grab;
 }
 
 .editor-image-frame > .editor-image-resize-handle {
-    right: -9px;
-    bottom: -9px;
-    width: 20px;
-    height: 20px;
+    right: -12px;
+    bottom: -12px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    font-size: 13px;
+    font-size: 16px;
     cursor: nwse-resize;
 }
 
@@ -478,6 +478,51 @@ body.is-moving-editor-image {
     background: #1a73e8;
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8);
     pointer-events: none;
+}
+
+/* Controles táctiles y gestos de imágenes estilo Word. */
+.editor-image-frame > .editor-image-move-handle,
+.editor-image-frame > .editor-image-resize-handle,
+.editor-image-frame > .editor-image-delete-handle {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+}
+
+.editor-image-frame.is-selected {
+    z-index: 2;
+}
+
+.editor-image-frame.is-moving {
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .editor-image-frame > .editor-image-move-handle {
+        top: -42px;
+        min-width: 88px;
+        min-height: 40px;
+        font-size: 13px;
+    }
+
+    .editor-image-frame > .editor-image-resize-handle {
+        width: 44px;
+        height: 44px;
+        right: -14px;
+        bottom: -14px;
+        font-size: 19px;
+    }
+
+    .editor-image-frame > .editor-image-delete-handle {
+        width: 32px;
+        height: 32px;
+        top: -16px;
+        right: -16px;
+        font-size: 20px;
+    }
+
+    .word-editor-content {
+        overflow-x: hidden;
+    }
 }
 
 /* Estados de carga */
@@ -582,6 +627,46 @@ body.is-moving-editor-image {
     .group-buttons {
         flex: 1;
         justify-content: flex-start;
+    }
+}
+
+/* Acciones de hipervínculo: botones legibles y cómodos en pantallas táctiles. */
+.word-button-link-action {
+    min-height: 38px;
+    padding: 8px 12px;
+    gap: 6px;
+    white-space: nowrap;
+    font-size: 13px;
+}
+
+@media (max-width: 640px) {
+    .toolbar-group-link-actions {
+        width: 100%;
+        align-items: stretch;
+        border-bottom: 1px solid #e8eaed;
+        padding: 8px 0;
+        margin: 0;
+    }
+
+    .toolbar-group-link-actions .group-label {
+        min-width: 0;
+        text-align: left;
+        margin: 0 0 6px;
+    }
+
+    .toolbar-group-link-actions .group-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+        gap: 8px;
+    }
+
+    .toolbar-group-link-actions .word-button-link-action {
+        width: 100%;
+        min-height: 44px;
+        justify-content: center;
+        white-space: normal;
+        font-size: 12px;
     }
 }
 

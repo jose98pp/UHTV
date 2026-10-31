@@ -103,12 +103,13 @@ class NoticiaRepository
     {
         $newsLimit = max(1, (int) $newsLimit);
 
+        // El mismo orden estable por ID se utiliza en el menú principal.
+        // No limitar el número de categorías: cada sección con noticias publicadas
+        // debe aparecer en portada.
         $categorias = Category::whereHas('noticias', function ($query) {
             $query->where('publicada', true);
         })
-            ->orderBy('name', 'asc')
             ->orderBy('id', 'asc')
-            ->take(8) // Mostrar más categorías como Brújula Digital
             ->get();
 
         if ($categorias->isEmpty()) {

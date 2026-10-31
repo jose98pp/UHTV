@@ -53,7 +53,7 @@ class NewsService
 
             // Reutilizar la lista cacheada de categorías para la navegación.
             $categorias = Cache::remember('all_categories', 600, function () {
-                return Category::all();
+                return Category::orderBy('id', 'asc')->get();
             });
 
             // Obtener "más leídas" (noticias más vistas)

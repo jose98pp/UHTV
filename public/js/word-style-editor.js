@@ -111,6 +111,12 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChan
             frame.removeAttribute('data-editor-image-bound');
         });
         cleanEditor.querySelectorAll('img').forEach(image => {
+            // Persistir el tamaño definido en el editor: los estilos de interfaz
+            // se eliminan, pero las dimensiones reales deben llegar al artículo.
+            const renderedWidth = parseFloat(image.style.width);
+            const renderedHeight = parseFloat(image.style.height);
+            if (renderedWidth > 0) image.setAttribute('width', String(Math.round(renderedWidth)));
+            if (renderedHeight > 0) image.setAttribute('height', String(Math.round(renderedHeight)));
             image.removeAttribute('loading');
             image.removeAttribute('draggable');
             image.removeAttribute('title');
@@ -270,7 +276,7 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChan
     const applyImageDimensions = (frame, image, width) => {
         const editor = editorRef.current;
         const ratio = getImageAspectRatio(image);
-        const maxWidth = Math.max(240, (editor?.clientWidth || 800) - 32);
+        const maxWidth = Math.max(96, (editor?.clientWidth || 800) - 32);
         const nextWidth = Math.round(Math.min(Math.max(width, 96), maxWidth));
         const nextHeight = Math.round(nextWidth / ratio);
 
@@ -652,18 +658,111 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChan
         uploadImages(files, dropRange);
     };
 
+    const handleEditorCopy = (event) => {
+        const frame = selectedImageFrameRef.current;
+        if (!frame || !editorRef.current?.contains(frame) || !event.clipboardData) return;
+
+        const cleanFrame = frame.cloneNode(true);
+        cleanFrame.querySelectorAll('button').forEach(button => button.remove());
+        cleanFrame.removeAttribute('id');
+        cleanFrame.removeAttribute('contenteditable');
+        cleanFrame.removeAttribute('role');
+        cleanFrame.removeAttribute('tabindex');
+        cleanFrame.removeAttribute('aria-label');
+        cleanFrame.removeAttribute('aria-selected');
+        cleanFrame.removeAttribute('data-editor-image-bound');
+        const image = cleanFrame.querySelector('img');
+        if (!image) return;
+        image.removeAttribute('draggable');
+        image.removeAttribute('title');
+        image.removeAttribute('loading');
+        image.style.width = '';
+        image.style.height = '';
+        event.clipboardData.setData('text/html', cleanFrame.outerHTML);
+        event.clipboardData.setData('text/plain', image.alt || 'Imagen');
+        event.preventDefault();
+    };
+
+    const handleEditorCut = (event) => {
+        const frame = selectedImageFrameRef.current;
+        if (!frame || !editorRef.current?.contains(frame)) return;
+        handleEditorCopy(event);
+        if (event.defaultPrevented) {
+            frame.remove();
+            clearImageSelection();
+            commitContent(editorRef.current.innerHTML);
+        }
+    };
+
+    const insertClipboardHtmlImages = (html) => {
+        const editor = editorRef.current;
+        if (!editor || !html) return false;
+        const parsed = document.createElement('div');
+        parsed.innerHTML = html;
+        const images = Array.from(parsed.querySelectorAll('img')).filter(sourceImage =>
+            !!getSafeImageUrl(sourceImage.getAttribute('src') || '')
+        );
+        if (images.length === 0) return false;
+
+        const selection = window.getSelection();
+        let range = selection && selection.rangeCount ? selection.getRangeAt(0).cloneRange() : null;
+        if (!range || !editor.contains(range.commonAncestorContainer)) {
+            range = document.createRange();
+            range.selectNodeContents(editor);
+            range.collapse(false);
+        }
+
+        range.deleteContents();
+        images.forEach(sourceImage => {
+            const src = getSafeImageUrl(sourceImage.getAttribute('src') || '');
+            const image = document.createElement('img');
+            image.src = src;
+            image.alt = sourceImage.alt || 'Imagen insertada';
+            image.className = 'editor-image';
+            image.loading = 'lazy';
+            const width = parseInt(sourceImage.getAttribute('width') || sourceImage.style.width, 10);
+            const height = parseInt(sourceImage.getAttribute('height') || sourceImage.style.height, 10);
+            if (width > 0) image.setAttribute('width', String(width));
+            if (height > 0) image.setAttribute('height', String(height));
+            const frame = createEditableImageFrame(image);
+            range.insertNode(frame);
+            const spacer = document.createElement('br');
+            frame.after(spacer);
+            range.setStartAfter(spacer);
+            range.collapse(true);
+        });
+
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+        savedRangeRef.current = range.cloneRange();
+        decorateEditorImages();
+        commitContent(editor.innerHTML);
+        return true;
+    };
+
     const handleEditorPaste = (event) => {
         const files = getClipboardImageFiles(event.clipboardData);
-        if (files.length === 0) return;
-        event.preventDefault();
-        event.stopPropagation();
-        rememberSelection();
-        uploadImages(files);
+        if (files.length > 0) {
+            event.preventDefault();
+            event.stopPropagation();
+            rememberSelection();
+            uploadImages(files);
+            return;
+        }
+
+        const html = event.clipboardData?.getData('text/html') || '';
+        if (insertClipboardHtmlImages(html)) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
     };
 
     // Función para insertar enlaces
     // Función para insertar enlaces preservando la selección y soportando texto libre
     const insertLink = () => {
+        // En móviles el diálogo nativo puede quitar el foco; recuperar primero
+        // el rango guardado para no perder el texto seleccionado.
+        restoreSelection();
         const selection = window.getSelection();
         let savedRange = null;
         let selectedText = '';
@@ -748,6 +847,7 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChan
 
     // Función para quitar enlaces
     const removeLink = () => {
+        restoreSelection();
         const selection = window.getSelection();
         if (selection.rangeCount > 0) {
             const range = selection.getRangeAt(0);
@@ -795,6 +895,18 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChan
                 case 'y':
                     e.preventDefault();
                     redo();
+                    break;
+                case 'c':
+                    if (selectedImageFrameRef.current && editorRef.current?.contains(selectedImageFrameRef.current)) {
+                        // El evento onCopy escribe el HTML limpio en el portapapeles.
+                        return;
+                    }
+                    break;
+                case 'x':
+                    if (selectedImageFrameRef.current && editorRef.current?.contains(selectedImageFrameRef.current)) {
+                        // El evento onCut copia y retira la imagen seleccionada.
+                        return;
+                    }
                     break;
                 case 's':
                     e.preventDefault();
@@ -1067,7 +1179,30 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChan
                                 ])
                             ])
                         ] : [
-                            // Pestaña Insertar
+                            // Pestaña Insertar: enlaces visibles y con área táctil amplia.
+                            React.createElement('div', { className: 'toolbar-group toolbar-group-link-actions', key: 'insert-links' }, [
+                                React.createElement('div', { className: 'group-label', key: 'insert-links-label' }, 'Enlaces'),
+                                React.createElement('div', { className: 'group-buttons', key: 'insert-links-buttons' }, [
+                                    React.createElement('button', {
+                                        className: 'word-button word-button-link-action',
+                                        type: 'button',
+                                        onMouseDown: (event) => { event.preventDefault(); rememberSelection(); },
+                                        onClick: insertLink,
+                                        title: 'Insertar hipervínculo',
+                                        'aria-label': 'Insertar hipervínculo',
+                                        key: 'insert-link-action'
+                                    }, '🔗 Insertar enlace'),
+                                    React.createElement('button', {
+                                        className: 'word-button word-button-link-action',
+                                        type: 'button',
+                                        onMouseDown: (event) => { event.preventDefault(); rememberSelection(); },
+                                        onClick: removeLink,
+                                        title: 'Quitar hipervínculo',
+                                        'aria-label': 'Quitar hipervínculo',
+                                        key: 'remove-link-action'
+                                    }, '✕ Quitar enlace')
+                                ])
+                            ]),
                             React.createElement('div', { className: 'toolbar-group', key: 'insert-images' }, [
                                 React.createElement('div', { className: 'group-label', key: 'images-label' }, 'Imágenes'),
                                 React.createElement('div', { className: 'group-buttons', key: 'images-buttons' }, [
@@ -1084,7 +1219,7 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChan
                                         },
                                         onClick: openImagePicker,
                                         key: 'image-upload'
-                                    }, isUploading ? '⏳' : '🖼'),
+                                    }, isUploading ? '⏳ Subiendo…' : '🖼 Insertar imagen'),
                                     React.createElement('input', {
                                         ref: imageInputRef,
                                         id: imageInputId,
@@ -1124,6 +1259,8 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChan
                     onMouseUp: rememberSelection,
                     onBlur: rememberSelection,
                     onPaste: handleEditorPaste,
+                    onCopy: handleEditorCopy,
+                    onCut: handleEditorCut,
                     onDragEnter: handleEditorDragEnter,
                     onDragOver: handleEditorDragOver,
                     onDragLeave: handleEditorDragLeave,
