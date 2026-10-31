@@ -664,6 +664,9 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChan
     // Función para insertar enlaces
     // Función para insertar enlaces preservando la selección y soportando texto libre
     const insertLink = () => {
+        // En móviles el diálogo nativo puede quitar el foco; recuperar primero
+        // el rango guardado para no perder el texto seleccionado.
+        restoreSelection();
         const selection = window.getSelection();
         let savedRange = null;
         let selectedText = '';
@@ -748,6 +751,7 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChan
 
     // Función para quitar enlaces
     const removeLink = () => {
+        restoreSelection();
         const selection = window.getSelection();
         if (selection.rangeCount > 0) {
             const range = selection.getRangeAt(0);
@@ -1067,7 +1071,30 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChan
                                 ])
                             ])
                         ] : [
-                            // Pestaña Insertar
+                            // Pestaña Insertar: enlaces visibles y con área táctil amplia.
+                            React.createElement('div', { className: 'toolbar-group toolbar-group-link-actions', key: 'insert-links' }, [
+                                React.createElement('div', { className: 'group-label', key: 'insert-links-label' }, 'Enlaces'),
+                                React.createElement('div', { className: 'group-buttons', key: 'insert-links-buttons' }, [
+                                    React.createElement('button', {
+                                        className: 'word-button word-button-link-action',
+                                        type: 'button',
+                                        onMouseDown: (event) => { event.preventDefault(); rememberSelection(); },
+                                        onClick: insertLink,
+                                        title: 'Insertar hipervínculo',
+                                        'aria-label': 'Insertar hipervínculo',
+                                        key: 'insert-link-action'
+                                    }, '🔗 Insertar enlace'),
+                                    React.createElement('button', {
+                                        className: 'word-button word-button-link-action',
+                                        type: 'button',
+                                        onMouseDown: (event) => { event.preventDefault(); rememberSelection(); },
+                                        onClick: removeLink,
+                                        title: 'Quitar hipervínculo',
+                                        'aria-label': 'Quitar hipervínculo',
+                                        key: 'remove-link-action'
+                                    }, '✕ Quitar enlace')
+                                ])
+                            ]),
                             React.createElement('div', { className: 'toolbar-group', key: 'insert-images' }, [
                                 React.createElement('div', { className: 'group-label', key: 'images-label' }, 'Imágenes'),
                                 React.createElement('div', { className: 'group-buttons', key: 'images-buttons' }, [
