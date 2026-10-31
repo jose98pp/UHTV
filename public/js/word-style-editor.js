@@ -1219,7 +1219,7 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChan
                                         },
                                         onClick: openImagePicker,
                                         key: 'image-upload'
-                                    }, isUploading ? '⏳' : '🖼'),
+                                    }, isUploading ? '⏳ Subiendo…' : '🖼 Insertar imagen'),
                                     React.createElement('input', {
                                         ref: imageInputRef,
                                         id: imageInputId,
