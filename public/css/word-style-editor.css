@@ -407,24 +407,24 @@
 }
 
 .editor-image-frame > .editor-image-move-handle {
-    top: -32px;
+    top: -38px;
     left: 50%;
     transform: translateX(-50%);
-    min-width: 68px;
-    height: 26px;
-    padding: 0 9px;
-    border-radius: 13px;
-    font-size: 11px;
+    min-width: 76px;
+    min-height: 34px;
+    padding: 0 10px;
+    border-radius: 17px;
+    font-size: 12px;
     cursor: grab;
 }
 
 .editor-image-frame > .editor-image-resize-handle {
-    right: -9px;
-    bottom: -9px;
-    width: 20px;
-    height: 20px;
+    right: -12px;
+    bottom: -12px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    font-size: 13px;
+    font-size: 16px;
     cursor: nwse-resize;
 }
 
@@ -478,6 +478,51 @@ body.is-moving-editor-image {
     background: #1a73e8;
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8);
     pointer-events: none;
+}
+
+/* Controles táctiles y gestos de imágenes estilo Word. */
+.editor-image-frame > .editor-image-move-handle,
+.editor-image-frame > .editor-image-resize-handle,
+.editor-image-frame > .editor-image-delete-handle {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+}
+
+.editor-image-frame.is-selected {
+    z-index: 2;
+}
+
+.editor-image-frame.is-moving {
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .editor-image-frame > .editor-image-move-handle {
+        top: -42px;
+        min-width: 88px;
+        min-height: 40px;
+        font-size: 13px;
+    }
+
+    .editor-image-frame > .editor-image-resize-handle {
+        width: 44px;
+        height: 44px;
+        right: -14px;
+        bottom: -14px;
+        font-size: 19px;
+    }
+
+    .editor-image-frame > .editor-image-delete-handle {
+        width: 32px;
+        height: 32px;
+        top: -16px;
+        right: -16px;
+        font-size: 20px;
+    }
+
+    .word-editor-content {
+        overflow-x: hidden;
+    }
 }
 
 /* Estados de carga */
