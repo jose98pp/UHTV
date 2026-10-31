@@ -276,7 +276,7 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChan
     const applyImageDimensions = (frame, image, width) => {
         const editor = editorRef.current;
         const ratio = getImageAspectRatio(image);
-        const maxWidth = Math.max(240, (editor?.clientWidth || 800) - 32);
+        const maxWidth = Math.max(96, (editor?.clientWidth || 800) - 32);
         const nextWidth = Math.round(Math.min(Math.max(width, 96), maxWidth));
         const nextHeight = Math.round(nextWidth / ratio);
 
