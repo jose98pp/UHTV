@@ -111,6 +111,12 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChan
             frame.removeAttribute('data-editor-image-bound');
         });
         cleanEditor.querySelectorAll('img').forEach(image => {
+            // Persistir el tamaño definido en el editor: los estilos de interfaz
+            // se eliminan, pero las dimensiones reales deben llegar al artículo.
+            const renderedWidth = parseFloat(image.style.width);
+            const renderedHeight = parseFloat(image.style.height);
+            if (renderedWidth > 0) image.setAttribute('width', String(Math.round(renderedWidth)));
+            if (renderedHeight > 0) image.setAttribute('height', String(Math.round(renderedHeight)));
             image.removeAttribute('loading');
             image.removeAttribute('draggable');
             image.removeAttribute('title');
@@ -652,13 +658,101 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChan
         uploadImages(files, dropRange);
     };
 
+    const handleEditorCopy = (event) => {
+        const frame = selectedImageFrameRef.current;
+        if (!frame || !editorRef.current?.contains(frame) || !event.clipboardData) return;
+
+        const cleanFrame = frame.cloneNode(true);
+        cleanFrame.querySelectorAll('button').forEach(button => button.remove());
+        cleanFrame.removeAttribute('id');
+        cleanFrame.removeAttribute('contenteditable');
+        cleanFrame.removeAttribute('role');
+        cleanFrame.removeAttribute('tabindex');
+        cleanFrame.removeAttribute('aria-label');
+        cleanFrame.removeAttribute('aria-selected');
+        cleanFrame.removeAttribute('data-editor-image-bound');
+        const image = cleanFrame.querySelector('img');
+        if (!image) return;
+        image.removeAttribute('draggable');
+        image.removeAttribute('title');
+        image.removeAttribute('loading');
+        image.style.width = '';
+        image.style.height = '';
+        event.clipboardData.setData('text/html', cleanFrame.outerHTML);
+        event.clipboardData.setData('text/plain', image.alt || 'Imagen');
+        event.preventDefault();
+    };
+
+    const handleEditorCut = (event) => {
+        const frame = selectedImageFrameRef.current;
+        if (!frame || !editorRef.current?.contains(frame)) return;
+        handleEditorCopy(event);
+        if (event.defaultPrevented) {
+            frame.remove();
+            clearImageSelection();
+            commitContent(editorRef.current.innerHTML);
+        }
+    };
+
+    const insertClipboardHtmlImages = (html) => {
+        const editor = editorRef.current;
+        if (!editor || !html) return false;
+        const parsed = document.createElement('div');
+        parsed.innerHTML = html;
+        const images = Array.from(parsed.querySelectorAll('img'));
+        if (images.length === 0) return false;
+
+        const selection = window.getSelection();
+        let range = selection && selection.rangeCount ? selection.getRangeAt(0).cloneRange() : null;
+        if (!range || !editor.contains(range.commonAncestorContainer)) {
+            range = document.createRange();
+            range.selectNodeContents(editor);
+            range.collapse(false);
+        }
+
+        images.forEach(sourceImage => {
+            const src = getSafeImageUrl(sourceImage.getAttribute('src') || '');
+            if (!src) return;
+            const image = document.createElement('img');
+            image.src = src;
+            image.alt = sourceImage.alt || 'Imagen insertada';
+            image.className = 'editor-image';
+            image.loading = 'lazy';
+            const width = parseInt(sourceImage.getAttribute('width') || sourceImage.style.width, 10);
+            const height = parseInt(sourceImage.getAttribute('height') || sourceImage.style.height, 10);
+            if (width > 0) image.setAttribute('width', String(width));
+            if (height > 0) image.setAttribute('height', String(height));
+            const frame = createEditableImageFrame(image);
+            range.insertNode(frame);
+            const spacer = document.createElement('br');
+            frame.after(spacer);
+            range.setStartAfter(spacer);
+            range.collapse(true);
+        });
+
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+        savedRangeRef.current = range.cloneRange();
+        decorateEditorImages();
+        commitContent(editor.innerHTML);
+        return true;
+    };
+
     const handleEditorPaste = (event) => {
         const files = getClipboardImageFiles(event.clipboardData);
-        if (files.length === 0) return;
-        event.preventDefault();
-        event.stopPropagation();
-        rememberSelection();
-        uploadImages(files);
+        if (files.length > 0) {
+            event.preventDefault();
+            event.stopPropagation();
+            rememberSelection();
+            uploadImages(files);
+            return;
+        }
+
+        const html = event.clipboardData?.getData('text/html') || '';
+        if (insertClipboardHtmlImages(html)) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
     };
 
     // Función para insertar enlaces
@@ -799,6 +893,18 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChan
                 case 'y':
                     e.preventDefault();
                     redo();
+                    break;
+                case 'c':
+                    if (selectedImageFrameRef.current && editorRef.current?.contains(selectedImageFrameRef.current)) {
+                        // El evento onCopy escribe el HTML limpio en el portapapeles.
+                        return;
+                    }
+                    break;
+                case 'x':
+                    if (selectedImageFrameRef.current && editorRef.current?.contains(selectedImageFrameRef.current)) {
+                        // El evento onCut copia y retira la imagen seleccionada.
+                        return;
+                    }
                     break;
                 case 's':
                     e.preventDefault();
@@ -1151,6 +1257,8 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChan
                     onMouseUp: rememberSelection,
                     onBlur: rememberSelection,
                     onPaste: handleEditorPaste,
+                    onCopy: handleEditorCopy,
+                    onCut: handleEditorCut,
                     onDragEnter: handleEditorDragEnter,
                     onDragOver: handleEditorDragOver,
                     onDragLeave: handleEditorDragLeave,
