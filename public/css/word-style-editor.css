@@ -585,6 +585,46 @@ body.is-moving-editor-image {
     }
 }
 
+/* Acciones de hipervínculo: botones legibles y cómodos en pantallas táctiles. */
+.word-button-link-action {
+    min-height: 38px;
+    padding: 8px 12px;
+    gap: 6px;
+    white-space: nowrap;
+    font-size: 13px;
+}
+
+@media (max-width: 640px) {
+    .toolbar-group-link-actions {
+        width: 100%;
+        align-items: stretch;
+        border-bottom: 1px solid #e8eaed;
+        padding: 8px 0;
+        margin: 0;
+    }
+
+    .toolbar-group-link-actions .group-label {
+        min-width: 0;
+        text-align: left;
+        margin: 0 0 6px;
+    }
+
+    .toolbar-group-link-actions .group-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+        gap: 8px;
+    }
+
+    .toolbar-group-link-actions .word-button-link-action {
+        width: 100%;
+        min-height: 44px;
+        justify-content: center;
+        white-space: normal;
+        font-size: 12px;
+    }
+}
+
 /* Animaciones */
 @keyframes fadeIn {
     from {
