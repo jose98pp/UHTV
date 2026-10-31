@@ -358,7 +358,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <!-- Secciones de Categorías como Brújula Digital -->
-    @foreach($seccionesCategoria->take(4) as $categoria)
+    @foreach($seccionesCategoria as $categoria)
       @php
         $noticiasCat = isset($noticiasPorCategoria[$categoria->id]) ? $noticiasPorCategoria[$categoria->id]->take(5) : collect();
       @endphp
