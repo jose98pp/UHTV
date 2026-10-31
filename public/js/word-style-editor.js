@@ -699,7 +699,9 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChan
         if (!editor || !html) return false;
         const parsed = document.createElement('div');
         parsed.innerHTML = html;
-        const images = Array.from(parsed.querySelectorAll('img'));
+        const images = Array.from(parsed.querySelectorAll('img')).filter(sourceImage =>
+            !!getSafeImageUrl(sourceImage.getAttribute('src') || '')
+        );
         if (images.length === 0) return false;
 
         const selection = window.getSelection();
@@ -710,9 +712,9 @@ const WordStyleEditor = ({ initialContent = '', onChange, onAutoSave, onBusyChan
             range.collapse(false);
         }
 
+        range.deleteContents();
         images.forEach(sourceImage => {
             const src = getSafeImageUrl(sourceImage.getAttribute('src') || '');
-            if (!src) return;
             const image = document.createElement('img');
             image.src = src;
             image.alt = sourceImage.alt || 'Imagen insertada';
