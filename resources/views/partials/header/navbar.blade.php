@@ -17,7 +17,7 @@
 </style>
 
 @if(isset($banners['portada_top']) && $banners['portada_top']->count() > 0)
-  <div class="w-full bg-gray-100 dark:bg-gray-950 border-b-2 border-purple-700/30 py-1">
+  <div class="uhtv-top-ad w-full bg-gray-100 dark:bg-gray-950 border-b-2 border-purple-700/30 py-1">
     <div class="container mx-auto px-2 sm:px-4 flex justify-center items-center">
       <a href="{{ $banners['portada_top']->first()->link ?? '#' }}" target="_blank" rel="noopener noreferrer sponsored" class="flex justify-center items-center w-full" title="Publicidad">
         <div class="uhtv-banner-slot w-full max-w-[728px]">
@@ -32,7 +32,7 @@
   </div>
 @else
   {{-- Placeholder cuando no hay banner: franja de color con logo/texto con misma altura del header --}}
-  <div class="uhtv-banner-matched-height w-full bg-gradient-to-r from-purple-900 via-indigo-800 to-purple-900 dark:from-gray-900 dark:via-indigo-950 dark:to-gray-900 border-b-2 border-purple-600/40 flex items-center justify-center">
+  <div class="uhtv-top-ad uhtv-banner-matched-height w-full bg-gradient-to-r from-purple-900 via-indigo-800 to-purple-900 dark:from-gray-900 dark:via-indigo-950 dark:to-gray-900 border-b-2 border-purple-600/40 flex items-center justify-center">
     <div class="flex items-center gap-4 opacity-60">
       <span class="text-white/50 text-xs uppercase tracking-widest font-semibold">Espacio Publicitario</span>
       <div class="h-px w-24 bg-white/20"></div>
@@ -42,7 +42,7 @@
 @endif
 
 <!-- Navbar Mejorada -->
-<nav id="category-navigation" class="bg-white dark:bg-gray-900 shadow-xl sticky top-0 left-0 w-full z-50 border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
+<nav id="category-navigation" class="bg-white dark:bg-gray-900 shadow-xl relative w-full z-50 border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
  <div class="container mx-auto flex justify-between items-center py-4 px-4">
   <!-- Logo/Inicio -->
   <a href="/" class="flex items-center space-x-2 text-gray-900 dark:text-gray-100 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-300">
