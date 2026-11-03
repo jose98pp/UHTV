@@ -32,7 +32,14 @@ class AuthenticatedSessionController extends Controller
         // Redirigir según el rol del usuario
         $user = Auth::user();
         
-        if ($user && $user->role === 'admin') {
+        if ($user && !$user->is_active) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect()->route('admin.login')->with('error', 'Tu cuenta está desactivada. Contacta al administrador.');
+        }
+
+        if ($user && in_array($user->role, ['superadmin', 'admin', 'editor', 'periodista'], true)) {
             return redirect()->intended(route('admin.dashboard'));
         }
 
