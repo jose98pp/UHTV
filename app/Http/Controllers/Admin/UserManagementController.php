@@ -62,6 +62,7 @@ class UserManagementController extends Controller
             'role' => ['required', Rule::in(self::ASSIGNABLE_ROLES)],
             'is_active' => ['required', 'boolean'],
             'password' => ['nullable', 'confirmed', Password::defaults()],
+            'current_password' => ['required_with:password', 'current_password'],
         ]);
 
         $user->name = $data['name'];
@@ -79,7 +80,7 @@ class UserManagementController extends Controller
     public function destroy(User $user)
     {
         abort_if($user->id === auth()->id() || $user->role === 'superadmin', 403, 'No puedes eliminar esta cuenta.');
-        $user->delete();
-        return redirect()->route('admin.users.index')->with('success', 'Usuario eliminado.');
+        $user->update(['is_active' => false]);
+        return redirect()->route('admin.users.index')->with('success', 'Usuario desactivado. Se conservaron sus noticias y su historial.');
     }
 }
