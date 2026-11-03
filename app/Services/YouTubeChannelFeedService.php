@@ -81,6 +81,12 @@ class YouTubeChannelFeedService
                             'youtube_id' => $videoId,
                             'titulo' => trim((string) ($atom->title ?? 'Video de UHTV')),
                             'descripcion' => '',
+                            // Mantener la misma estructura que el modelo Transmision para las vistas Blade.
+                            'tipo' => 'clip',
+                            'plataforma' => 'youtube',
+                            'plataforma_nombre' => 'YouTube',
+                            'plataforma_color' => '#ff0000',
+                            'plataforma_icon' => 'fab fa-youtube',
                             'url' => $url,
                             'embed_url' => 'https://www.youtube-nocookie.com/embed/' . $videoId . '?rel=0&playsinline=1',
                             'effective_thumbnail' => $thumbnail ?: 'https://img.youtube.com/vi/' . $videoId . '/hqdefault.jpg',
