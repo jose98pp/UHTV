@@ -60,7 +60,8 @@ class YouTubeChannelFeedService
                         $mediaGroup = $entry->children('http://search.yahoo.com/mrss/')->group;
                         $thumbnail = null;
                         if ($mediaGroup && isset($mediaGroup->thumbnail)) {
-                            $thumbnail = (string) $mediaGroup->thumbnail->attributes()->url;
+                            $thumbnailNode = $mediaGroup->children('http://search.yahoo.com/mrss/')->thumbnail;
+                            $thumbnail = (string) $thumbnailNode->attributes()->url;
                         }
 
                         $published = trim((string) ($entry->published ?? ''));
