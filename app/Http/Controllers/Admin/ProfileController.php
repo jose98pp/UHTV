@@ -70,6 +70,7 @@ class ProfileController extends Controller
         $request->user()->update([
             'password' => Hash::make($validated['password']),
         ]);
+        $request->session()->regenerate();
 
         return Redirect::route('admin.profile.index')->with('success', 'Contraseña actualizada exitosamente.');
     }
