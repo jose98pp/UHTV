@@ -217,11 +217,7 @@
     </aside>
   @endif
 
-@if(request()->routeIs('portada'))
-  @include('partials.multimedia-strip', [
-      'contenidos' => $multimediaPortada ?? ($transmisionesRecientes ?? collect())
-  ])
-@endif
+
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {

@@ -46,6 +46,12 @@
         @include('partials.header.navbar')
     </div>
 
+    @if(request()->routeIs('portada'))
+        @include('partials.multimedia-strip', [
+            'contenidos' => $multimediaPortada ?? ($transmisionesRecientes ?? collect())
+        ])
+    @endif
+
     <main class="container my-4">
         @yield('content')
     </main>
