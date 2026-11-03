@@ -321,6 +321,22 @@
                             @endif
                         </a>
                     </li>
+                    @if(auth()->user()->role === 'superadmin')
+                    <li>
+                        <a href="{{ route('admin.billing.index') }}" class="nav-link-admin d-flex align-items-center text-white text-decoration-none py-2 px-3 {{ request()->routeIs('admin.billing.*') ? 'active' : '' }}">
+                            <i class="fas fa-file-invoice-dollar me-3" style="width: 20px;"></i><span>Facturación y control</span>
+                        </a>
+                    </li>
+                    @endif
+                    @if(auth()->user()->role === 'superadmin')
+                    <li>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="nav-link-admin d-flex align-items-center text-white text-decoration-none py-2 px-3 {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                            <i class="fas fa-users-cog me-3" style="width: 20px;"></i>
+                            <span>Usuarios y roles</span>
+                        </a>
+                    </li>
+                    @endif
                     <li>
                         <a href="{{ route('admin.profile.index') }}" 
                            class="nav-link-admin d-flex align-items-center text-white text-decoration-none py-2 px-3 {{ request()->routeIs('admin.profile.*') ? 'active' : '' }}">
@@ -350,7 +366,7 @@
                             <p class="small mb-0 fw-bold text-truncate text-white">{{ auth()->user()->name ?? 'Admin' }}</p>
                             <p class="mb-0 text-white-50 d-flex align-items-center" style="font-size: 0.72rem;">
                                 <span class="d-inline-block rounded-circle bg-success me-1" style="width: 7px; height: 7px;"></span>
-                                {{ auth()->user()->role === 'admin' ? 'Administrador' : 'Editor' }}
+                                {{ ['superadmin' => 'Superadministrador', 'admin' => 'Administrador', 'editor' => 'Editor', 'periodista' => 'Periodista'][auth()->user()->role] ?? 'Usuario' }}
                             </p>
                         </div>
                     </a>
@@ -505,6 +521,13 @@
             
             <!-- Content Area -->
             <main class="flex-fill p-4">
+                @if(isset($adminBillingNotice) && $adminBillingNotice['pending'] && in_array(auth()->user()->role, ['admin', 'superadmin'], true))
+                    <div class="alert alert-warning d-flex align-items-center justify-content-between flex-wrap gap-2 shadow-sm" role="status">
+                        <div><strong><i class="fas fa-file-invoice-dollar me-2"></i>Recordatorio de pago pendiente</strong>
+                            <div class="small">Saldo: {{ $adminBillingNotice['currency'] }} {{ number_format((float)$adminBillingNotice['amount'], 2) }} @if($adminBillingNotice['due_date']) · Vencimiento: {{ $adminBillingNotice['due_date'] }} @endif</div>
+                        </div><span class="badge bg-warning text-dark">Pendiente</span>
+                    </div>
+                @endif
                 <!-- Alerts -->
                 @if(session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">

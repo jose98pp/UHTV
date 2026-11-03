@@ -424,7 +424,7 @@
                         </button>
                         <small class="text-muted">
                             <i class="fas fa-info-circle"></i> 
-                            Los cambios se guardarán automáticamente
+                            Guarda los cambios con el botón
                         </small>
                     </div>
                 </form>
@@ -553,49 +553,7 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-save functionality for profile form
-    const profileForm = document.getElementById('profile-form');
-    const inputs = profileForm.querySelectorAll('input, textarea');
-    
-    let autoSaveTimeout;
-    
-    inputs.forEach(input => {
-        input.addEventListener('input', function() {
-            clearTimeout(autoSaveTimeout);
-            autoSaveTimeout = setTimeout(() => {
-                // Show saving indicator
-                const saveBtn = profileForm.querySelector('button[type="submit"]');
-                const originalText = saveBtn.innerHTML;
-                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-                saveBtn.disabled = true;
-                
-                // Auto-submit form
-                fetch(profileForm.action, {
-                    method: 'POST',
-                    body: new FormData(profileForm),
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        saveBtn.innerHTML = '<i class="fas fa-check"></i> Guardado';
-                        setTimeout(() => {
-                            saveBtn.innerHTML = originalText;
-                            saveBtn.disabled = false;
-                        }, 2000);
-                    }
-                })
-                .catch(error => {
-                    saveBtn.innerHTML = originalText;
-                    saveBtn.disabled = false;
-                });
-            }, 2000);
-        });
-    });
-    
-    // Password strength indicator
+    // El perfil se guarda mediante el envío normal del formulario para mostrar errores de validación.\n    // Password strength indicator
     const passwordInput = document.getElementById('password');
     if (passwordInput) {
         passwordInput.addEventListener('input', function() {
