@@ -41,13 +41,13 @@ class BillingController extends Controller
         foreach (['concept' => 'billing_concept', 'pending_amount' => 'billing_pending_amount', 'currency' => 'billing_currency', 'due_date' => 'billing_due_date', 'courtesy_auto' => 'courtesy_auto', 'courtesy_stage' => 'courtesy_stage', 'courtesy_message' => 'courtesy_message'] as $field => $key) {
             SiteSetting::put($key, $data[$field] ?? '');
         }
-        return back()->with('success', 'Configuración de facturación guardada.');
+        SiteSetting::put('courtesy_override', 'auto');\n        return back()->with('success', 'Configuración de facturación guardada.');
     }
 
     public function toggleCourtesy(Request $request)
     {
         $enabled = $request->validate(['enabled' => ['required', 'boolean']])['enabled'];
-        SiteSetting::put('courtesy_enabled', $enabled ? '1' : '0');
+        SiteSetting::put('courtesy_override', $enabled ? 'on' : 'off');
         return back()->with('success', $enabled ? 'Modo de cortesía activado.' : 'Sitio restaurado a su apariencia normal.');
     }
 
@@ -66,7 +66,7 @@ class BillingController extends Controller
             $balance = max(0, (float) SiteSetting::value('billing_pending_amount', '0') - (float) $data['amount']);
             SiteSetting::put('billing_pending_amount', number_format($balance, 2, '.', ''));
             if ($balance <= 0) {
-                SiteSetting::put('courtesy_enabled', '0');
+                SiteSetting::put('courtesy_override', 'off');
             }
         });
 
