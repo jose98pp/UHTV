@@ -12,15 +12,22 @@ class CourtesyModeMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $isAdmin = $request->is('admin*');
-        $active = filter_var(SiteSetting::value('courtesy_enabled', '0'), FILTER_VALIDATE_BOOLEAN);
         $auto = filter_var(SiteSetting::value('courtesy_auto', '1'), FILTER_VALIDATE_BOOLEAN);
         $dueDate = SiteSetting::value('billing_due_date');
         $stage = (int) SiteSetting::value('courtesy_stage', '1');
+        $override = SiteSetting::value('courtesy_override', 'auto');
 
-        if ($auto && $dueDate && now()->startOfDay()->gt(\Illuminate\Support\Carbon::parse($dueDate)->startOfDay())) {
-            $days = \Illuminate\Support\Carbon::parse($dueDate)->startOfDay()->diffInDays(now()->startOfDay());
-            $stage = $days >= 8 ? 3 : ($days >= 4 ? 2 : 1);
+        // El control manual siempre prevalece sobre la automatización.
+        if ($override === 'on') {
             $active = true;
+        } elseif ($override === 'off') {
+            $active = false;
+        } else {
+            $active = $auto && $dueDate && now()->startOfDay()->gt(\\Illuminate\\Support\\Carbon::parse($dueDate)->startOfDay());
+            if ($active) {
+                $days = \\Illuminate\\Support\\Carbon::parse($dueDate)->startOfDay()->diffInDays(now()->startOfDay());
+                $stage = $days >= 8 ? 3 : ($days >= 4 ? 2 : 1);
+            }
         }
 
         $mode = [
