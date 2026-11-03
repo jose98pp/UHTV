@@ -273,7 +273,7 @@ class NoticiaController extends Controller
         try {
             $validatedData = $request->validated();
             $noticia = Noticia::findOrFail($id);
-            abort_if(auth()->user()->isJournalist() && (int) $noticia->user_id !== (int) auth()->id(), 403);
+            abort_if(auth()->user()->isJournalist() && ((int) $noticia->user_id !== (int) auth()->id() || $noticia->publicada), 403);
 
             // Validate content length
             $contentLengthError = $this->sanitizationService->validateContentLength(
