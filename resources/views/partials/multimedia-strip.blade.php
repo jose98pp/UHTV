@@ -12,15 +12,17 @@
         <div class="container mx-auto px-4 py-2.5">
             <div class="mb-2 flex items-center justify-between gap-3">
                 <div class="flex min-w-0 items-center gap-3">
-                    <span class="inline-flex flex-shrink-0 items-center gap-2 rounded-full bg-gradient-to-r from-purple-700 to-red-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-white shadow-sm">
+                    <a href="{{ route('herencia.index') }}" 
+                       class="inline-flex flex-shrink-0 items-center gap-2 rounded-full bg-gradient-to-r from-purple-700 to-red-600 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-white shadow-sm hover:opacity-95 transition-opacity"
+                       title="Ir a la sección Herencia Invisible">
                         <i class="fas fa-play"></i>
-                        UHTV Play
-                    </span>
+                        Herencia Invisible
+                    </a>
                 </div>
 
-                <a href="{{ route('transmisiones.en-vivo') }}"
+                <a href="{{ route('herencia.index') }}"
                    class="group inline-flex flex-shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-bold text-purple-700 transition-colors hover:bg-purple-50 hover:text-purple-900 dark:text-purple-300 dark:hover:bg-purple-950/50 dark:hover:text-purple-200"
-                   aria-label="Ver todas las transmisiones, podcasts y clips">
+                   aria-label="Ver todos los videos en Herencia Invisible">
                     <span class="hidden sm:inline">Ver todos</span>
                     <i class="fas fa-arrow-right text-[10px] transition-transform group-hover:translate-x-0.5"></i>
                 </a>
@@ -29,7 +31,7 @@
             <div id="multimedia-strip-track"
                  class="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2"
                  style="scrollbar-width: thin; scrollbar-color: #a78bfa transparent;"
-                 aria-label="Contenidos multimedia destacados">
+                 aria-label="Contenidos multimedia de Herencia Invisible">
                 @foreach($stripItems as $item)
                     @php
                         $typeBadgeBg = match($item->tipo ?? 'clip') {
@@ -44,17 +46,21 @@
                             'programa' => 'fas fa-tv',
                             default => 'fas fa-video',
                         };
+                        $targetUrl = isset($item->id)
+                            ? route('herencia.index', ['v' => $item->id])
+                            : (isset($item->youtube_id)
+                                ? route('herencia.index', ['yt' => $item->youtube_id])
+                                : route('herencia.index'));
                     @endphp
-                    <button type="button"
-                            data-open-live-modal
-                            data-stream-embed="{{ $item->embed_url }}"
-                            data-stream-title="{{ $item->titulo }}"
-                            data-stream-platform="{{ $item->plataforma_nombre }}"
-                            data-stream-platform-color="{{ $item->plataforma_color }}"
-                            data-stream-platform-icon="{{ $item->plataforma_icon }}"
-                            data-stream-type="{{ $item->tipo_nombre }}"
-                            class="multimedia-strip-card group flex w-[310px] flex-shrink-0 snap-start items-stretch overflow-hidden rounded-xl border border-gray-200 bg-white text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-purple-300 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:border-gray-700 dark:bg-gray-800 dark:focus:ring-offset-gray-900 sm:w-[350px]"
-                            aria-label="Reproducir {{ $item->tipo_nombre }}: {{ $item->titulo }}">
+                    <a href="{{ $targetUrl }}"
+                       class="multimedia-strip-card group flex w-[310px] flex-shrink-0 snap-start items-stretch overflow-hidden rounded-xl border border-gray-200 bg-white text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-purple-300 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:border-gray-700 dark:bg-gray-800 dark:focus:ring-offset-gray-900 sm:w-[350px]"
+                       data-stream-title="{{ $item->titulo }}"
+                       data-stream-embed="{{ $item->embed_url }}"
+                       data-stream-platform="{{ $item->plataforma_nombre }}"
+                       data-stream-platform-color="{{ $item->plataforma_color }}"
+                       data-stream-platform-icon="{{ $item->plataforma_icon }}"
+                       data-stream-type="{{ $item->tipo_nombre }}"
+                       aria-label="Ver en Herencia Invisible {{ $item->tipo_nombre }}: {{ $item->titulo }}">
 
                         <div class="relative h-[92px] w-[120px] flex-shrink-0 overflow-hidden bg-gray-900 sm:h-[100px] sm:w-[138px]">
                             <img src="{{ $item->effective_thumbnail }}"
@@ -108,7 +114,7 @@
                                 <i class="fas fa-circle-play text-sm text-purple-600 transition-transform group-hover:scale-110 dark:text-purple-400"></i>
                             </div>
                         </div>
-                    </button>
+                    </a>
                 @endforeach
             </div>
         </div>

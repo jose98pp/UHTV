@@ -73,7 +73,7 @@
     <div class="container mx-auto flex items-center justify-between md:justify-start w-full md:w-2/3 uhtv-header-matched-height relative z-10 px-2 sm:px-4 py-1 order-2 md:order-1">
       <!-- Columna Izquierda: Herencia Invisible -->
       <div class="flex items-center justify-start md:w-1/2">
-        <a href="/" class="uhtv-header-heritage-link block w-28 sm:w-44 md:w-52 rounded-xl hover:bg-white/5 transition-all" title="Herencia Invisible">
+        <a href="{{ route('herencia.index') }}" class="uhtv-header-heritage-link block w-28 sm:w-44 md:w-52 rounded-xl hover:bg-white/10 transition-all focus:outline-none focus:ring-2 focus:ring-purple-400/50" title="Herencia Invisible - Videos, Podcasts y En Vivo">
           <span class="sr-only">Herencia Invisible</span>
         </a>
       </div>
