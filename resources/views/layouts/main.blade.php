@@ -39,8 +39,18 @@
             }
         }
     </style>
+    @if(!empty($courtesyMode['active']))
+    <style>
+        body.uhtv-courtesy-stage-1 { filter: saturate(.88) brightness(.985); }
+        body.uhtv-courtesy-stage-2 { filter: saturate(.62) brightness(.96); }
+        body.uhtv-courtesy-stage-3 { filter: saturate(.38) brightness(.93); }
+    </style>
+    @endif
 </head>
-<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 {{ !empty($courtesyMode['active']) ? 'uhtv-courtesy-stage-'.$courtesyMode['stage'] : '' }}">
+    @if(!empty($courtesyMode['active']))
+        <div class="alert alert-warning text-center rounded-0 mb-0 py-2" role="status"><strong>AVISO DE SERVICIO:</strong> {{ $courtesyMode['message'] }}</div>
+    @endif
     <div id="uhtv-sticky-shell">
         @include('partials.header.topbar')
         @include('partials.header.navbar')
