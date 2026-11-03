@@ -36,7 +36,6 @@ class NoticiaController extends Controller
     {
         $query = Noticia::with('category');
         if (auth()->user()->isJournalist()) { $query->where('user_id', auth()->id()); }
-        if (auth()->user()->isJournalist()) { $query->where('user_id', auth()->id()); }
         
         // Calculate statistics before applying filters
         $statistics = $this->calculateNewsStatistics();
@@ -260,7 +259,7 @@ class NoticiaController extends Controller
     public function edit($id)
     {
         $noticia = Noticia::findOrFail($id);
-        abort_if(auth()->user()->isJournalist() && (int) $noticia->user_id !== (int) auth()->id(), 403);
+        abort_if(auth()->user()->isJournalist() && ((int) $noticia->user_id !== (int) auth()->id() || $noticia->publicada), 403);
         $categories = Category::all();
         
         // Add image information for the edit view
@@ -472,6 +471,7 @@ class NoticiaController extends Controller
     public function filter(Request $request)
     {
         $query = Noticia::with('category');
+        if (auth()->user()->isJournalist()) { $query->where('user_id', auth()->id()); }
         
         // Apply filters
         if ($request->filled('search')) {
