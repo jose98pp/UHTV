@@ -109,8 +109,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/noticias/filter', [NoticiaController::class, 'filter'])->name('noticias.filter');
     Route::get('/noticias/create', [NoticiaController::class, 'create'])->name('noticias.create');
     Route::post('/noticias', [NoticiaController::class, 'store'])->name('noticias.store');
-    Route::post('/noticias/bulk-action', [NoticiaController::class, 'bulkAction'])->name('noticias.bulk-action');
-    Route::post('/noticias/{id}/toggle-status', [NoticiaController::class, 'toggleStatus'])->name('noticias.toggle-status');
+    Route::post('/noticias/bulk-action', [NoticiaController::class, 'bulkAction'])->middleware('role:superadmin,admin,editor')->name('noticias.bulk-action');
+    Route::post('/noticias/{id}/toggle-status', [NoticiaController::class, 'toggleStatus'])->middleware('role:superadmin,admin,editor')->name('noticias.toggle-status');
     Route::get('/noticias/{id}/edit', [NoticiaController::class, 'edit'])->name('noticias.edit');
     Route::put('/noticias/{id}', [NoticiaController::class, 'update'])->name('noticias.update');
     Route::delete('/noticias/{id}', [NoticiaController::class, 'destroy'])->name('noticias.destroy');
