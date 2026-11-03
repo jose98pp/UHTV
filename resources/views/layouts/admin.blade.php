@@ -321,6 +321,15 @@
                             @endif
                         </a>
                     </li>
+                    @if(auth()->user()->role === 'superadmin')
+                    <li>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="nav-link-admin d-flex align-items-center text-white text-decoration-none py-2 px-3 {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                            <i class="fas fa-users-cog me-3" style="width: 20px;"></i>
+                            <span>Usuarios y roles</span>
+                        </a>
+                    </li>
+                    @endif
                     <li>
                         <a href="{{ route('admin.profile.index') }}" 
                            class="nav-link-admin d-flex align-items-center text-white text-decoration-none py-2 px-3 {{ request()->routeIs('admin.profile.*') ? 'active' : '' }}">
@@ -350,7 +359,7 @@
                             <p class="small mb-0 fw-bold text-truncate text-white">{{ auth()->user()->name ?? 'Admin' }}</p>
                             <p class="mb-0 text-white-50 d-flex align-items-center" style="font-size: 0.72rem;">
                                 <span class="d-inline-block rounded-circle bg-success me-1" style="width: 7px; height: 7px;"></span>
-                                {{ auth()->user()->role === 'admin' ? 'Administrador' : 'Editor' }}
+                                {{ ['superadmin' => 'Superadministrador', 'admin' => 'Administrador', 'editor' => 'Editor', 'periodista' => 'Periodista'][auth()->user()->role] ?? 'Usuario' }}
                             </p>
                         </div>
                     </a>
