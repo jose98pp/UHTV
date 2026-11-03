@@ -39,7 +39,6 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\ShareCategoriesMiddleware::class,
             \App\Http\Middleware\SecurityHeadersMiddleware::class,
             \App\Http\Middleware\UpdateLastLoginMiddleware::class,
-            \App\Http\Middleware\CourtesyModeMiddleware::class,
         ],
 
         'api' => [
@@ -69,8 +68,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
-        'superadmin' => \App\Http\Middleware\SuperAdminMiddleware::class,
-        'role' => \App\Http\Middleware\RoleMiddleware::class,
     ];
     
 }
