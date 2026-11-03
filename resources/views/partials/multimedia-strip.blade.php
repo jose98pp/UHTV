@@ -1,6 +1,6 @@
 @php
     $stripItems = collect($contenidos ?? [])
-        ->filter(fn ($item) => in_array($item->tipo, ['podcast', 'clip', 'programa'], true) && !$item->en_vivo)
+        ->filter(fn ($item) => in_array($item->tipo ?? 'clip', ['podcast', 'clip', 'programa'], true) && !($item->en_vivo ?? false))
         ->values();
 @endphp
 
@@ -32,7 +32,7 @@
                  aria-label="Contenidos multimedia destacados">
                 @foreach($stripItems as $item)
                     @php
-                        $typeBadgeBg = match($item->tipo) {
+                        $typeBadgeBg = match($item->tipo ?? 'clip') {
                             'podcast' => '#7c3aed',
                             'clip' => '#d97706',
                             'programa' => '#2563eb',
