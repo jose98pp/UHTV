@@ -1,11 +1,11 @@
 <?php
 
-namespace App\\Services;
+namespace App\Services;
 
-use Illuminate\\Support\\Carbon;
-use Illuminate\\Support\\Facades\\Cache;
-use Illuminate\\Support\\Facades\\Http;
-use Illuminate\\Support\\Facades\\Log;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class YouTubeChannelFeedService
 {
@@ -36,7 +36,7 @@ class YouTubeChannelFeedService
                 $previous = libxml_use_internal_errors(true);
                 $xml = simplexml_load_string(
                     $response->body(),
-                    \\SimpleXMLElement::class,
+                    \SimpleXMLElement::class,
                     LIBXML_NONET | LIBXML_NOCDATA
                 );
                 libxml_clear_errors();
@@ -46,9 +46,6 @@ class YouTubeChannelFeedService
                     Log::warning('El feed Atom de YouTube UHTV devolvió XML inválido.');
                     return collect();
                 }
-
-                $xml->registerXPathNamespace('yt', 'http://www.youtube.com/xml/schemas/2015');
-                $xml->registerXPathNamespace('media', 'http://search.yahoo.com/mrss/');
 
                 return collect($xml->entry ?? [])
                     ->take(max(1, min($limit, 20)))
@@ -86,7 +83,7 @@ class YouTubeChannelFeedService
                     })
                     ->filter()
                     ->values();
-            } catch (\\Throwable $e) {
+            } catch (\Throwable $e) {
                 Log::warning('Error al cargar videos recientes del canal UHTV', [
                     'error' => $e->getMessage(),
                 ]);
@@ -102,7 +99,7 @@ class YouTubeChannelFeedService
             return null;
         }
 
-        if (preg_match('~(?:youtu\\.be/|youtube(?:-nocookie)?\\.com/(?:watch\\?v=|embed/|live/|shorts/))([A-Za-z0-9_-]{11})~', $url, $matches)) {
+        if (preg_match('~(?:youtu\.be/|youtube(?:-nocookie)?\.com/(?:watch\?v=|embed/|live/|shorts/))([A-Za-z0-9_-]{11})~', $url, $matches)) {
             return $matches[1];
         }
 
