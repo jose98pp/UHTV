@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Log;
 class YouTubeChannelFeedService
 {
     private const CHANNEL_ID = 'UCx8c9O9qP3IjtnEKkEr-Bng';
+    private const ATOM_NS = 'http://www.w3.org/2005/Atom';
+    private const YOUTUBE_NS = 'http://www.youtube.com/xml/schemas/2015';
+    private const MEDIA_NS = 'http://search.yahoo.com/mrss/';
 
     /**
      * Recupera los videos públicos recientes del canal mediante el feed Atom oficial.
@@ -47,30 +50,36 @@ class YouTubeChannelFeedService
                     return collect();
                 }
 
-                return collect($xml->entry ?? [])
+                $entries = $xml->children(self::ATOM_NS)->entry;
+
+                return collect($entries ?: [])
                     ->take(max(1, min($limit, 20)))
                     ->map(function ($entry) {
-                        $videoIdNodes = $entry->children('http://www.youtube.com/xml/schemas/2015');
-                        $videoId = trim((string) ($videoIdNodes->videoId ?? ''));
+                        $atom = $entry->children(self::ATOM_NS);
+                        $youtube = $entry->children(self::YOUTUBE_NS);
+                        $videoId = trim((string) ($youtube->videoId ?? ''));
 
                         if ($videoId === '') {
                             return null;
                         }
 
-                        $mediaGroup = $entry->children('http://search.yahoo.com/mrss/')->group;
+                        $mediaGroup = $entry->children(self::MEDIA_NS)->group;
                         $thumbnail = null;
-                        if ($mediaGroup && isset($mediaGroup->thumbnail)) {
-                            $thumbnailNode = $mediaGroup->children('http://search.yahoo.com/mrss/')->thumbnail;
-                            $thumbnail = (string) $thumbnailNode->attributes()->url;
+
+                        if ($mediaGroup) {
+                            $thumbnailNode = $mediaGroup->children(self::MEDIA_NS)->thumbnail;
+                            if ($thumbnailNode) {
+                                $thumbnail = (string) $thumbnailNode->attributes()->url;
+                            }
                         }
 
-                        $published = trim((string) ($entry->published ?? ''));
+                        $published = trim((string) ($atom->published ?? ''));
                         $date = $published !== '' ? Carbon::parse($published) : now();
                         $url = 'https://www.youtube.com/watch?v=' . $videoId;
 
                         return (object) [
                             'youtube_id' => $videoId,
-                            'titulo' => trim((string) ($entry->title ?? 'Video de UHTV')),
+                            'titulo' => trim((string) ($atom->title ?? 'Video de UHTV')),
                             'descripcion' => '',
                             'url' => $url,
                             'embed_url' => 'https://www.youtube-nocookie.com/embed/' . $videoId . '?rel=0&playsinline=1',
