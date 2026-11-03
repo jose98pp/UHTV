@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\NoticiaController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Admin\BillingController;
 use App\Http\Controllers\Api\ImageUploadController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\PortadaController;
@@ -93,8 +95,24 @@ Route::get('/dashboard', function () {
 // ---------------------------------
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    // Dashboard del administrador
+    // Dashboard del equipo editorial
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::middleware('superadmin')->prefix('facturacion')->name('billing.')->group(function () {
+        Route::get('/', [BillingController::class, 'index'])->name('index');
+        Route::put('/', [BillingController::class, 'update'])->name('update');
+        Route::post('/cortesia', [BillingController::class, 'toggleCourtesy'])->name('courtesy');
+        Route::post('/pagos', [BillingController::class, 'recordPayment'])->name('payments');
+    });
+
+    Route::middleware('superadmin')->prefix('usuarios')->name('users.')->group(function () {
+        Route::get('/', [UserManagementController::class, 'index'])->name('index');
+        Route::get('/crear', [UserManagementController::class, 'create'])->name('create');
+        Route::post('/', [UserManagementController::class, 'store'])->name('store');
+        Route::get('/{user}/editar', [UserManagementController::class, 'edit'])->name('edit');
+        Route::put('/{user}', [UserManagementController::class, 'update'])->name('update');
+        Route::delete('/{user}', [UserManagementController::class, 'destroy'])->name('destroy');
+    });
     
     // Rutas del perfil del administrador
     Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile.index');
@@ -119,15 +137,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('categorias', CategoryController::class)->middleware('role:superadmin,admin,editor');
 
     // Rutas para el CRUD de banners
-    Route::resource('banners', \App\Http\Controllers\Admin\BannerController::class);
+    Route::resource('banners', \App\Http\Controllers\Admin\BannerController::class)->middleware('role:superadmin,admin,editor');
 
     // Rutas para el CRUD de transmisiones en vivo, podcasts y clips
-    Route::post('transmisiones/preview', [\App\Http\Controllers\Admin\TransmisionController::class, 'preview'])->name('transmisiones.preview');
-    Route::post('transmisiones/{id}/toggle-live', [\App\Http\Controllers\Admin\TransmisionController::class, 'toggleLive'])->name('transmisiones.toggle-live');
-    Route::post('transmisiones/{id}/toggle-active', [\App\Http\Controllers\Admin\TransmisionController::class, 'toggleActive'])->name('transmisiones.toggle-active');
-    Route::delete('transmisiones/{id}', [\App\Http\Controllers\Admin\TransmisionController::class, 'destroy'])->name('transmisiones.destroy');
-    Route::post('transmisiones/{id}/delete', [\App\Http\Controllers\Admin\TransmisionController::class, 'destroy'])->name('transmisiones.delete');
-    Route::resource('transmisiones', \App\Http\Controllers\Admin\TransmisionController::class)->except(['destroy']);
+    Route::post('transmisiones/preview', [\App\Http\Controllers\Admin\TransmisionController::class, 'preview'])->middleware('role:superadmin,admin,editor')->name('transmisiones.preview');
+    Route::post('transmisiones/{id}/toggle-live', [\App\Http\Controllers\Admin\TransmisionController::class, 'toggleLive'])->middleware('role:superadmin,admin,editor')->name('transmisiones.toggle-live');
+    Route::post('transmisiones/{id}/toggle-active', [\App\Http\Controllers\Admin\TransmisionController::class, 'toggleActive'])->middleware('role:superadmin,admin,editor')->name('transmisiones.toggle-active');
+    Route::delete('transmisiones/{id}', [\App\Http\Controllers\Admin\TransmisionController::class, 'destroy'])->middleware('role:superadmin,admin,editor')->name('transmisiones.destroy');
+    Route::post('transmisiones/{id}/delete', [\App\Http\Controllers\Admin\TransmisionController::class, 'destroy'])->middleware('role:superadmin,admin,editor')->name('transmisiones.delete');
+    Route::resource('transmisiones', \App\Http\Controllers\Admin\TransmisionController::class)->except(['destroy'])->middleware('role:superadmin,admin,editor');
 
     // Ruta para cerrar sesión (logout)
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
