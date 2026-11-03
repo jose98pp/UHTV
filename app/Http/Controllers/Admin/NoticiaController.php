@@ -35,6 +35,8 @@ class NoticiaController extends Controller
     public function index(Request $request)
     {
         $query = Noticia::with('category');
+        if (auth()->user()->isJournalist()) { $query->where('user_id', auth()->id()); }
+        if (auth()->user()->isJournalist()) { $query->where('user_id', auth()->id()); }
         
         // Calculate statistics before applying filters
         $statistics = $this->calculateNewsStatistics();
@@ -212,7 +214,7 @@ class NoticiaController extends Controller
             'imagen' => $imagePath,
             'galeria' => !empty($galeriaPaths) ? $galeriaPaths : null,
             'video_youtube' => $this->getYouTubeVideoID($validatedData['video_youtube'] ?? null),
-            'publicada' => $request->has('publicada'),
+            'publicada' => auth()->user()->isJournalist() ? false : $request->has('publicada'),
         ]);
 
         Log::info('Noticia creada', ['noticia_id' => $noticia->id, 'user_id' => auth()->id()]);
@@ -258,6 +260,7 @@ class NoticiaController extends Controller
     public function edit($id)
     {
         $noticia = Noticia::findOrFail($id);
+        abort_if(auth()->user()->isJournalist() && (int) $noticia->user_id !== (int) auth()->id(), 403);
         $categories = Category::all();
         
         // Add image information for the edit view
@@ -271,6 +274,7 @@ class NoticiaController extends Controller
         try {
             $validatedData = $request->validated();
             $noticia = Noticia::findOrFail($id);
+            abort_if(auth()->user()->isJournalist() && (int) $noticia->user_id !== (int) auth()->id(), 403);
 
             // Validate content length
             $contentLengthError = $this->sanitizationService->validateContentLength(
@@ -374,9 +378,9 @@ class NoticiaController extends Controller
                 'titulo' => strip_tags($validatedData['titulo']), // Sanitizar título
                 'contenido' => $this->sanitizationService->sanitizeContent($validatedData['contenido']), // Sanitizar contenido
                 'category_id' => $validatedData['category_id'],
-                'user_id' => auth()->id(), // Mantener el usuario actual
+                'user_id' => $noticia->user_id, // Conservar autor original al editar
                 'video_youtube' => $this->getYouTubeVideoID($validatedData['video_youtube'] ?? null),
-                'publicada' => $request->has('publicada'),
+                'publicada' => auth()->user()->isJournalist() ? (bool) $noticia->publicada : $request->has('publicada'),
             ]);
 
             Log::info('Noticia actualizada', ['noticia_id' => $noticia->id, 'user_id' => auth()->id()]);
@@ -402,6 +406,7 @@ class NoticiaController extends Controller
     {
         try {
             $noticia = Noticia::findOrFail($id);
+            abort_if(auth()->user()->isJournalist() && ((int) $noticia->user_id !== (int) auth()->id() || $noticia->publicada), 403);
 
             // Enhanced image deletion with validation
             if ($noticia->imagen) {
