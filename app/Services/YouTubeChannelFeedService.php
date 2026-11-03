@@ -20,7 +20,7 @@ class YouTubeChannelFeedService
      */
     public function latestVideos(int $limit = 12)
     {
-        return Cache::remember('uhtv_youtube_channel_feed', 600, function () use ($limit) {
+        return Cache::remember('uhtv_youtube_channel_feed_v2', 600, function () use ($limit) {
             try {
                 $response = Http::accept('application/atom+xml')
                     ->withHeaders(['User-Agent' => 'UHTVNewsPortal/1.0'])
