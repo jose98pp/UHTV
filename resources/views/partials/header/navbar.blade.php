@@ -44,11 +44,21 @@
 <!-- Navbar Mejorada -->
 <nav id="category-navigation" class="bg-white dark:bg-gray-900 shadow-xl relative w-full z-50 border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
  <div class="container mx-auto flex justify-between items-center py-4 px-4">
-  <!-- Logo/Inicio -->
-  <a href="/" class="flex items-center space-x-2 text-gray-900 dark:text-gray-100 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-300">
-    <i class="fas fa-home text-xl"></i>
-    <span class="text-xl font-bold">Inicio</span>
-  </a>
+  <div class="flex items-center space-x-3">
+    <!-- Logo/Inicio -->
+    <a href="/" class="flex items-center space-x-2 text-gray-900 dark:text-gray-100 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-300">
+      <i class="fas fa-home text-xl"></i>
+      <span class="text-xl font-bold">Inicio</span>
+    </a>
+
+    <!-- Enlace directo Herencia Adquirida -->
+    <a href="{{ route('herencia.index') }}" 
+       class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-gradient-to-r from-purple-700 via-indigo-600 to-red-600 text-white shadow-md hover:shadow-purple-500/30 hover:scale-105 transition-all duration-300"
+       title="Sección oficial Herencia Adquirida: Videos, Podcasts y Transmisiones">
+      <i class="fas fa-play text-[9px] animate-pulse"></i>
+      <span>Herencia Adquirida</span>
+    </a>
+  </div>
   
   <!-- Botón del menú hamburguesa mejorado -->
   <button id="hamburgerButton" class="lg:hidden text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 focus:outline-none focus:text-purple-600 dark:focus:text-purple-400 transition-colors duration-300">
@@ -112,6 +122,13 @@
       <a href="/" class="flex items-center space-x-3 text-gray-800 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-300 py-3 border-b border-gray-100 dark:border-gray-700">
         <i class="fas fa-home text-lg"></i>
         <span class="font-semibold">Inicio</span>
+      </a>
+      <a href="{{ route('herencia.index') }}" class="flex items-center justify-between text-purple-700 dark:text-purple-300 hover:text-purple-900 font-bold py-3 border-b border-gray-100 dark:border-gray-700 bg-purple-50/60 dark:bg-purple-950/30 px-3 rounded-lg my-1 transition-colors">
+        <span class="flex items-center gap-2.5">
+          <i class="fas fa-play-circle text-lg text-purple-600 dark:text-purple-400"></i>
+          <span>Herencia Adquirida</span>
+        </span>
+        <span class="text-[9px] font-black uppercase tracking-wider bg-purple-600 text-white px-2 py-0.5 rounded-full">Videos & Vivo</span>
       </a>
       @if(isset($transmisionEnVivo) && $transmisionEnVivo)
         <a href="{{ route('transmisiones.en-vivo') }}" class="flex items-center space-x-3 text-red-600 dark:text-red-400 hover:text-red-700 font-semibold py-3 border-b border-gray-100 dark:border-gray-700">

@@ -57,8 +57,8 @@ class AppServiceProvider extends ServiceProvider
             }
         }
 
-        // View Composer para transmisiones en el frontend (layouts.main, portada, modal, etc.)
-        \Illuminate\Support\Facades\View::composer(['layouts.main', 'portada', 'partials.live-modal', 'transmisiones.*'], function ($view) {
+        // View Composer para transmisiones en el frontend (layouts.main, portada, modal, transmisiones y herencia adquirida)
+        \Illuminate\Support\Facades\View::composer(['layouts.main', 'portada', 'partials.live-modal', 'transmisiones.*', 'herencia.*'], function ($view) {
             try {
                 if (\Illuminate\Support\Facades\Schema::hasTable('transmisiones')) {
                     $liveStream = \App\Models\Transmision::enVivo()->first();

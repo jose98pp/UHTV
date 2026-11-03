@@ -40,6 +40,13 @@
             <div>
                 <h4 class="text-lg font-semibold text-white mb-4">Secciones</h4>
                 <ul class="space-y-2">
+                    <li>
+                        <a href="{{ route('herencia.index') }}" 
+                           class="text-purple-400 font-semibold hover:text-purple-300 transition-colors duration-300 text-sm flex items-center gap-1.5">
+                            <i class="fas fa-play-circle text-xs"></i>
+                            Herencia Adquirida (Videos)
+                        </a>
+                    </li>
                     @forelse($categorias ?? [] as $categoria)
                         <li>
                             <a href="{{ $categoria->url }}" 
