@@ -15,7 +15,7 @@ class HerenciaAdquiridaController extends Controller
     ) {}
 
     /**
-     * Vista principal de la sección "Herencia Adquirida"
+     * Vista principal de la sección "Herencia Invisible"
      * Centraliza todos los videos, podcasts, clips y transmisiones en vivo.
      */
     public function index(Request $request)
@@ -131,3 +131,4 @@ class HerenciaAdquiridaController extends Controller
         ));
     }
 }
+

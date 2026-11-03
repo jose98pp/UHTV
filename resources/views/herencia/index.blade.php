@@ -1,14 +1,14 @@
 @extends('layouts.main')
 
-@section('title', 'Herencia Adquirida - Videos, Podcasts y Transmisiones en Vivo | Última Hora TV')
+@section('title', 'Herencia Invisible - Videos, Podcasts y Transmisiones en Vivo | Última Hora TV')
 
-@section('meta_description', 'Disfruta de todos los videos, podcasts, clips informativos y transmisiones en vivo del programa oficial Herencia Adquirida en Última Hora TV.')
+@section('meta_description', 'Disfruta de todos los videos, podcasts, clips informativos y transmisiones en vivo del programa oficial Herencia Invisible en Última Hora TV.')
 
 @section('content')
 <div class="min-h-screen bg-slate-900 text-slate-100 transition-colors duration-300">
 
     <!-- ============================================================
-         1. HERO HEADER: IDENTIDAD Y BRANDING DE HERENCIA ADQUIRIDA
+         1. HERO HEADER: IDENTIDAD Y BRANDING DE HERENCIA INVISIBLE
     ================================================================ -->
     <section class="relative overflow-hidden border-b border-purple-900/40 bg-gradient-to-r from-slate-950 via-purple-950/80 to-slate-950 py-10 sm:py-14">
         <!-- Luces y efectos de fondo -->
@@ -23,7 +23,7 @@
                         <div class="absolute -inset-1 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-red-600 opacity-75 blur transition duration-300 group-hover:opacity-100"></div>
                         <div class="relative h-24 w-24 sm:h-28 sm:w-28 rounded-2xl bg-black p-2 shadow-2xl flex items-center justify-center overflow-hidden border border-white/20">
                             <img src="{{ asset('images/herencia_logo.png') }}"
-                                 alt="Herencia Adquirida"
+                                 alt="Herencia Invisible"
                                  class="h-full w-full object-contain"
                                  loading="eager"
                                  onerror="this.onerror=null;this.src='{{ asset('images/Logo.jpg') }}';">
@@ -45,7 +45,7 @@
                         </div>
 
                         <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white mb-2 leading-tight">
-                            Herencia <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-red-400">Adquirida</span>
+                            Herencia <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-red-400">Invisible</span>
                         </h1>
 
                         <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
@@ -128,7 +128,7 @@
                     <iframe id="herenciaCinemaIframe"
                             class="absolute inset-0 w-full h-full border-0"
                             src="{{ $activeStream->embed_url }}"
-                            title="{{ $activeStream->titulo ?? 'Herencia Adquirida' }}"
+                            title="{{ $activeStream->titulo ?? 'Herencia Invisible' }}"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             allowfullscreen>
                     </iframe>
@@ -187,7 +187,7 @@
                     </div>
 
                     <h2 id="cinemaActiveTitle" class="text-base sm:text-xl font-extrabold text-white leading-snug mb-2">
-                        {{ $activeStream->titulo ?? 'Herencia Adquirida - Contenido Audiovisual' }}
+                        {{ $activeStream->titulo ?? 'Herencia Invisible - Contenido Audiovisual' }}
                     </h2>
 
                     @if(!empty($activeStream->descripcion))
@@ -210,7 +210,7 @@
                 <div>
                     <span class="text-[11px] uppercase font-black tracking-widest text-purple-400">Catálogo Completo</span>
                     <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                        Explorar Contenidos de Herencia Adquirida
+                        Explorar Contenidos de Herencia Invisible
                     </h2>
                     <p class="text-xs sm:text-sm text-slate-400">Filtra por podcasts, transmisiones completas o momentos destacados.</p>
                 </div>
@@ -288,7 +288,7 @@
                             $youtubeId = isset($item->youtube_id) ? $item->youtube_id : null;
                             $thumbnail = $item->effective_thumbnail ?? ($item->thumbnail_url ?? asset('images/Logo.jpg'));
                             $embedUrl = $item->embed_url ?? '';
-                            $titulo = $item->titulo ?? 'Herencia Adquirida';
+                            $titulo = $item->titulo ?? 'Herencia Invisible';
                             $descripcion = $item->descripcion ?? '';
                             $duracion = $item->duracion ?? null;
                             $tipo = $item->tipo ?? 'clip';
@@ -442,7 +442,7 @@
     </section>
 
     <!-- ============================================================
-         4. ACERCA DE HERENCIA ADQUIRIDA / COMUNIDAD
+         4. ACERCA DE HERENCIA INVISIBLE / COMUNIDAD
     ================================================================ -->
     <section class="py-12 bg-slate-950 border-t border-slate-800">
         <div class="container mx-auto px-4 max-w-5xl">
@@ -453,7 +453,7 @@
                         <span>Periodismo Audiovisual de Vanguardia</span>
                     </div>
                     <h3 class="text-xl sm:text-2xl font-black text-white mb-2">
-                        ¿Tienes una historia, denuncia o sugerencia para Herencia Adquirida?
+                        ¿Tienes una historia, denuncia o sugerencia para Herencia Invisible?
                     </h3>
                     <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
                         Nuestro equipo de producción investiga permanentemente temas de impacto social, político y cultural en Bolivia y el mundo. Envíanos tus propuestas o participa en nuestras emisiones en vivo.
@@ -554,12 +554,12 @@ function toggleCinemaFullscreen() {
  */
 function shareCurrentVideo() {
     const url = window.location.href;
-    const title = document.getElementById('cinemaActiveTitle')?.textContent || 'Herencia Adquirida - UHTV';
+    const title = document.getElementById('cinemaActiveTitle')?.textContent || 'Herencia Invisible - UHTV';
 
     if (navigator.share) {
         navigator.share({
             title: title,
-            text: 'Mira este contenido en Herencia Adquirida - Última Hora TV:',
+            text: 'Mira este contenido en Herencia Invisible - Última Hora TV:',
             url: url,
         }).catch(() => {});
     } else {
@@ -600,3 +600,4 @@ function showHerenciaToast(msg) {
 }
 </script>
 @endsection
+

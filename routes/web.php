@@ -27,10 +27,10 @@ Route::get('/buscar', [PortadaController::class, 'search'])->name('search');
 Route::get('/en-vivo', [\App\Http\Controllers\TransmisionPublicController::class, 'index'])->name('transmisiones.en-vivo');
 Route::get('/transmisiones/data/{id}', [\App\Http\Controllers\TransmisionPublicController::class, 'showJson'])->name('transmisiones.json');
 
-// Rutas para la Sección Multimedia Oficial "Herencia Adquirida" (Videos, Podcasts y En Vivo)
-Route::get('/herencia-adquirida', [\App\Http\Controllers\HerenciaAdquiridaController::class, 'index'])->name('herencia.index');
-Route::redirect('/herencia', '/herencia-adquirida', 301);
-Route::redirect('/herencia-invisible', '/herencia-adquirida', 301);
+// Rutas para la Sección Multimedia Oficial "Herencia Invisible" (Videos, Podcasts y En Vivo)
+Route::get('/herencia-invisible', [\App\Http\Controllers\HerenciaAdquiridaController::class, 'index'])->name('herencia.index');
+Route::redirect('/herencia', '/herencia-invisible', 301);
+Route::redirect('/herencia-adquirida', '/herencia-invisible', 301);
 
 // Ruta para Sitemap XML (Google SEO)
 Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');

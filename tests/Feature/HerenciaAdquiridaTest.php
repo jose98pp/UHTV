@@ -11,32 +11,32 @@ class HerenciaAdquiridaTest extends TestCase
     use DatabaseTransactions;
 
     /** @test */
-    public function it_loads_herencia_adquirida_page_successfully()
+    public function it_loads_herencia_invisible_page_successfully()
     {
         $response = $this->get(route('herencia.index'));
 
         $response->assertStatus(200);
         $response->assertSee('Herencia');
-        $response->assertSee('Adquirida');
+        $response->assertSee('Invisible');
         $response->assertSee('Cinema Player');
         $response->assertSee('Catálogo Completo');
         $response->assertSee('Todos los Contenidos');
     }
 
     /** @test */
-    public function it_redirects_legacy_herencia_slugs_to_herencia_adquirida()
+    public function it_redirects_legacy_herencia_slugs_to_herencia_invisible()
     {
         $responseHerencia = $this->get('/herencia');
         $responseHerencia->assertStatus(301);
-        $responseHerencia->assertRedirect('/herencia-adquirida');
+        $responseHerencia->assertRedirect('/herencia-invisible');
 
-        $responseInvisible = $this->get('/herencia-invisible');
-        $responseInvisible->assertStatus(301);
-        $responseInvisible->assertRedirect('/herencia-adquirida');
+        $responseAdquirida = $this->get('/herencia-adquirida');
+        $responseAdquirida->assertStatus(301);
+        $responseAdquirida->assertRedirect('/herencia-invisible');
     }
 
     /** @test */
-    public function it_displays_registered_transmisiones_in_herencia_adquirida()
+    public function it_displays_registered_transmisiones_in_herencia_invisible()
     {
         $podcast = Transmision::create([
             'titulo' => 'Episodio Especial Podcast Herencia',
@@ -113,12 +113,15 @@ class HerenciaAdquiridaTest extends TestCase
     }
 
     /** @test */
-    public function navbar_and_header_contain_links_to_herencia_adquirida()
+    public function header_and_multimedia_strip_link_to_herencia_invisible()
     {
         $response = $this->get('/');
 
         $response->assertStatus(200);
         $response->assertSee(route('herencia.index'));
-        $response->assertSee('Herencia Adquirida');
+        $response->assertSee('Herencia Invisible');
+        
+        // El botón del navbar fue removido según solicitado
+        $response->assertDontSee('Herencia Adquirida');
     }
 }
