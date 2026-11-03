@@ -116,7 +116,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/noticias/{id}', [NoticiaController::class, 'destroy'])->name('noticias.destroy');
 
     // Rutas para el CRUD de categorías
-    Route::resource('categorias', CategoryController::class);
+    Route::resource('categorias', CategoryController::class)->middleware('role:superadmin,admin,editor');
 
     // Rutas para el CRUD de banners
     Route::resource('banners', \App\Http\Controllers\Admin\BannerController::class);
