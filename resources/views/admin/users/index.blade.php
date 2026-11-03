@@ -20,9 +20,9 @@
                     <td class="text-end">
                         @if($user->role !== 'superadmin')
                         <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-primary">Editar</a>
-                        <form method="POST" action="{{ route('admin.users.destroy', $user) }}" class="d-inline" onsubmit="return confirm('¿Eliminar este usuario? Sus noticias se conservarán.');">
+                        <form method="POST" action="{{ route('admin.users.destroy', $user) }}" class="d-inline" onsubmit="return confirm('¿Desactivar este usuario? Sus noticias e historial se conservarán.');">
                             @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+                            <button class="btn btn-sm btn-outline-danger">Desactivar</button>
                         </form>
                         @else <span class="text-muted small">Cuenta protegida</span> @endif
                     </td>
