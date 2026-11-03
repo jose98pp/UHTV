@@ -50,13 +50,13 @@ class User extends Authenticatable
         'password' => 'hashed',
         'is_active' => 'boolean',
     ];
-    /**
-     * Verificar si el usuario es administrador
-     */
-    public function isAdmin()
-    {
-        return $this->role === 'admin';
-    }
+    /** Roles reconocidos por el panel UHTV. */
+    public const ROLES = ['superadmin', 'admin', 'editor', 'periodista'];
+
+    public function isSuperAdmin(): bool { return $this->role === 'superadmin'; }
+    public function isAdmin(): bool { return in_array($this->role, ['superadmin', 'admin'], true); }
+    public function canManageContent(): bool { return in_array($this->role, ['superadmin', 'admin', 'editor'], true); }
+    public function isJournalist(): bool { return $this->role === 'periodista'; }
 
     /**
      * Verificar si el usuario está activo
