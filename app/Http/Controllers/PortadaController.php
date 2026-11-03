@@ -6,6 +6,7 @@ use App\Models\Noticia;
 use App\Models\Category;
 use App\Models\Transmision;
 use App\Services\NewsService;
+use App\Services\YouTubeChannelFeedService;
 use Illuminate\Http\Request;
 
 class PortadaController extends Controller
@@ -18,14 +19,38 @@ class PortadaController extends Controller
     {
         $data = $this->newsService->getHomePageData();
 
+        // Videos públicos recientes del canal: se leen del feed oficial de YouTube
+        // y se combinan con el contenido que el administrador registró manualmente.
+        $feedService = app(YouTubeChannelFeedService::class);
+        $videosCanal = $feedService->latestVideos(12);
+        $videosAdministrados = collect();
+
         try {
-            $data['multimediaPortada'] = Transmision::paraPortada()
+            $videosAdministrados = Transmision::paraPortada()
                 ->take(12)
                 ->get();
+
+            $data['transmisionEnVivo'] = Transmision::enVivo()
+                ->latest('fecha_transmision')
+                ->first();
         } catch (\Throwable $e) {
-            // La portada debe seguir funcionando si la tabla multimedia no está disponible.
-            $data['multimediaPortada'] = collect();
+            // La portada y los videos del canal deben seguir funcionando sin la tabla multimedia.
+            $data['transmisionEnVivo'] = null;
         }
+
+        $idsDelCanal = $videosCanal->pluck('youtube_id')->filter()->all();
+        $videosAdministradosUnicos = $videosAdministrados->reject(function ($video) use ($idsDelCanal, $feedService) {
+            $videoId = $feedService->extractVideoId($video->url ?? '');
+            return $videoId && in_array($videoId, $idsDelCanal, true);
+        });
+
+        // Primero aparecen los últimos videos publicados en YouTube.
+        $data['transmisionesRecientes'] = $videosCanal
+            ->concat($videosAdministradosUnicos)
+            ->take(12)
+            ->values();
+
+        $data['multimediaPortada'] = $data['transmisionesRecientes'];
         
         return view('portada', $data);
     }
