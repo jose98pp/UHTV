@@ -40,6 +40,55 @@
                 height: 56px;
             }
     }
+    /* Corrección aislada del ancho móvil: no altera el sticky ni el diseño desktop. */
+    @media (max-width: 767.98px) {
+        #uhtv-main-header {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+        }
+
+        /* Los widgets pueden pasar a una segunda línea si el ancho no alcanza. */
+        #uhtv-main-header > div:nth-of-type(2) {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            flex-wrap: wrap;
+            row-gap: 6px;
+        }
+
+        #uhtv-main-header > div:nth-of-type(2) > div,
+        #widget-tipo-cambio-bcb,
+        #bcb-pill-btn {
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        #bcb-ticker-display {
+            min-width: 0;
+            max-width: min(42vw, 190px);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        /* Reparte el espacio entre los dos accesos del encabezado. */
+        #uhtv-main-header .uhtv-header-matched-height {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+        }
+
+        #uhtv-main-header .uhtv-header-matched-height > div {
+            flex: 1 1 50%;
+            min-width: 0;
+            max-width: 50%;
+        }
+
+        #uhtv-main-header .uhtv-header-matched-height a {
+            max-width: 100%;
+            min-width: 0;
+        }
+    }
   </style>
 
   <!-- Header Principal con Imagen de Fondo Herencia Invisible + UHTV en Ultra HD -->
